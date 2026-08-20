@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "category": "Communiqué",
+    "title": "Olympiades Nationales d'Intelligence Artificielle : les lauréats distingués",
+    "excerpt": "Les meilleurs jeunes talents béninois en IA ont été sélectionnés lors de la cérémonie du 4 juillet à Sèmè One. Huit d'entre eux constitueront l'équipe nationale aux IOAI 2026 à Astana.",
+    "date": "6 juillet 2026",
+    "image": "/olympiades.jpg",
+    "link": "https://www.gouv.bj/article/3579/",
+    "readTime": "3 min"
+  },
+  {
+    "id": 2,
+    "category": "Communiqué",
+    "title": "Le Bénin lance les Olympiades Nationales d'IA pour sélectionner les talents qui représenteront le pays au Kazakhstan",
+    "excerpt": "Première édition des NOAI pour sélectionner les talents qui représenteront le pays aux Olympiades Internationales d'IA au Kazakhstan du 2 au 8 août 2026.",
+    "date": "28 juin 2026",
+    "image": "",
+    "link": "https://www.gouv.bj/article/3565/",
+    "readTime": "3 min"
+  },
+  {
+    "id": 3,
+    "category": "Dossier",
+    "title": "2ème Conférence des RSSI : le Ministre Akplogan pose la sécurité numérique au cœur de l'ambition de l'État augmenté",
+    "excerpt": "Sous le thème « IA pour la cybersécurité et cybersécurité pour l'IA », la conférence a réuni les responsables de la sécurité des systèmes d'information du secteur public et privé.",
+    "date": "26 juin 2026",
+    "image": "/alaune-cyber.jpg",
+    "link": "https://www.gouv.bj/article/3560/",
+    "readTime": "4 min"
+  },
+  {
+    "id": 4,
+    "category": "Nomination",
+    "title": "Mahuna Akplogan nommé Ministre de la Transformation Digitale et de l'Innovation, en charge de la Stratégie Nationale d'IA",
+    "excerpt": "",
+    "date": "25 mai 2026",
+    "image": "/alaune-partenariat.jpg",
+    "link": "",
+    "readTime": "2 min"
+  },
+  {
+    "id": 5,
+    "category": "Innovation",
+    "title": "GPT.bj, le chatbot gouvernemental béninois, remporte le prix Innovation au Gitex Africa",
+    "excerpt": "",
+    "date": "2025",
+    "image": "/alaune-startups.jpg",
+    "link": "",
+    "readTime": "2 min"
+  },
+  {
+    "id": 6,
+    "category": "IA & Culture",
+    "title": "« J'aime ma langue » : une initiative citoyenne pour intégrer le Fon, le Yoruba et le Bariba dans les modèles d'IA",
+    "excerpt": "",
+    "date": "2025",
+    "image": "/alaune-service.jpg",
+    "link": "",
+    "readTime": "2 min"
+  }
+]

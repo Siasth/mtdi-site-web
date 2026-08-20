@@ -1,0 +1,185 @@
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
+import Link from "next/link";
+
+const VERT = "#162233";
+const JAUNE = "#FFBE00";
+
+const BOX_MINISTER = "#006828";
+const BOX_BLUE = "#0891b2";
+const BOX_ORANGE = "#ea8c00";
+const BOX_GREEN = "#65a30d";
+const BOX_WHITE = "white";
+
+function Box({ label, sub, bg, text = "white", border }: { label: string; sub?: string; bg: string; text?: string; border?: string }) {
+  return (
+    <div
+      className="px-4 py-3 text-center"
+      style={{ background: bg, color: text, border: border || "none" }}
+    >
+      <p className="text-[11px] font-bold leading-tight">{label}</p>
+      {sub && <p className="text-[9px] mt-0.5 opacity-70">{sub}</p>}
+    </div>
+  );
+}
+
+function Connector({ height = 24 }: { height?: number }) {
+  return (
+    <div className="flex justify-center" style={{ height }}>
+      <div className="w-px h-full" style={{ background: "rgba(0,0,0,0.15)" }} />
+    </div>
+  );
+}
+
+function SectionLabel({ children }: { children: string }) {
+  return (
+    <p className="text-center text-xs font-black uppercase tracking-widest text-anthracite/50 my-6">
+      {children}
+    </p>
+  );
+}
+
+export default function OrganigrammePage() {
+  return (
+    <>
+      <Navbar />
+
+      <main style={{ paddingTop: "80px" }}>
+
+        {/* Hero */}
+        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-20" style={{ background: VERT }}>
+          <div className="max-w-7xl mx-auto">
+            <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-4">
+              Le Ministère
+            </p>
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black uppercase leading-none tracking-tight text-white max-w-5xl">
+              <span style={{ color: JAUNE }}>Organigramme</span>
+            </h1>
+          </div>
+        </section>
+
+        {/* Organigramme */}
+        <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle overflow-x-auto">
+          <div className="max-w-5xl mx-auto min-w-[700px]">
+
+            {/* === MINISTRE === */}
+            <div className="flex justify-center">
+              <Box label="MINISTRE" bg={BOX_MINISTER} />
+            </div>
+
+            {/* Rattachements directs au Ministre */}
+            <Connector />
+            <div className="flex justify-center gap-3 flex-wrap">
+              <Box label="Inspection Générale du Ministre" bg={BOX_ORANGE} />
+              <Box label="Secrétariat Particulier" bg={BOX_BLUE} />
+              <Box label="CMAI" bg={BOX_BLUE} />
+              <Box label="CMSIC" bg={BOX_BLUE} />
+              <Box label="C/PIP" bg={BOX_BLUE} />
+            </div>
+            <div className="flex justify-center gap-3 flex-wrap mt-3">
+              <Box label="Cellule de Contrôle des MP" bg={BOX_ORANGE} />
+              <Box label="PRMP" bg={BOX_ORANGE} />
+              <Box label="Assistant du Ministre" bg={BOX_BLUE} />
+              <Box label="Garde du Corps" bg={BOX_BLUE} />
+            </div>
+
+            {/* === CABINET + SECRÉTAIRE GÉNÉRAL === */}
+            <Connector height={32} />
+            <div className="grid grid-cols-2 gap-8">
+              {/* Cabinet */}
+              <div>
+                <SectionLabel>Cabinet</SectionLabel>
+                <div className="flex flex-col items-center gap-2">
+                  <Box label="Directeur de Cabinet" bg={BOX_ORANGE} />
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    <Box label="Assistant DC" bg={BOX_ORANGE} />
+                    <Box label="Secrétariat du Cabinet" bg={BOX_ORANGE} />
+                    <Box label="Point Focal Communication" bg={BOX_ORANGE} />
+                    <Box label="Directeur Adjoint du Cabinet" bg={BOX_ORANGE} />
+                  </div>
+                  <Box label="Conseillers Techniques" bg={BOX_ORANGE} />
+                </div>
+              </div>
+
+              {/* Secrétaire Général */}
+              <div>
+                <SectionLabel>Secrétaire Général</SectionLabel>
+                <div className="flex flex-col items-center gap-2">
+                  <Box label="Secrétaire Général" bg={BOX_BLUE} />
+                  <div className="grid grid-cols-2 gap-2 w-full">
+                    <Box label="Assistant SGM" bg={BOX_BLUE} />
+                    <Box label="Secrétariat du SGM" bg={BOX_BLUE} />
+                    <Box label="CMMR" bg={BOX_BLUE} />
+                    <Box label="CTPR" bg={BOX_BLUE} />
+                  </div>
+                  <Box label="Secrétaire Général Adjoint" bg={BOX_BLUE} />
+                  <div className="grid grid-cols-1 gap-2 w-full">
+                    <Box label="Secrétariat Administratif" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
+                    <Box label="Cellule Juridique" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
+                    <Box label="Commission de Passation des Marchés publics" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
+                    <Box label="Cellule de Pilotage de la réforme Administrative et Institutionnelle" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* === DIRECTIONS CENTRALES === */}
+            <Connector height={32} />
+            <SectionLabel>Directions centrales</SectionLabel>
+            <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+              <Box label="Direction de la Programmation, de l'Administration et des Finances" sub="DPAF" bg={BOX_BLUE} />
+              <Box label="Direction des Systèmes d'Information" sub="DSI" bg={BOX_BLUE} />
+            </div>
+
+            {/* === DIRECTIONS TECHNIQUES === */}
+            <Connector height={32} />
+            <SectionLabel>Directions techniques</SectionLabel>
+            <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
+              <Box label="Direction du Numérique" sub="DN" bg={BOX_BLUE} />
+              <Box label="Direction de la Digitalisation" sub="DD" bg={BOX_BLUE} />
+              <Box label="Direction des Médias" sub="DM" bg={BOX_BLUE} />
+            </div>
+
+            {/* === ORGANISMES SOUS TUTELLE === */}
+            <Connector height={32} />
+            <SectionLabel>Organismes sous tutelle</SectionLabel>
+            <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
+              <Box label="Société Béninoise d'Infrastructures Numériques" sub="SBIN" bg={BOX_GREEN} />
+              <Box label="Agence des Systèmes d'Information et du Numérique" sub="ASIN" bg={BOX_GREEN} />
+            </div>
+
+          </div>
+        </section>
+
+        {/* Lien vers les directions */}
+        <section className="px-4 sm:px-6 lg:px-8 py-12 bg-white" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
+          <div className="max-w-7xl mx-auto flex flex-wrap gap-4">
+            <Link
+              href="/le-ministere/directions"
+              className="inline-flex items-center gap-3 px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:gap-5"
+              style={{ background: VERT, color: "white" }}
+            >
+              Voir les directions
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+            <Link
+              href="/le-ministere/structures"
+              className="inline-flex items-center gap-3 px-6 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:gap-5"
+              style={{ border: `1px solid ${VERT}`, color: VERT }}
+            >
+              Structures sous tutelle
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+
+      </main>
+
+      <Footer />
+    </>
+  );
+}

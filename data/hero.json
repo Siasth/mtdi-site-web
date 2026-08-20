@@ -1,0 +1,7 @@
+[
+  { "id": 1, "src": "/hero-conference.jpg", "alt": "Conférence sur le numérique en Afrique" },
+  { "id": 2, "src": "/hero-graduation.jpg", "alt": "Cérémonie de remise des diplômes" },
+  { "id": 3, "src": "/hero-city.jpg", "alt": "Boulevard de la Marina, Cotonou" },
+  { "id": 4, "src": "/hero-auditorium.jpg", "alt": "Diplômés célébrant leur réussite" },
+  { "id": 5, "src": "/chantier-01-ia.jpg", "alt": "Intelligence artificielle" }
+]

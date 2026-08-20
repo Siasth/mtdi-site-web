@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "number": "01",
+    "title": "Faire du Bénin un leader africain de l'IA",
+    "subtitle": "Stratégie nationale · Vision 2030",
+    "description": "Le Bénin adopte sa stratégie nationale d'intelligence artificielle. Des laboratoires publics, des partenariats internationaux et une gouvernance éthique pour positionner le pays comme référence continentale.",
+    "image": "/chantier-01-ia.jpg",
+    "stats": [
+      { "value": "12", "label": "projets IA en cours" },
+      { "value": "3", "label": "laboratoires publics" },
+      { "value": "2030", "label": "horizon stratégie" }
+    ]
+  },
+  {
+    "id": 2,
+    "number": "02",
+    "title": "Des services publics 100 % numériques",
+    "subtitle": "E-gouvernement · Accessibilité",
+    "description": "Naissance, mariage, impôts, permis : tous les actes de la vie administrative accessibles en ligne, sans déplacement, depuis n'importe quel téléphone.",
+    "image": "/chantier-02-services.jpg",
+    "stats": [
+      { "value": "47", "label": "services dématérialisés" },
+      { "value": "200K+", "label": "usagers actifs" },
+      { "value": "24/7", "label": "disponibilité" }
+    ]
+  },
+  {
+    "id": 3,
+    "number": "03",
+    "title": "Connecter tout le territoire",
+    "subtitle": "Infrastructure · Connectivité",
+    "description": "Fibre optique, 4G étendue, points d'accès communautaires. Aucune commune béninoise ne sera laissée hors du réseau numérique national.",
+    "image": "/chantier-03-connectivite.jpg",
+    "stats": [
+      { "value": "2 000", "label": "km de fibre" },
+      { "value": "14", "label": "nouvelles communes" },
+      { "value": "2028", "label": "objectif 100 %" }
+    ]
+  },
+  {
+    "id": 4,
+    "number": "04",
+    "title": "Former les talents de demain",
+    "subtitle": "Digital Academy · Compétences",
+    "description": "Coding bootcamps, certifications IA, formation des agents de l'État : le Bénin investit dans son capital humain numérique pour les 10 prochaines années.",
+    "image": "/chantier-04-formation.jpg",
+    "stats": [
+      { "value": "5 000", "label": "jeunes formés" },
+      { "value": "200", "label": "agents certifiés" },
+      { "value": "30", "label": "écoles partenaires" }
+    ]
+  },
+  {
+    "id": 5,
+    "number": "05",
+    "title": "Protéger l'espace numérique national",
+    "subtitle": "Cybersécurité · Confiance",
+    "description": "CSIRT national, cadre juridique du numérique, protection des données personnelles. La confiance numérique est un prérequis de la souveraineté.",
+    "image": "/chantier-05-cyber.jpg",
+    "stats": [
+      { "value": "CSIRT.bj", "label": "opérationnel" },
+      { "value": "1 / an", "label": "audit sécurité" },
+      { "value": "24 h", "label": "réponse incidents" }
+    ]
+  }
+]

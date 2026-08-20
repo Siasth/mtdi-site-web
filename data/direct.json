@@ -1,0 +1,46 @@
+{
+  "upcoming": [
+    {
+      "id": 1,
+      "date": "Samedi 2 août 2026 · 09h00",
+      "title": "Olympiades Internationales d'IA 2026 — Cérémonie d'ouverture à Astana",
+      "description": "Retransmission en direct de la cérémonie d'ouverture des IOAI 2026 au Kazakhstan. L'équipe nationale du Bénin (8 jeunes talents) y représentera le pays parmi 60+ nations."
+    },
+    {
+      "id": 2,
+      "date": "Vendredi 8 août 2026 · 15h00",
+      "title": "IOAI 2026 — Cérémonie de clôture et résultats",
+      "description": "Annonce des résultats et remise des médailles des Olympiades Internationales d'Intelligence Artificielle."
+    }
+  ],
+  "replays": [
+    {
+      "id": 1,
+      "title": "Intelligence artificielle : pourquoi un ministère y est dédié — Bénin TV",
+      "source": "Bénin TV",
+      "date": "28 mai 2026",
+      "url": "https://www.youtube.com/watch?v=ANyQSwEspC0"
+    },
+    {
+      "id": 2,
+      "title": "Olympiades de l'IA : le Bénin sème les graines du futur — Bénin TV",
+      "source": "Bénin TV",
+      "date": "27 juin 2026",
+      "url": "https://www.youtube.com/watch?v=TnvuuXZEjCw"
+    },
+    {
+      "id": 3,
+      "title": "NOAI 2026 : le Bénin prépare ses talents pour les Olympiades internationales d'IA",
+      "source": "YouTube",
+      "date": "Juin 2026",
+      "url": "https://www.youtube.com/watch?v=wuvN-U6TT_0"
+    },
+    {
+      "id": 4,
+      "title": "Conférence RSSI 2026 : IA et cybersécurité — Compte rendu",
+      "source": "La Nation",
+      "date": "25 juin 2026",
+      "url": "https://lanation.bj/numerique/conference-des-rssi-les-experts-mobilises-pour-une-cybersecurite-plus-resiliente"
+    }
+  ]
+}
