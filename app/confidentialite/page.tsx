@@ -124,7 +124,7 @@ export default function ConfidentialitePage() {
             <p className="text-anthracite/60 text-sm font-medium leading-relaxed">
               Le Ministère de la Transformation Digitale et de l'Innovation (MTDI) accorde une importance
               particulière à la protection de vos données à caractère personnel. Cette politique décrit
-              quelles données sont collectées sur mtdi.gouv.bj, pourquoi, et comment vous pouvez exercer
+              quelles données sont collectées sur gouv.bj, pourquoi, et comment vous pouvez exercer
               vos droits, conformément à la Loi n°2017-20 du 20 avril 2018 portant Code du numérique
               (Livre 5) et sous le contrôle de l'Autorité de Protection des Données Personnelles (APDP).
             </p>

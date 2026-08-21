@@ -2,12 +2,13 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
+import Image from "next/image";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
-type Partner = { name: string; full: string; description: string; accent: string };
+type Partner = { name: string; full: string; description: string; accent: string; logoSrc?: string };
 
 const partenairesInstitutionnels: Partner[] = [
   {
@@ -21,6 +22,7 @@ const partenairesInstitutionnels: Partner[] = [
     full: "Agence Nationale d'Identification des Personnes",
     description: "Gère l'identité civile et délivre les documents d'identité officiels des citoyens béninois, dont le programme MonIdentité.bj.",
     accent: "#006828",
+    logoSrc: "/logo-anip.png",
   },
   {
     name: "Présidence",
@@ -33,6 +35,7 @@ const partenairesInstitutionnels: Partner[] = [
     full: "Cité de l'Innovation et du Savoir",
     description: "Hub d'innovation et d'entrepreneuriat du Bénin, laboratoire de la transformation digitale africaine situé à Cotonou.",
     accent: "#006828",
+    logoSrc: "/logo-seme-city.svg",
   },
 ];
 const partenairesTechnologiques: Partner[] = [
@@ -138,6 +141,11 @@ export default async function PartenairesPage({ params }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
                   {category.partners.map((partner) => (
                     <div key={partner.name} className="group p-8 bg-white hover:bg-gris-perle transition-colors">
+                      {partner.logoSrc && (
+                        <div className="relative h-8 w-28 mb-4">
+                          <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain object-left" sizes="112px" />
+                        </div>
+                      )}
                       <h3 className="text-anthracite font-black text-base uppercase leading-snug mb-1">{partner.name}</h3>
                       <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: partner.accent }}>{partner.full}</p>
                       <p className="text-anthracite/70 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors">{partner.description}</p>

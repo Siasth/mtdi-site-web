@@ -7,7 +7,7 @@ const sections = [
   {
     title: "1. Éditeur du site",
     content: [
-      "Le présent site, accessible à l'adresse mtdi.gouv.bj, est édité par :",
+      "Le présent site, accessible à l'adresse gouv.bj, est édité par :",
       "Ministère de la Transformation Digitale et de l'Innovation (MTDI)\nRépublique du Bénin",
       "Directeur de la publication : le Ministre de la Transformation Digitale et de l'Innovation.",
     ],

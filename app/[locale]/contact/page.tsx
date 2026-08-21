@@ -10,7 +10,7 @@ const specificContacts = [
   {
     role: "Presse & Accréditations",
     name: "Service Communication",
-    email: "presse@numerique.gouv.bj",
+    email: "presse@gouv.bj",
     phone: "+229 21 30 00 01",
     note: "Pour les demandes d'interview, accréditations et dossiers de presse.",
     accent: VERT,
@@ -18,7 +18,7 @@ const specificContacts = [
   {
     role: "Partenariats & Coopération",
     name: "Direction des Partenariats",
-    email: "partenariats@numerique.gouv.bj",
+    email: "partenariats@gouv.bj",
     phone: "+229 21 30 00 02",
     note: "Organisations internationales, bailleurs de fonds, partenaires techniques.",
     accent: "#7A5800",
@@ -26,7 +26,7 @@ const specificContacts = [
   {
     role: "Réclamations & Signalements",
     name: "Cellule Citoyenne",
-    email: "reclamations@numerique.gouv.bj",
+    email: "reclamations@gouv.bj",
     phone: "+229 21 30 00 03",
     note: "Traitement des signalements et réclamations relatives aux services numériques publics.",
     accent: ROUGE,
@@ -149,10 +149,10 @@ export default async function ContactPage({ params }: Props) {
                       {t.emailGeneral}
                     </p>
                     <a
-                      href="mailto:contact@numerique.gouv.bj"
+                      href="mailto:contact@gouv.bj"
                       className="text-anthracite font-semibold text-sm hover:text-vert-benin transition-colors"
                     >
-                      contact@numerique.gouv.bj
+                      contact@gouv.bj
                     </a>
                   </div>
                 </div>

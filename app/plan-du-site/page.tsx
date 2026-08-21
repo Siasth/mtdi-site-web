@@ -76,7 +76,7 @@ export default function PlanDuSitePage() {
               Plan du Site
             </h1>
             <p className="mt-4 text-white/60 text-sm font-semibold uppercase tracking-widest">
-              Toutes les pages du site numérique.gouv.bj
+              Toutes les pages du site gouv.bj
             </p>
           </div>
         </section>

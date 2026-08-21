@@ -50,7 +50,7 @@ export default async function AccessibilitePage({ params }: Props) {
               1. État de conformité
             </h2>
             <p className="text-anthracite/70 text-sm font-medium leading-relaxed">
-              Le site mtdi.gouv.bj vise une conformité au Référentiel Général d&apos;Amélioration de l&apos;Accessibilité (RGAA) / aux Web Content Accessibility Guidelines (WCAG) 2.1 niveau AA.
+              Le site gouv.bj vise une conformité au Référentiel Général d&apos;Amélioration de l&apos;Accessibilité (RGAA) / aux Web Content Accessibility Guidelines (WCAG) 2.1 niveau AA.
             </p>
           </div>
         </section>

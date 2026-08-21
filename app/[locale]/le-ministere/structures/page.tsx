@@ -2,6 +2,7 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
+import Image from "next/image";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
@@ -21,6 +22,7 @@ const structures = [
     url: "https://celtiis.bj/",
     accent: "#005f99",
     logo: "Celtiis",
+    logoSrc: "/logo-sbin.png",
     label: "Infrastructures numériques & connectivité",
   },
   {
@@ -39,6 +41,7 @@ const structures = [
     url: "https://asin.bj/",
     accent: "#006828",
     logo: "ASIN",
+    logoSrc: "/logo-asin.png",
     label: "Systèmes d'information & cybersécurité",
   },
 ];
@@ -115,8 +118,14 @@ export default async function StructuresPage({ params }: Props) {
                     {/* Left: Identity */}
                     <div className="lg:col-span-2">
                       <div className="flex items-start gap-4 mb-6">
-                        <div className="flex-shrink-0 w-14 h-14 rounded-sm flex items-center justify-center" style={{ background: `${structure.accent}14` }}>
-                          <StructureIcon acronym={structure.acronym} color={structure.accent} />
+                        <div className="flex-shrink-0 w-14 h-14 rounded-sm flex items-center justify-center p-2" style={{ background: `${structure.accent}14` }}>
+                          {structure.logoSrc ? (
+                            <div className="relative w-full h-full">
+                              <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="56px" />
+                            </div>
+                          ) : (
+                            <StructureIcon acronym={structure.acronym} color={structure.accent} />
+                          )}
                         </div>
                         <div>
                           <span className="text-[10px] font-black uppercase tracking-widest block mb-1" style={{ color: structure.accent }}>
@@ -179,8 +188,14 @@ export default async function StructuresPage({ params }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px overflow-hidden" style={{ background: "rgba(0,0,0,0.08)" }}>
               {structures.map((structure) => (
                 <div key={structure.acronym} className="p-8 bg-white text-center">
-                  <div className="w-12 h-12 rounded-sm flex items-center justify-center mx-auto mb-4" style={{ background: `${structure.accent}14` }}>
-                    <StructureIcon acronym={structure.acronym} color={structure.accent} />
+                  <div className="w-12 h-12 rounded-sm flex items-center justify-center mx-auto mb-4 p-2" style={{ background: `${structure.accent}14` }}>
+                    {structure.logoSrc ? (
+                      <div className="relative w-full h-full">
+                        <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="48px" />
+                      </div>
+                    ) : (
+                      <StructureIcon acronym={structure.acronym} color={structure.accent} />
+                    )}
                   </div>
                   <h3 className="text-anthracite font-black text-base uppercase mb-2">{structure.acronym}</h3>
                   <p className="text-anthracite/75 text-xs font-semibold uppercase tracking-wider">{structure.label}</p>

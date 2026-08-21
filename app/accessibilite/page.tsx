@@ -46,7 +46,7 @@ export default function AccessibilitePage() {
               1. État de conformité
             </h2>
             <p className="text-anthracite/70 text-sm font-medium leading-relaxed">
-              Le site mtdi.gouv.bj vise une conformité au Référentiel Général d'Amélioration de l'Accessibilité
+              Le site gouv.bj vise une conformité au Référentiel Général d'Amélioration de l'Accessibilité
               (RGAA) / aux Web Content Accessibility Guidelines (WCAG) 2.1 niveau AA.
             </p>
           </div>
