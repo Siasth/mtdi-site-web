@@ -7,3 +7,12 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+const nextConfig: NextConfig = {
+  images: {
+    qualities: [70, 75, 85],
+  },
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./data/**"],
+  },
+};

@@ -26,25 +26,35 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
+    // MODIFIÉ : tout le bloc fetch est désormais entouré d'un try/catch.
+    // Avant, une erreur réseau ou une réponse non-JSON (ex. page d'erreur HTML
+    // renvoyée par un crash serveur) provoquait une exception non interceptée,
+    // ce qui laissait `loading` bloqué à `true` indéfiniment (spinner infini).
+    // Le catch garantit que `setLoading(false)` est toujours appelé.
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok && data.ok) {
-      // Pas de 2FA → connexion directe
-      router.push(redirect);
-    } else if (res.ok && data.requireCode) {
-      // 2FA activé → passer à l'étape code
-      setStep("code");
-      setMaskedEmail(data.email);
-      setLoading(false);
-      setTimeout(() => codeRefs.current[0]?.focus(), 100);
-    } else {
-      setError(data.error || "Erreur de connexion");
+      if (res.ok && data.ok) {
+        // Pas de 2FA → connexion directe
+        router.push(redirect);
+      } else if (res.ok && data.requireCode) {
+        // 2FA activé → passer à l'étape code
+        setStep("code");
+        setMaskedEmail(data.email);
+        setLoading(false);
+        setTimeout(() => codeRefs.current[0]?.focus(), 100);
+      } else {
+        setError(data.error || "Erreur de connexion");
+        setLoading(false);
+      }
+    } catch {
+      setError("Erreur serveur inattendue. Réessayez.");
       setLoading(false);
     }
   };
@@ -238,121 +248,3 @@ function LoginForm() {
                         <circle cx="12" cy="12" r="10" />
                         <path d="M12 8v4m0 4h.01" strokeLinecap="round" />
                       </svg>
-                      <p className="text-sm font-medium text-red-600">{error}</p>
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={loading || !password}
-                    className="w-full py-3 text-sm font-bold uppercase tracking-wider text-white rounded-lg transition-all disabled:opacity-40"
-                    style={{ background: VERT }}
-                  >
-                    {loading ? (
-                      <span className="inline-flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
-                          <path d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor" className="opacity-75" />
-                        </svg>
-                        Vérification...
-                      </span>
-                    ) : (
-                      "Continuer"
-                    )}
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: `${VERT}14` }}
-                  >
-                    <svg width="22" height="22" fill="none" stroke={VERT} strokeWidth="1.8" viewBox="0 0 24 24">
-                      <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-xl font-bold text-gray-900">Vérification</h2>
-                  <p className="text-sm text-gray-400 mt-1">
-                    Un code à 6 chiffres a été envoyé à <strong className="text-gray-600">{maskedEmail}</strong>
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-                      Code de vérification
-                    </label>
-                    <div className="flex gap-2 justify-between" onPaste={handleCodePaste}>
-                      {code.map((digit, i) => (
-                        <input
-                          key={i}
-                          ref={(el) => { codeRefs.current[i] = el; }}
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={1}
-                          value={digit}
-                          onChange={(e) => handleCodeChange(i, e.target.value)}
-                          onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                          className="w-12 h-14 text-center text-xl font-bold border border-gray-200 rounded-lg text-gray-900 focus:outline-none focus:border-green-600 focus:ring-2 focus:ring-green-600/10 transition-all"
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-red-50 border border-red-100">
-                      <svg width="16" height="16" fill="none" stroke="#DC2626" strokeWidth="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M12 8v4m0 4h.01" strokeLinecap="round" />
-                      </svg>
-                      <p className="text-sm font-medium text-red-600">{error}</p>
-                    </div>
-                  )}
-
-                  {loading && (
-                    <div className="flex items-center justify-center py-2">
-                      <svg className="animate-spin h-5 w-5 text-green-700" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
-                        <path d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor" className="opacity-75" />
-                      </svg>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-2">
-                    <button
-                      onClick={() => { setStep("password"); setError(""); setCode(["", "", "", "", "", ""]); }}
-                      className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      Retour
-                    </button>
-                    <button
-                      onClick={resendCode}
-                      disabled={loading}
-                      className="text-xs font-semibold text-green-700 hover:text-green-900 transition-colors disabled:opacity-40"
-                    >
-                      Renvoyer le code
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          <p className="text-center mt-6 text-white/15 text-[10px] font-medium uppercase tracking-widest">
-            République du Bénin
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
-  );
-}
