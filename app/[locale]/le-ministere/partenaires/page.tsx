@@ -141,11 +141,11 @@ export default async function PartenairesPage({ params }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
                   {category.partners.map((partner) => (
                     <div key={partner.name} className="group p-8 bg-white hover:bg-gris-perle transition-colors">
-                      {partner.logoSrc && (
-                        <div className="relative h-10 w-32 mb-4">
-                          <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain object-left" sizes="128px" />
-                        </div>
-                      )}
+                      <div className="relative h-10 w-full mb-4 flex items-center justify-center">
+                        {partner.logoSrc && (
+                          <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain" sizes="128px" />
+                        )}
+                      </div>
                       <h3 className="text-anthracite font-black text-base uppercase leading-snug mb-1">{partner.name}</h3>
                       <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: partner.accent }}>{partner.full}</p>
                       <p className="text-anthracite/70 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors">{partner.description}</p>
