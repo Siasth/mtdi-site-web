@@ -5,13 +5,17 @@ import Link from "next/link";
 import type { Actualite } from "@/lib/actualites";
 
 const VERT = "#006828";
-const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  "Communiqué": { bg: "#006828", text: "white" },
-  "Discours": { bg: "#FFBE00", text: "#1A1A1A" },
-  "Dossier": { bg: "#EB0000", text: "white" },
-  "Revue de presse": { bg: "#FFBE00", text: "#1A1A1A" },
-};
-const DEFAULT_COLOR = { bg: "rgba(0,0,0,0.08)", text: "#1A1A1A" };
+
+function textColorFor(bgColor: string): string {
+  // Contraste simple : fond clair -> texte foncé, fond foncé -> texte blanc
+  const hex = bgColor.replace("#", "");
+  if (hex.length !== 6) return "white";
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.6 ? "#1A1A1A" : "white";
+}
 
 export default function ActualitesListClient({
   articles,
@@ -66,13 +70,12 @@ export default function ActualitesListClient({
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
             {visible.map((article) => {
-              const colors = CATEGORY_COLORS[article.category] || DEFAULT_COLOR;
               const href = article.hrefExternal || `${prefix}/actualites`;
               const isExternal = !!article.hrefExternal;
               return (
                 <article key={article.id} className="group flex flex-col justify-between p-8 bg-white hover:bg-gris-perle transition-colors" style={{ minHeight: "260px" }}>
                   <div>
-                    <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest mb-5" style={{ background: colors.bg, color: colors.text }}>
+                    <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest mb-5" style={{ background: article.categoryColor, color: textColorFor(article.categoryColor) }}>
                       {article.category}
                     </span>
                     <h2 className="text-anthracite font-black text-base sm:text-lg leading-snug uppercase group-hover:text-anthracite/80 transition-colors">

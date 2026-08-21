@@ -18,6 +18,7 @@ const LABELS: Record<string, string> = {
   administration: "Autres",
   utilisateurs: "Utilisateurs",
   roles: "Rôles & permissions",
+  categories: "Catégories",
   logs: "Journal d'audit",
 };
 

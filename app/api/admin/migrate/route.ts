@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { PERMISSIONS, SUPER_ADMIN_ROLE_NAME } from "@/lib/permissions";
 
 // ============================================================================
 // Route de migration à usage ponctuel, protégée par SETUP_SECRET (la même
@@ -18,6 +19,29 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // ── Synchroniser le catalogue de permissions (nouvelles permissions
+    // ajoutées au fil des modules) et les accorder automatiquement au rôle
+    // Super Admin, sans avoir à rappeler /api/admin/setup.
+    for (const p of PERMISSIONS) {
+      await sql`
+        INSERT INTO permissions (code, module, description)
+        VALUES (${p.code}, ${p.module}, ${p.description})
+        ON CONFLICT (code) DO UPDATE SET module = EXCLUDED.module, description = EXCLUDED.description
+      `;
+    }
+    const superAdminRole = await sql`SELECT id FROM roles WHERE name = ${SUPER_ADMIN_ROLE_NAME}`;
+    if (superAdminRole.rows[0]) {
+      const superAdminRoleId = superAdminRole.rows[0].id;
+      const allPermissions = await sql`SELECT id FROM permissions`;
+      for (const perm of allPermissions.rows) {
+        await sql`
+          INSERT INTO role_permissions (role_id, permission_id)
+          VALUES (${superAdminRoleId}, ${perm.id})
+          ON CONFLICT DO NOTHING
+        `;
+      }
+    }
+
     await sql.query(
       `ALTER TABLE users ADD COLUMN IF NOT EXISTS two_factor_enabled BOOLEAN NOT NULL DEFAULT FALSE`
     );
@@ -57,6 +81,67 @@ export async function POST(req: NextRequest) {
       `CREATE INDEX IF NOT EXISTS idx_actualites_status ON actualites(status) WHERE deleted_at IS NULL`
     );
 
+    // ── Vraie gestion des catégories (remplace le texte libre) ────────────
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id            SERIAL PRIMARY KEY,
+        name_fr       TEXT NOT NULL,
+        name_en       TEXT,
+        color         TEXT NOT NULL DEFAULT '#006828',
+        display_order INTEGER NOT NULL DEFAULT 0,
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at    TIMESTAMPTZ
+      )
+    `);
+
+    const categoriesCount = await sql`SELECT COUNT(*) AS count FROM categories`;
+    if (Number(categoriesCount.rows[0].count) === 0) {
+      const defaultCategories = [
+        { fr: "Communiqué", en: "Press Release", color: "#006828" },
+        { fr: "Discours", en: "Speech", color: "#FFBE00" },
+        { fr: "Dossier", en: "Feature", color: "#EB0000" },
+        { fr: "Revue de presse", en: "Press Review", color: "#0369a1" },
+        { fr: "Nomination", en: "Appointment", color: "#7c3aed" },
+        { fr: "Innovation", en: "Innovation", color: "#0891b2" },
+      ];
+      for (let i = 0; i < defaultCategories.length; i++) {
+        const c = defaultCategories[i];
+        await sql`
+          INSERT INTO categories (name_fr, name_en, color, display_order)
+          VALUES (${c.fr}, ${c.en}, ${c.color}, ${i})
+        `;
+      }
+    }
+
+    // Rattacher les articles à leur catégorie (par correspondance de nom),
+    // une seule fois (idempotent via vérification de la colonne).
+    const categoryColumnCheck = await sql`
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'actualites' AND column_name = 'category_id'
+    `;
+    const categoryColumnAlreadyExisted = categoryColumnCheck.rows.length > 0;
+
+    await sql.query(
+      `ALTER TABLE actualites ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id)`
+    );
+
+    if (!categoryColumnAlreadyExisted) {
+      // Associer chaque article à la catégorie dont le nom FR correspond
+      // (insensible à la casse). Repli sur la première catégorie si aucune
+      // correspondance (ex : "IA & Culture" du jeu de données initial).
+      await sql.query(`
+        UPDATE actualites a
+        SET category_id = c.id
+        FROM categories c
+        WHERE a.category_id IS NULL AND LOWER(a.category) = LOWER(c.name_fr)
+      `);
+      await sql.query(`
+        UPDATE actualites a
+        SET category_id = (SELECT id FROM categories ORDER BY display_order ASC LIMIT 1)
+        WHERE a.category_id IS NULL
+      `);
+    }
+
     const existingCount = await sql`SELECT COUNT(*) AS count FROM actualites`;
     if (Number(existingCount.rows[0].count) === 0) {
       const seedArticles = [
@@ -70,9 +155,12 @@ export async function POST(req: NextRequest) {
 
       for (let i = 0; i < seedArticles.length; i++) {
         const a = seedArticles[i];
+        const catMatch = await sql`SELECT id FROM categories WHERE LOWER(name_fr) = LOWER(${a.category})`;
+        const fallbackCat = await sql`SELECT id FROM categories ORDER BY display_order ASC LIMIT 1`;
+        const categoryId = catMatch.rows[0]?.id ?? fallbackCat.rows[0]?.id ?? null;
         await sql`
-          INSERT INTO actualites (title_fr, excerpt_fr, category, image, href_external, published_at, featured, display_order, read_time, status)
-          VALUES (${a.title}, ${a.excerpt}, ${a.category}, ${a.image}, ${a.link || null}, ${a.date}, ${a.featured}, ${i}, ${a.readTime}, 'publie')
+          INSERT INTO actualites (title_fr, excerpt_fr, category, category_id, image, href_external, published_at, featured, display_order, read_time, status)
+          VALUES (${a.title}, ${a.excerpt}, ${a.category}, ${categoryId}, ${a.image}, ${a.link || null}, ${a.date}, ${a.featured}, ${i}, ${a.readTime}, 'publie')
         `;
       }
     }

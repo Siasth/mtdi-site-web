@@ -14,7 +14,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   archive: { label: "Archivé", className: "bg-slate-200 text-slate-600" },
 };
 
-const KNOWN_CATEGORIES = ["Communiqué", "Discours", "Dossier", "Revue de presse", "Nomination", "Innovation"];
+type Category = { id: number; name_fr: string; name_en: string | null; color: string };
 
 type Article = {
   id: number;
@@ -22,7 +22,8 @@ type Article = {
   title_en: string | null;
   excerpt_fr: string;
   excerpt_en: string | null;
-  category: string;
+  category_id: number | null;
+  cat_name_fr: string | null;
   image: string | null;
   href_external: string | null;
   published_at: string;
@@ -35,13 +36,13 @@ type Article = {
 
 type FormState = {
   titleFr: string; titleEn: string; excerptFr: string; excerptEn: string;
-  category: string; image: string; hrefExternal: string; publishedAt: string;
+  categoryId: number | ""; image: string; hrefExternal: string; publishedAt: string;
   readTime: string; featured: boolean; displayOrder: number; status: string;
 };
 
 const emptyForm: FormState = {
   titleFr: "", titleEn: "", excerptFr: "", excerptEn: "",
-  category: "Communiqué", image: "", hrefExternal: "", publishedAt: new Date().toISOString().slice(0, 10),
+  categoryId: "", image: "", hrefExternal: "", publishedAt: new Date().toISOString().slice(0, 10),
   readTime: "3 min", featured: false, displayOrder: 0, status: "publie",
 };
 
@@ -53,6 +54,7 @@ export default function AdminActualites() {
   const canRestore = useHasPermission("actualites.restaurer");
 
   const [articles, setArticles] = useState<Article[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -62,7 +64,14 @@ export default function AdminActualites() {
 
   function load() {
     setLoading(true);
-    fetch("/api/admin/actualites").then((r) => r.json()).then((d) => { setArticles(d); setLoading(false); });
+    Promise.all([
+      fetch("/api/admin/actualites").then((r) => r.json()),
+      fetch("/api/admin/categories").then((r) => r.json()),
+    ]).then(([articlesData, categoriesData]) => {
+      setArticles(articlesData);
+      setCategories(categoriesData);
+      setLoading(false);
+    });
   }
   useEffect(() => { if (canView) load(); }, [canView]);
 
@@ -78,7 +87,7 @@ export default function AdminActualites() {
   }
 
   function openNew() {
-    setForm(emptyForm);
+    setForm({ ...emptyForm, categoryId: categories[0]?.id ?? "" });
     setActiveLang("fr");
     setEditingId("new");
   }
@@ -87,7 +96,7 @@ export default function AdminActualites() {
     setForm({
       titleFr: a.title_fr, titleEn: a.title_en || "",
       excerptFr: a.excerpt_fr, excerptEn: a.excerpt_en || "",
-      category: a.category, image: a.image || "", hrefExternal: a.href_external || "",
+      categoryId: a.category_id ?? "", image: a.image || "", hrefExternal: a.href_external || "",
       publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
       featured: a.featured, displayOrder: a.display_order, status: a.status,
     });
@@ -178,7 +187,7 @@ export default function AdminActualites() {
                     <span className="text-xs text-amber-600">⚠ non traduit</span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-gray-500">{a.category}</td>
+                <td className="px-5 py-3 text-gray-500">{a.cat_name_fr || "—"}</td>
                 <td className="px-5 py-3">
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_LABELS[a.status]?.className || "bg-gray-100 text-gray-600"}`}>
                     {STATUS_LABELS[a.status]?.label || a.status}
@@ -264,16 +273,15 @@ export default function AdminActualites() {
             <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Catégorie</label>
-                <input
+                <select
                   required
-                  list="categories-suggestions"
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                />
-                <datalist id="categories-suggestions">
-                  {KNOWN_CATEGORIES.map((c) => <option key={c} value={c} />)}
-                </datalist>
+                  value={form.categoryId}
+                  onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                >
+                  <option value="" disabled>Sélectionner...</option>
+                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name_fr}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Statut</label>

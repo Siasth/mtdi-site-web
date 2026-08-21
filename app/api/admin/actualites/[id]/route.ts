@@ -29,7 +29,7 @@ export async function PATCH(
   }
 
   const {
-    titleFr, titleEn, excerptFr, excerptEn, category,
+    titleFr, titleEn, excerptFr, excerptEn, categoryId,
     image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
   } = body;
 
@@ -39,7 +39,7 @@ export async function PATCH(
       title_en = ${titleEn ?? null},
       excerpt_fr = COALESCE(${excerptFr}, excerpt_fr),
       excerpt_en = ${excerptEn ?? null},
-      category = COALESCE(${category}, category),
+      category_id = COALESCE(${categoryId}, category_id),
       image = ${image ?? null},
       href_external = ${hrefExternal ?? null},
       published_at = COALESCE(${publishedAt}, published_at),

@@ -42,6 +42,7 @@ const navItems: NavEntry[] = [
     children: [
       { type: "link", label: "Utilisateurs", href: "/back-office-mtdi/utilisateurs", icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-4a4 4 0 100-8 4 4 0 000 8zm-6 8v-2a4 4 0 013-3.87m9-9.13a4 4 0 010 7.75", perm: "utilisateurs.voir" },
       { type: "link", label: "Rôles & permissions", href: "/back-office-mtdi/roles", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", perm: "roles.voir" },
+      { type: "link", label: "Catégories", href: "/back-office-mtdi/categories", icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 11V6a3 3 0 013-3z", perm: "categories.voir" },
       { type: "link", label: "Journal d'audit", href: "/back-office-mtdi/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4", perm: "logs.voir" },
       { type: "link", label: "Autres", href: "/back-office-mtdi/administration", icon: "M4 6h16M4 12h16M4 18h7", perm: "securite.modifier" },
     ],

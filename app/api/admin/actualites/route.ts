@@ -15,8 +15,10 @@ export async function GET() {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const result = await sql`
-    SELECT * FROM actualites
-    ORDER BY deleted_at NULLS FIRST, published_at DESC, display_order ASC
+    SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
+    FROM actualites a
+    LEFT JOIN categories c ON c.id = a.category_id
+    ORDER BY a.deleted_at NULLS FIRST, a.published_at DESC, a.display_order ASC
   `;
   return NextResponse.json(result.rows);
 }
@@ -29,19 +31,19 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    titleFr, titleEn, excerptFr, excerptEn, category,
+    titleFr, titleEn, excerptFr, excerptEn, categoryId,
     image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
   } = body;
 
-  if (!titleFr || !category || !publishedAt) {
+  if (!titleFr || !categoryId || !publishedAt) {
     return NextResponse.json({ error: "Titre (FR), catégorie et date sont requis" }, { status: 400 });
   }
 
   const result = await sql`
     INSERT INTO actualites
-      (title_fr, title_en, excerpt_fr, excerpt_en, category, image, href_external, published_at, read_time, featured, display_order, status, created_by)
+      (title_fr, title_en, excerpt_fr, excerpt_en, category_id, image, href_external, published_at, read_time, featured, display_order, status, created_by)
     VALUES
-      (${titleFr}, ${titleEn || null}, ${excerptFr || ""}, ${excerptEn || null}, ${category}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
+      (${titleFr}, ${titleEn || null}, ${excerptFr || ""}, ${excerptEn || null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
     RETURNING id
   `;
 

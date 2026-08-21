@@ -10,6 +10,10 @@ export const PERMISSIONS = [
   { code: "actualites.supprimer", module: "actualites", description: "Supprimer (logiquement) une actualité" },
   { code: "actualites.restaurer", module: "actualites", description: "Restaurer une actualité supprimée" },
 
+  // Catégories d'actualités
+  { code: "categories.voir", module: "categories", description: "Voir les catégories" },
+  { code: "categories.gerer", module: "categories", description: "Créer, modifier, supprimer des catégories" },
+
   // Contenu général (hero, chantiers, galerie, direct, ministre, stats)
   { code: "contenu.modifier", module: "contenu", description: "Modifier le contenu des pages (hero, chantiers, galerie, direct, ministre, stats)" },
 
