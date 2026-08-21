@@ -117,11 +117,14 @@ export default async function StructuresPage({ params }: Props) {
                   >
                     {/* Left: Identity */}
                     <div className="lg:col-span-2">
-                      <div className="flex items-start gap-4 mb-6">
-                        <div className="flex-shrink-0 w-14 h-14 rounded-sm flex items-center justify-center p-2" style={{ background: `${structure.accent}14` }}>
+                      <div className="mb-6">
+                        <div
+                          className="h-16 w-40 rounded-md flex items-center justify-center p-3 bg-white mb-4"
+                          style={{ border: "1px solid rgba(0,0,0,0.1)" }}
+                        >
                           {structure.logoSrc ? (
                             <div className="relative w-full h-full">
-                              <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="56px" />
+                              <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="160px" />
                             </div>
                           ) : (
                             <StructureIcon acronym={structure.acronym} color={structure.accent} />
@@ -188,10 +191,13 @@ export default async function StructuresPage({ params }: Props) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px overflow-hidden" style={{ background: "rgba(0,0,0,0.08)" }}>
               {structures.map((structure) => (
                 <div key={structure.acronym} className="p-8 bg-white text-center">
-                  <div className="w-12 h-12 rounded-sm flex items-center justify-center mx-auto mb-4 p-2" style={{ background: `${structure.accent}14` }}>
+                  <div
+                    className="h-14 w-36 rounded-md flex items-center justify-center mx-auto mb-4 p-2.5 bg-white"
+                    style={{ border: "1px solid rgba(0,0,0,0.1)" }}
+                  >
                     {structure.logoSrc ? (
                       <div className="relative w-full h-full">
-                        <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="48px" />
+                        <Image src={structure.logoSrc} alt={`Logo ${structure.acronym}`} fill className="object-contain" sizes="144px" />
                       </div>
                     ) : (
                       <StructureIcon acronym={structure.acronym} color={structure.accent} />

@@ -142,8 +142,8 @@ export default async function PartenairesPage({ params }: Props) {
                   {category.partners.map((partner) => (
                     <div key={partner.name} className="group p-8 bg-white hover:bg-gris-perle transition-colors">
                       {partner.logoSrc && (
-                        <div className="relative h-8 w-28 mb-4">
-                          <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain object-left" sizes="112px" />
+                        <div className="relative h-10 w-32 mb-4">
+                          <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain object-left" sizes="128px" />
                         </div>
                       )}
                       <h3 className="text-anthracite font-black text-base uppercase leading-snug mb-1">{partner.name}</h3>
