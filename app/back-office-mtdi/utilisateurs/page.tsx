@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
+import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
 
@@ -142,21 +143,21 @@ export default function AdminUtilisateurs() {
                 <td className="px-5 py-3 text-gray-400 text-xs">
                   {u.last_login_at ? new Date(u.last_login_at).toLocaleString("fr-FR") : "Jamais"}
                 </td>
-                <td className="px-5 py-3 text-right space-x-2">
-                  {u.deleted_at ? (
-                    <button onClick={() => restoreUser(u)} className="text-xs font-bold text-green-700 hover:underline">
-                      Restaurer
-                    </button>
-                  ) : (
-                    <>
-                      <button onClick={() => toggleStatus(u)} className="text-xs font-bold text-gray-500 hover:underline">
-                        {u.status === "actif" ? "Désactiver" : "Activer"}
-                      </button>
-                      <button onClick={() => removeUser(u)} className="text-xs font-bold text-red-500 hover:underline">
-                        Supprimer
-                      </button>
-                    </>
-                  )}
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-1">
+                    {u.deleted_at ? (
+                      <RestoreIcon label="Restaurer" onClick={() => restoreUser(u)} />
+                    ) : (
+                      <>
+                        {u.status === "actif" ? (
+                          <ToggleOnIcon label="Désactiver" onClick={() => toggleStatus(u)} />
+                        ) : (
+                          <ToggleOffIcon label="Activer" onClick={() => toggleStatus(u)} />
+                        )}
+                        <DeleteIcon label="Supprimer" onClick={() => removeUser(u)} />
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

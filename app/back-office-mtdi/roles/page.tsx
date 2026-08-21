@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
+import { DeleteIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
 
@@ -125,14 +126,12 @@ export default function AdminRoles() {
             </div>
             <p className="text-xs text-gray-400 mb-3">{role.description}</p>
             <p className="text-xs text-gray-500 mb-4">{role.permissions.length} permission(s)</p>
-            <div className="flex gap-3">
+            <div className="flex items-center justify-between gap-3">
               <button onClick={() => openEdit(role)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>
                 Modifier les permissions
               </button>
               {!role.is_system && (
-                <button onClick={() => deleteRole(role)} className="text-xs font-bold text-red-500 hover:underline">
-                  Supprimer
-                </button>
+                <DeleteIcon label="Supprimer le rôle" onClick={() => deleteRole(role)} />
               )}
             </div>
           </div>

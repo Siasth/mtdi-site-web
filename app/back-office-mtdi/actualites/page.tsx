@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
 
@@ -57,6 +58,7 @@ export default function AdminActualites() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
   function load() {
     setLoading(true);
@@ -77,6 +79,7 @@ export default function AdminActualites() {
 
   function openNew() {
     setForm(emptyForm);
+    setActiveLang("fr");
     setEditingId("new");
   }
 
@@ -88,6 +91,7 @@ export default function AdminActualites() {
       publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
       featured: a.featured, displayOrder: a.display_order, status: a.status,
     });
+    setActiveLang("fr");
     setEditingId(a.id);
   }
 
@@ -182,15 +186,17 @@ export default function AdminActualites() {
                 </td>
                 <td className="px-5 py-3 text-gray-400 text-xs">{new Date(a.published_at).toLocaleDateString("fr-FR")}</td>
                 <td className="px-5 py-3">{a.featured ? "✓" : ""}</td>
-                <td className="px-5 py-3 text-right space-x-2">
-                  {a.deleted_at ? (
-                    canRestore && <button onClick={() => handleRestore(a)} className="text-xs font-bold text-green-700 hover:underline">Restaurer</button>
-                  ) : (
-                    <>
-                      {canEdit && <button onClick={() => openEdit(a)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>Modifier</button>}
-                      {canDelete && <button onClick={() => handleDelete(a)} className="text-xs font-bold text-red-500 hover:underline">Supprimer</button>}
-                    </>
-                  )}
+                <td className="px-5 py-3">
+                  <div className="flex items-center justify-end gap-1">
+                    {a.deleted_at ? (
+                      canRestore && <RestoreIcon label="Restaurer" onClick={() => handleRestore(a)} />
+                    ) : (
+                      <>
+                        {canEdit && <EditIcon label="Modifier" onClick={() => openEdit(a)} />}
+                        {canDelete && <DeleteIcon label="Supprimer" onClick={() => handleDelete(a)} />}
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -203,34 +209,61 @@ export default function AdminActualites() {
 
       {editingId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
-          <form onSubmit={handleSave} className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl space-y-4 my-auto">
-            <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvel article" : "Modifier l'article"}</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
-                <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (English)</label>
-                <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          <form onSubmit={handleSave} className="bg-white rounded-xl p-6 w-[90%] max-w-6xl shadow-2xl space-y-5 my-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvel article" : "Modifier l'article"}</h2>
+              {/* Onglets de langue : on édite le FR puis l'EN l'un après l'autre, jamais côte à côte */}
+              <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => setActiveLang("fr")}
+                  className="px-4 py-2"
+                  style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}
+                >
+                  Français
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveLang("en")}
+                  className="px-4 py-2 flex items-center gap-1.5"
+                  style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}
+                >
+                  English
+                  {!form.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
+                </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
-                <MarkdownEditor value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={4} />
+            {activeLang === "fr" ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
+                  <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
+                  <MarkdownEditor value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={6} />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (English)</label>
-                <MarkdownEditor value={form.excerptEn} onChange={(v) => setForm({ ...form, excerptEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} />
+            ) : (
+              <div className="space-y-4">
+                {!form.titleFr && (
+                  <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français (onglet précédent).</p>
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (English)</label>
+                  <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (English)</label>
+                  <MarkdownEditor value={form.excerptEn} onChange={(v) => setForm({ ...form, excerptEn: v })} placeholder="Laisser vide si pas encore traduit" rows={6} />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catégorie</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Catégorie</label>
                 <input
                   required
                   list="categories-suggestions"
@@ -243,7 +276,7 @@ export default function AdminActualites() {
                 </datalist>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Statut</label>
                 <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
@@ -252,19 +285,20 @@ export default function AdminActualites() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Date de publication</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Date de publication</label>
                 <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
-              <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
-              <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
+                <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
+                <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
             </div>
 
             <div>

@@ -15,7 +15,7 @@ const LABELS: Record<string, string> = {
   direct: "Direct",
   ministre: "Mot du Ministre",
   securite: "Mon profil",
-  administration: "Paramètres",
+  administration: "Autres",
   utilisateurs: "Utilisateurs",
   roles: "Rôles & permissions",
   logs: "Journal d'audit",
