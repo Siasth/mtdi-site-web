@@ -27,7 +27,7 @@ const directionsData = [
     name: "Direction du Numérique",
     director: "Geoffroy BONOU",
     description: "La Direction du Numérique est chargée d'élaborer la politique de développement des infrastructures, des usages et des contenus numériques. Elle contribue au pilotage de la stratégie nationale de développement des infrastructures haut débit et très haut débit, veille à la mise en place des infrastructures numériques de télévision et radio, promeut les communications électroniques et incite au développement de l'industrie dans le domaine de l'économie numérique.",
-    accent: "#A07800",
+    accent: "#7A5800",
   },
   {
     type: "Direction technique",
@@ -35,7 +35,7 @@ const directionsData = [
     name: "Direction de la Digitalisation",
     director: "Boris Rodrigue SEHLOUAN Y.M.",
     description: "La Direction de la Digitalisation est chargée de superviser la mise en œuvre du programme de gouvernance électronique de l'État par l'usage des TIC dans l'administration et la dématérialisation des services publics. Elle promeut la transformation digitale des entreprises, contribue au développement des compétences numériques et à la promotion de l'entrepreneuriat numérique, et contribue à l'élaboration de la politique de sécurité numérique et à la mise en œuvre de la stratégie nationale de cybersécurité.",
-    accent: "#A07800",
+    accent: "#7A5800",
   },
   {
     type: "Direction technique",
@@ -90,7 +90,7 @@ export default async function DirectionsCentralesPage({ params }: Props) {
                   <div className="flex flex-wrap items-center gap-3 mb-3">
                     <span
                       className="px-3 py-1 text-[10px] font-black uppercase tracking-widest"
-                      style={{ background: dir.accent, color: dir.accent === "#EB0000" || dir.accent === VERT ? "white" : "#1a1a1a" }}
+                      style={{ background: dir.accent, color: dir.accent === "#EB0000" || dir.accent === VERT || dir.accent === "#7A5800" ? "white" : "#1a1a1a" }}
                     >
                       {dir.acronym}
                     </span>

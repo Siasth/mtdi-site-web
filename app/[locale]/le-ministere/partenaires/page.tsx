@@ -85,7 +85,7 @@ export default async function PartenairesPage({ params }: Props) {
 
   const categories = [
     { label: "Partenaires institutionnels", id: "institutionnels", accent: "#006828", partners: partenairesInstitutionnels },
-    { label: "Partenaires technologiques & internationaux", id: "technologiques", accent: "#A07800", partners: partenairesTechnologiques },
+    { label: "Partenaires technologiques & internationaux", id: "technologiques", accent: "#7A5800", partners: partenairesTechnologiques },
     { label: "Partenaires académiques", id: "academiques", accent: ROUGE, partners: partenairesAcademiques },
   ];
 

@@ -31,7 +31,7 @@ const cabinetMembers = [
     rôle: "Conseillers Techniques (CT)",
     direction: "Cabinet du Ministre",
     description: "Les Conseillers Techniques assistent le Ministre et le Directeur de Cabinet dans l'expertise sectorielle, l'analyse des dossiers et la préparation des décisions stratégiques. Ils interviennent dans les domaines de l'intelligence artificielle, de la transformation digitale, de la cybersécurité, des politiques publiques numériques et de la coopération internationale.",
-    accent: "#A07800",
+    accent: "#7A5800",
     level: 2,
   },
 ];

@@ -89,7 +89,7 @@ export default async function DirectPage({ params }: Props) {
                 {upcomingEvents.map((event) => (
                   <div key={event.id} className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 p-6 sm:p-8 bg-white">
                     <div className="flex-shrink-0 w-full sm:w-52">
-                      <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed" style={{ color: "#A07800" }}>
+                      <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed" style={{ color: "#7A5800" }}>
                         {event.date}
                       </p>
                     </div>

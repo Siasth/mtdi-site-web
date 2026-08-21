@@ -8,7 +8,7 @@ const VERT  = "#162233";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
-const priorityAccents = [VERT, "#A07800", ROUGE, VERT];
+const priorityAccents = [VERT, "#7A5800", ROUGE, VERT];
 
 const priorityIcons = [
   <svg key="01" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">

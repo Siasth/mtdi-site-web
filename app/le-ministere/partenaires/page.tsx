@@ -27,7 +27,7 @@ const categories: PartnerCategory[] = [
   {
     label: "Partenaires technologiques & internationaux",
     id: "technologiques",
-    accent: "#A07800",
+    accent: "#7A5800",
     partners: partenairesTechnologiques,
   },
   {

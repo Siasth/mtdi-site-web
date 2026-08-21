@@ -20,7 +20,7 @@ const specificContacts = [
     email: "partenariats@innovation.gouv.bj",
     phone: "+229 01 21 30 79 39",
     note: "Organisations internationales, bailleurs de fonds, partenaires techniques.",
-    accent: "#A07800",
+    accent: "#7A5800",
   },
   {
     rôle: "Réclamations & Signalements",

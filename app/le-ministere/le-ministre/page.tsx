@@ -23,7 +23,7 @@ const priorities = [
   },
   {
     number: "02",
-    accent: "#A07800",
+    accent: "#7A5800",
     title: "Stratégie nationale d'intelligence artificielle",
     description:
       "Positionner le Bénin comme référence africaine de l'IA en déployant des solutions concrètes dans l'agriculture, la santé, l'éducation et la gouvernance.",

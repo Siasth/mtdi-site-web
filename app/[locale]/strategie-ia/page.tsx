@@ -22,7 +22,7 @@ const piliers = [
   },
   {
     number: "02",
-    accent: "#A07800",
+    accent: "#7A5800",
     title: "Infrastructures IA",
     description: "Souveraineté numérique par le cloud public béninois, des data centers à haute disponibilité et un réseau national d'open data structuré pour l'entraînement des modèles d'IA.",
     icon: (
