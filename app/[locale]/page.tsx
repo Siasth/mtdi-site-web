@@ -24,7 +24,7 @@ export default async function HomePage({ params }: Props) {
       <Navbar locale={locale} dict={dict.nav} />
       <main>
         <HeroSection dict={home} />
-        <AlaUne />
+        <AlaUne locale={locale} />
         <MinistryMessage dict={home} locale={locale} />
         <GrandsChantiers dict={home} chantiersDict={chantiers} />
         <StatsSection dict={home} />

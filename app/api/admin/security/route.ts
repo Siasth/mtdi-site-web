@@ -1,66 +1,85 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readData, writeData } from "@/lib/data";
+import { requireSession, getSetting, setSetting, logAudit } from "@/lib/auth";
+import { hasPerm } from "@/lib/permissions";
+import { testSmtpConnection } from "@/lib/mail";
 
-type Security = {
-  password: string;
-  twoFactorEmail: string;
-  sessionSecret: string;
-};
+function getIp(req: NextRequest): string | null {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+}
 
-// GET : récupérer les paramètres (sans le mot de passe ni le secret)
+type SmtpConfig = { host: string; port: number; user: string; pass: string; from: string };
+
+// Réglages GLOBAUX du site (2FA forcée + SMTP) — réservés à la permission
+// "securite.modifier". Enregistrés en base : pris en compte immédiatement,
+// sans redéploiement.
 export async function GET() {
-  const security = await readData<Security>("security");
+  const session = await requireSession();
+  if (!hasPerm(session, "securite.modifier")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+  const forceTwoFactorAll = (await getSetting<boolean>("force_2fa_all")) ?? false;
+  const smtp = (await getSetting<SmtpConfig>("smtp_config")) ?? null;
+
   return NextResponse.json({
-    twoFactorEmail: security.twoFactorEmail,
-    has2FA: !!security.twoFactorEmail,
+    forceTwoFactorAll,
+    smtp: smtp ? { ...smtp, pass: smtp.pass ? "••••••••" : "" } : null, // le mot de passe n'est jamais renvoyé en clair
   });
 }
 
-// PUT : modifier le mot de passe et/ou l'email 2FA
 export async function PUT(req: NextRequest) {
+  const session = await requireSession();
+  if (!hasPerm(session, "securite.modifier")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+
   const body = await req.json();
-  const security = await readData<Security>("security");
+  const ip = getIp(req);
 
-  // Changement de mot de passe
-  if (body.action === "password") {
-    const { currentPassword, newPassword } = body;
-
-    if (!currentPassword || !newPassword) {
-      return NextResponse.json({ error: "Champs requis manquants" }, { status: 400 });
-    }
-
-    if (currentPassword !== security.password) {
-      return NextResponse.json({ error: "Mot de passe actuel incorrect" }, { status: 401 });
-    }
-
-    if (newPassword.length < 6) {
-      return NextResponse.json({ error: "Le nouveau mot de passe doit contenir au moins 6 caractères" }, { status: 400 });
-    }
-
-    security.password = newPassword;
-    // Renouveler le secret de session pour invalider les sessions existantes
-    security.sessionSecret = `mtdi-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    await writeData("security", security);
-
-    return NextResponse.json({ ok: true, message: "Mot de passe modifié. Vous allez être déconnecté." });
+  if (typeof body.forceTwoFactorAll === "boolean") {
+    await setSetting("force_2fa_all", body.forceTwoFactorAll);
+    await logAudit({ userId: session.id, action: "modifier", module: "securite", details: { forceTwoFactorAll: body.forceTwoFactorAll }, ip });
   }
 
-  // Changement d'email 2FA
-  if (body.action === "2fa") {
-    const { email } = body;
-
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json({ error: "Adresse email invalide" }, { status: 400 });
+  if (body.smtp) {
+    const { host, port, user, pass, from } = body.smtp;
+    if (!host || !port || !user || !from) {
+      return NextResponse.json({ error: "Champs SMTP incomplets (hôte, port, utilisateur, expéditeur requis)" }, { status: 400 });
     }
 
-    security.twoFactorEmail = email || "";
-    await writeData("security", security);
+    // Si le mot de passe envoyé est le masque "••••••••", on garde l'ancien
+    // (l'utilisateur n'a pas voulu le changer).
+    let finalPass = pass;
+    if (pass === "••••••••") {
+      const existing = await getSetting<SmtpConfig>("smtp_config");
+      finalPass = existing?.pass || "";
+    }
 
-    return NextResponse.json({
-      ok: true,
-      message: email ? "2FA activé. Un code sera envoyé à cette adresse lors de la connexion." : "2FA désactivé.",
-    });
+    await setSetting("smtp_config", { host, port: Number(port), user, pass: finalPass, from });
+    await logAudit({ userId: session.id, action: "modifier", module: "securite", details: { action: "smtp_config" }, ip });
   }
 
-  return NextResponse.json({ error: "Action invalide" }, { status: 400 });
+  return NextResponse.json({ ok: true });
+}
+
+// Test d'envoi (bouton "Tester la connexion" dans l'interface)
+export async function POST(req: NextRequest) {
+  const session = await requireSession();
+  if (!hasPerm(session, "securite.modifier")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+
+  const { host, port, user, pass, from } = await req.json();
+
+  let finalPass = pass;
+  if (pass === "••••••••") {
+    const existing = await getSetting<SmtpConfig>("smtp_config");
+    finalPass = existing?.pass || "";
+  }
+
+  try {
+    await testSmtpConnection({ host, port: Number(port), user, pass: finalPass, from });
+    return NextResponse.json({ ok: true, message: "Connexion SMTP réussie." });
+  } catch (err) {
+    return NextResponse.json({ error: `Échec de connexion : ${String(err)}` }, { status: 400 });
+  }
 }

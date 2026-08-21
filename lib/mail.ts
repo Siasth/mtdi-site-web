@@ -1,18 +1,45 @@
 import nodemailer from "nodemailer";
+import { getSetting } from "@/lib/auth";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+type SmtpConfig = {
+  host: string;
+  port: number;
+  user: string;
+  pass: string;
+  from: string;
+};
+
+// Le SMTP est lu EN BASE (table settings, clé "smtp_config") à chaque envoi,
+// avec repli sur les variables d'environnement si rien n'est configuré côté
+// back-office. Ça permet de modifier/activer le SMTP depuis l'interface
+// d'administration du site, sans jamais avoir besoin de redéployer.
+async function getTransporter() {
+  const dbConfig = await getSetting<Partial<SmtpConfig>>("smtp_config");
+
+  const config: SmtpConfig = {
+    host: dbConfig?.host || process.env.SMTP_HOST || "smtp.gmail.com",
+    port: Number(dbConfig?.port || process.env.SMTP_PORT || 587),
+    user: dbConfig?.user || process.env.SMTP_USER || "",
+    pass: dbConfig?.pass || process.env.SMTP_PASS || "",
+    from: dbConfig?.from || process.env.SMTP_FROM || dbConfig?.user || process.env.SMTP_USER || "",
+  };
+
+  return {
+    transporter: nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: false,
+      auth: { user: config.user, pass: config.pass },
+    }),
+    from: config.from,
+  };
+}
 
 export async function sendCode(to: string, code: string): Promise<void> {
+  const { transporter, from } = await getTransporter();
+
   await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+    from,
     to,
     subject: `[MTDI] Code de vérification : ${code}`,
     text: `Votre code de connexion au back-office MTDI est : ${code}\n\nCe code expire dans 5 minutes.\n\nSi vous n'êtes pas à l'origine de cette demande, ignorez ce message.`,
@@ -37,4 +64,16 @@ export async function sendCode(to: string, code: string): Promise<void> {
       </div>
     `,
   });
+}
+
+// Test de connexion SMTP (utilisé par l'écran d'administration pour
+// vérifier une configuration avant de l'enregistrer définitivement).
+export async function testSmtpConnection(config: SmtpConfig): Promise<void> {
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: false,
+    auth: { user: config.user, pass: config.pass },
+  });
+  await transporter.verify();
 }

@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   // config, data/*.json est absent du déploiement et toute lecture échoue
   // en production (fichier introuvable), même si tout fonctionne en local.
   outputFileTracingIncludes: {
-    "/api/**/*": ["./data/**"],
+    "/api/**/*": ["./data/**", "./db/**"],
   },
 };
 

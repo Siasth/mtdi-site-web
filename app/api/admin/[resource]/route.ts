@@ -1,15 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readData, writeData, nextId } from "@/lib/data";
+import { requireSession } from "@/lib/auth";
+import { hasPerm, type PermissionCode } from "@/lib/permissions";
 
 type Params = { params: Promise<{ resource: string }> };
 
-const VALID = ["hero", "actualites", "galerie", "chantiers", "stats", "direct", "ministre"];
+// "actualites" a migré vers la base de données (voir app/api/admin/actualites/)
+// — retiré d'ici pour éviter toute confusion avec l'ancien data/actualites.json.
+const VALID = ["hero", "galerie", "chantiers", "stats", "direct", "ministre"];
+
+function requiredPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer"): PermissionCode {
+  void resource;
+  return "contenu.modifier";
+}
+
+async function checkPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer") {
+  const session = await requireSession();
+  const code = requiredPermission(resource, action);
+  if (!hasPerm(session, code)) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+  return null;
+}
 
 export async function GET(_req: NextRequest, { params }: Params) {
   const { resource } = await params;
   if (!VALID.includes(resource)) {
     return NextResponse.json({ error: "Ressource invalide" }, { status: 404 });
   }
+  const denied = await checkPermission(resource, "voir");
+  if (denied) return denied;
+
   const data = await readData(resource);
   return NextResponse.json(data);
 }
@@ -19,6 +40,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
   if (!VALID.includes(resource)) {
     return NextResponse.json({ error: "Ressource invalide" }, { status: 404 });
   }
+  const denied = await checkPermission(resource, "modifier");
+  if (denied) return denied;
+
   const body = await req.json();
   await writeData(resource, body);
   return NextResponse.json({ ok: true });
@@ -29,8 +53,9 @@ export async function POST(req: NextRequest, { params }: Params) {
   if (!VALID.includes(resource)) {
     return NextResponse.json({ error: "Ressource invalide" }, { status: 404 });
   }
+  const denied = await checkPermission(resource, "creer");
+  if (denied) return denied;
 
-  // For resources that are arrays, add item
   const data = await readData<Record<string, unknown>[] | Record<string, unknown>>(resource);
   const body = await req.json();
 
@@ -41,7 +66,6 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json(newItem, { status: 201 });
   }
 
-  // For objects (direct, ministre), handle nested arrays
   if (body._action === "add" && body._target && typeof data === "object") {
     const obj = data as Record<string, unknown>;
     const arr = obj[body._target];
@@ -65,6 +89,8 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   if (!VALID.includes(resource)) {
     return NextResponse.json({ error: "Ressource invalide" }, { status: 404 });
   }
+  const denied = await checkPermission(resource, "supprimer");
+  if (denied) return denied;
 
   const { searchParams } = new URL(req.url);
   const id = Number(searchParams.get("id"));
@@ -78,7 +104,6 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: true });
   }
 
-  // For objects with nested arrays (direct)
   if (target && typeof data === "object") {
     const obj = data as Record<string, unknown>;
     const arr = obj[target];

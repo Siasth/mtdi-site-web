@@ -1,223 +1,301 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import MarkdownEditor from "../components/MarkdownEditor";
+
+const VERT = "#006828";
+
+const STATUS_LABELS: Record<string, { label: string; className: string }> = {
+  brouillon: { label: "Brouillon", className: "bg-gray-100 text-gray-600" },
+  publie: { label: "Publié", className: "bg-green-100 text-green-700" },
+  depublie: { label: "Dépublié", className: "bg-amber-100 text-amber-700" },
+  archive: { label: "Archivé", className: "bg-slate-200 text-slate-600" },
+};
+
+const KNOWN_CATEGORIES = ["Communiqué", "Discours", "Dossier", "Revue de presse", "Nomination", "Innovation"];
 
 type Article = {
   id: number;
+  title_fr: string;
+  title_en: string | null;
+  excerpt_fr: string;
+  excerpt_en: string | null;
   category: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  image: string;
-  link: string;
-  readTime: string;
+  image: string | null;
+  href_external: string | null;
+  published_at: string;
+  read_time: string;
+  featured: boolean;
+  display_order: number;
+  status: string;
+  deleted_at: string | null;
 };
 
-const emptyArticle: Omit<Article, "id"> = {
-  category: "",
-  title: "",
-  excerpt: "",
-  date: "",
-  image: "",
-  link: "",
-  readTime: "3 min",
+type FormState = {
+  titleFr: string; titleEn: string; excerptFr: string; excerptEn: string;
+  category: string; image: string; hrefExternal: string; publishedAt: string;
+  readTime: string; featured: boolean; displayOrder: number; status: string;
 };
 
-export default function AdminActualités() {
+const emptyForm: FormState = {
+  titleFr: "", titleEn: "", excerptFr: "", excerptEn: "",
+  category: "Communiqué", image: "", hrefExternal: "", publishedAt: new Date().toISOString().slice(0, 10),
+  readTime: "3 min", featured: false, displayOrder: 0, status: "publie",
+};
+
+export default function AdminActualites() {
+  const canView = useHasPermission("actualites.voir");
+  const canCreate = useHasPermission("actualites.creer");
+  const canEdit = useHasPermission("actualites.modifier");
+  const canDelete = useHasPermission("actualites.supprimer");
+  const canRestore = useHasPermission("actualites.restaurer");
+
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Article | null>(null);
-  const [isNew, setIsNew] = useState(false);
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const load = () => {
+  function load() {
+    setLoading(true);
     fetch("/api/admin/actualites").then((r) => r.json()).then((d) => { setArticles(d); setLoading(false); });
-  };
-  useEffect(load, []);
+  }
+  useEffect(() => { if (canView) load(); }, [canView]);
 
-  const openNew = () => {
-    setEditing({ ...emptyArticle, id: 0 });
-    setIsNew(true);
-  };
+  if (!canView) {
+    return (
+      <div className="p-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center max-w-md mx-auto mt-12">
+          <p className="font-bold text-gray-900 mb-1">Accès refusé</p>
+          <p className="text-sm text-gray-500">Vous n'avez pas la permission de consulter cette page.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const openEdit = (a: Article) => {
-    setEditing({ ...a });
-    setIsNew(false);
-  };
+  function openNew() {
+    setForm(emptyForm);
+    setEditingId("new");
+  }
 
-  const close = () => { setEditing(null); setIsNew(false); };
+  function openEdit(a: Article) {
+    setForm({
+      titleFr: a.title_fr, titleEn: a.title_en || "",
+      excerptFr: a.excerpt_fr, excerptEn: a.excerpt_en || "",
+      category: a.category, image: a.image || "", hrefExternal: a.href_external || "",
+      publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
+      featured: a.featured, displayOrder: a.display_order, status: a.status,
+    });
+    setEditingId(a.id);
+  }
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !editing) return;
+    if (!file) return;
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
     const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
     const { url } = await res.json();
-    setEditing({ ...editing, image: url });
+    setForm((f) => ({ ...f, image: url }));
     setUploading(false);
-  };
+    e.target.value = "";
+  }
 
-  const saveArticle = async () => {
-    if (!editing) return;
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
     setSaving(true);
-    if (isNew) {
-      const { id, ...data } = editing;
-      void id;
-      await fetch("/api/admin/actualites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-    } else {
-      const updated = articles.map((a) => (a.id === editing.id ? editing : a));
-      await fetch("/api/admin/actualites", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated),
-      });
-    }
-    close();
+    const isNew = editingId === "new";
+    const url = isNew ? "/api/admin/actualites" : `/api/admin/actualites/${editingId}`;
+    await fetch(url, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
     setSaving(false);
+    setEditingId(null);
     load();
-  };
+  }
 
-  const deleteArticle = async (id: number) => {
-    await fetch(`/api/admin/actualites?id=${id}`, { method: "DELETE" });
+  async function handleDelete(a: Article) {
+    if (!confirm(`Supprimer "${a.title_fr}" ? (réversible)`)) return;
+    await fetch(`/api/admin/actualites/${a.id}`, { method: "DELETE" });
     load();
-  };
+  }
+
+  async function handleRestore(a: Article) {
+    await fetch(`/api/admin/actualites/${a.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restore: true }),
+    });
+    load();
+  }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Actualités</h1>
-          <p className="text-sm text-gray-500 mt-1">{articles.length} article(s)</p>
+          <p className="text-sm text-gray-500 mt-1">Gérez les articles affichés sur le site (FR / EN)</p>
         </div>
-        <button
-          onClick={openNew}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors"
-        >
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M12 4v16m8-8H4" strokeLinecap="round" />
-          </svg>
-          Nouvel article
-        </button>
+        {canCreate && (
+          <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+            + Nouvel article
+          </button>
+        )}
       </div>
 
-      {/* Articles list */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-100 text-left">
-              <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Titre</th>
-              <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Catégorie</th>
-              <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Date</th>
-              <th className="px-5 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider w-24">Actions</th>
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+            <tr>
+              <th className="px-5 py-3">Titre (FR)</th>
+              <th className="px-5 py-3">Traduction EN</th>
+              <th className="px-5 py-3">Catégorie</th>
+              <th className="px-5 py-3">Statut</th>
+              <th className="px-5 py-3">Date</th>
+              <th className="px-5 py-3">À la une</th>
+              <th className="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {articles.map((a) => (
-              <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    {a.image && (
-                      /* eslint-disable-next-line @next/next/no-img-élément */
-                      <img src={a.image} alt="" className="w-12 h-8 object-cover rounded bg-gray-100 flex-shrink-0" />
-                    )}
-                    <span className="text-sm font-medium text-gray-900 line-clamp-2">{a.title}</span>
-                  </div>
+              <tr key={a.id} className={a.deleted_at ? "opacity-40" : ""}>
+                <td className="px-5 py-3 font-medium text-gray-900 max-w-xs">{a.title_fr}</td>
+                <td className="px-5 py-3">
+                  {a.title_en ? (
+                    <span className="text-xs text-green-700">✓ traduit</span>
+                  ) : (
+                    <span className="text-xs text-amber-600">⚠ non traduit</span>
+                  )}
                 </td>
-                <td className="px-5 py-4">
-                  <span className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
-                    {a.category}
+                <td className="px-5 py-3 text-gray-500">{a.category}</td>
+                <td className="px-5 py-3">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_LABELS[a.status]?.className || "bg-gray-100 text-gray-600"}`}>
+                    {STATUS_LABELS[a.status]?.label || a.status}
                   </span>
                 </td>
-                <td className="px-5 py-4 text-sm text-gray-500">{a.date}</td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => openEdit(a)} className="p-1.5 text-gray-400 hover:text-green-700 rounded transition-colors" title="Modifier">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                    <button onClick={() => deleteArticle(a.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors" title="Supprimer">
-                      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-                  </div>
+                <td className="px-5 py-3 text-gray-400 text-xs">{new Date(a.published_at).toLocaleDateString("fr-FR")}</td>
+                <td className="px-5 py-3">{a.featured ? "✓" : ""}</td>
+                <td className="px-5 py-3 text-right space-x-2">
+                  {a.deleted_at ? (
+                    canRestore && <button onClick={() => handleRestore(a)} className="text-xs font-bold text-green-700 hover:underline">Restaurer</button>
+                  ) : (
+                    <>
+                      {canEdit && <button onClick={() => openEdit(a)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>Modifier</button>}
+                      {canDelete && <button onClick={() => handleDelete(a)} className="text-xs font-bold text-red-500 hover:underline">Supprimer</button>}
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
+            {articles.length === 0 && (
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">Aucun article</td></tr>
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Edit/Create modal */}
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={close}>
-          <div className="bg-white rounded-2xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">{isNew ? "Nouvel article" : "Modifier l'article"}</h2>
-              <button onClick={close} className="p-1 text-gray-400 hover:text-gray-600">
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+      {editingId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
+          <form onSubmit={handleSave} className="bg-white rounded-xl p-6 max-w-2xl w-full shadow-2xl space-y-4 my-auto">
+            <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvel article" : "Modifier l'article"}</h2>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
+                <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (English)</label>
+                <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
+                <MarkdownEditor value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={4} />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (English)</label>
+                <MarkdownEditor value={form.excerptEn} onChange={(v) => setForm({ ...form, excerptEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catégorie</label>
+                <input
+                  required
+                  list="categories-suggestions"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                />
+                <datalist id="categories-suggestions">
+                  {KNOWN_CATEGORIES.map((c) => <option key={c} value={c} />)}
+                </datalist>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
+                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <option value="brouillon">Brouillon</option>
+                  <option value="publie">Publié</option>
+                  <option value="depublie">Dépublié</option>
+                  <option value="archive">Archivé</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Date de publication</label>
+                <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
+              <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
+              <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
+              {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                {uploading ? "Envoi..." : "Choisir une image"}
+                <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
+              </label>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+                Afficher dans "À la une"
+              </label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-700">Ordre d'affichage</label>
+                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setEditingId(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
+                Annuler
+              </button>
+              <button type="submit" disabled={saving} className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+                {saving ? "Enregistrement..." : "Enregistrer"}
               </button>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre *</label>
-                <input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Catégorie</label>
-                  <input value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Date</label>
-                  <input value={editing.date} onChange={(e) => setEditing({ ...editing, date: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Extrait</label>
-                <textarea value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600 resize-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Lien externe</label>
-                <input value={editing.link} onChange={(e) => setEditing({ ...editing, link: e.target.value })} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Temps de lecture</label>
-                <input value={editing.readTime} onChange={(e) => setEditing({ ...editing, readTime: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Image</label>
-                <div className="flex items-center gap-3">
-                  {editing.image && (
-                    /* eslint-disable-next-line @next/next/no-img-élément */
-                    <img src={editing.image} alt="" className="w-20 h-14 object-cover rounded bg-gray-100" />
-                  )}
-                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
-                    {uploading ? "Envoi..." : "Choisir une image"}
-                    <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={close} className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Annuler</button>
-              <button onClick={saveArticle} disabled={saving} className="px-6 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors disabled:opacity-50">
-                {saving ? "Sauvegarde..." : "Enregistrer"}
-              </button>
-            </div>
-          </div>
+          </form>
         </div>
       )}
     </div>

@@ -32,29 +32,27 @@ function detectLocale(pathname: string): { locale: Locale; isEnglish: boolean } 
 
 function handleAuth(req: NextRequest, pathname: string): NextResponse | null {
   const isBackOffice = pathname.startsWith("/back-office-mtdi");
-  const isAdminApi = pathname.startsWith("/api/admin");
+  // /api/admin/setup et /api/admin/migrate ont leur propre protection
+  // (SETUP_SECRET) : ce sont des routes d'amorçage/maintenance appelées sans
+  // qu'une session ne puisse forcément exister, donc exclues de la garde
+  // par cookie ci-dessous.
+  const isAdminApi =
+    pathname.startsWith("/api/admin") &&
+    pathname !== "/api/admin/setup" &&
+    pathname !== "/api/admin/migrate";
 
   if (!isBackOffice && !isAdminApi) return null;
 
-  const token = req.cookies.get("mtdi-auth")?.value;
+  // Contrôle RAPIDE (présence du cookie uniquement) : le middleware tourne en
+  // Edge Runtime et ne peut pas interroger la base Postgres. La validation
+  // stricte (session valide en base, non révoquée, non expirée par
+  // inactivité) est faite par requireSession() dans le layout du back-office
+  // (Server Component, Node.js runtime) et dans chaque route /api/admin/*.
+  const token = req.cookies.get("mtdi-session")?.value;
 
   if (!token) {
     if (isAdminApi) {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  try {
-    const decoded = atob(token);
-    if (!decoded.startsWith("mtdi-session:")) {
-      throw new Error("Invalid token");
-    }
-  } catch {
-    if (isAdminApi) {
-      return NextResponse.json({ error: "Session expirée" }, { status: 401 });
     }
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
