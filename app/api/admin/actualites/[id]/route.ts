@@ -33,6 +33,19 @@ export async function PATCH(
     image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
   } = body;
 
+  if (featured === true) {
+    const count = await sql`
+      SELECT COUNT(*) AS count FROM actualites
+      WHERE featured = TRUE AND deleted_at IS NULL AND status = 'publie' AND id != ${id}
+    `;
+    if (Number(count.rows[0].count) >= 8) {
+      return NextResponse.json(
+        { error: "Maximum 8 articles \"à la une\" actifs simultanément (RM-002). Retirez-en un avant d'en ajouter un nouveau." },
+        { status: 400 }
+      );
+    }
+  }
+
   await sql`
     UPDATE actualites SET
       title_fr = COALESCE(${titleFr}, title_fr),

@@ -64,7 +64,7 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
   return result.rows.map((r) => mapRow(r, locale));
 }
 
-export async function getFeaturedActualites(locale: Locale, limit = 3): Promise<Actualite[]> {
+export async function getFeaturedActualites(locale: Locale, limit = 8): Promise<Actualite[]> {
   const result = await sql`
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
     FROM actualites a

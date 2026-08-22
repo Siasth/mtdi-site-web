@@ -89,6 +89,7 @@ export default function AdminActualites() {
   function openNew() {
     setForm({ ...emptyForm, categoryId: categories[0]?.id ?? "" });
     setActiveLang("fr");
+    setSaveError("");
     setEditingId("new");
   }
 
@@ -101,6 +102,7 @@ export default function AdminActualites() {
       featured: a.featured, displayOrder: a.display_order, status: a.status,
     });
     setActiveLang("fr");
+    setSaveError("");
     setEditingId(a.id);
   }
 
@@ -117,19 +119,28 @@ export default function AdminActualites() {
     e.target.value = "";
   }
 
+  const [saveError, setSaveError] = useState("");
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
+    setSaveError("");
     const isNew = editingId === "new";
     const url = isNew ? "/api/admin/actualites" : `/api/admin/actualites/${editingId}`;
-    await fetch(url, {
+    const res = await fetch(url, {
       method: isNew ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    setSaving(false);
-    setEditingId(null);
-    load();
+    if (res.ok) {
+      setSaving(false);
+      setEditingId(null);
+      load();
+    } else {
+      const data = await res.json();
+      setSaveError(data.error || "Erreur lors de l'enregistrement");
+      setSaving(false);
+    }
   }
 
   async function handleDelete(a: Article) {
@@ -322,12 +333,21 @@ export default function AdminActualites() {
               <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
                 Afficher dans "À la une"
+                <span className="text-xs text-gray-400">
+                  ({articles.filter((a) => a.featured && a.status === "publie" && !a.deleted_at && a.id !== editingId).length}/8)
+                </span>
               </label>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-700">Ordre d'affichage</label>
                 <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
+
+            {saveError && (
+              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+                <p className="text-sm font-medium text-red-600">{saveError}</p>
+              </div>
+            )}
 
             <div className="flex gap-2 pt-2">
               <button type="button" onClick={() => setEditingId(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
