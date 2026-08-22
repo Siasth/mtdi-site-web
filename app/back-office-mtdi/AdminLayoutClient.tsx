@@ -40,6 +40,7 @@ const navItems: NavEntry[] = [
     label: "Paramètres",
     icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z",
     children: [
+      { type: "link", label: "Général", href: "/back-office-mtdi/general", icon: "M12 2L3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7z", perm: "parametres.modifier" },
       { type: "link", label: "Utilisateurs", href: "/back-office-mtdi/utilisateurs", icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-4a4 4 0 100-8 4 4 0 000 8zm-6 8v-2a4 4 0 013-3.87m9-9.13a4 4 0 010 7.75", perm: "utilisateurs.voir" },
       { type: "link", label: "Rôles & permissions", href: "/back-office-mtdi/roles", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", perm: "roles.voir" },
       { type: "link", label: "Catégories", href: "/back-office-mtdi/categories", icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 11V6a3 3 0 013-3z", perm: "categories.voir" },

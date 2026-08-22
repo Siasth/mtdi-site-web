@@ -32,6 +32,9 @@ export const PERMISSIONS = [
 
   // Sécurité
   { code: "securite.modifier", module: "securite", description: "Modifier les paramètres de sécurité globaux" },
+
+  // Paramètres généraux du site (nom, logos, réseaux sociaux)
+  { code: "parametres.modifier", module: "parametres", description: "Modifier les paramètres généraux du site (nom, logos, réseaux sociaux)" },
 ] as const;
 
 export type PermissionCode = (typeof PERMISSIONS)[number]["code"];

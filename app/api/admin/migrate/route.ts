@@ -52,6 +52,31 @@ export async function POST(req: NextRequest) {
       ON CONFLICT (key) DO NOTHING
     `;
 
+    // ── Paramètres généraux (nom, logos, réseaux sociaux) ──────────────
+    // Valeurs par défaut = ce qui est déjà codé en dur aujourd'hui, pour
+    // qu'aucun changement ne soit visible tant que personne ne modifie rien.
+    await sql`
+      INSERT INTO settings (key, value)
+      VALUES ('site_general', ${JSON.stringify({
+        siteName: "Ministère de la Transformation Digitale et de l'Innovation",
+        siteNameShort: "MTDI",
+        taglineFr: "",
+        taglineEn: "",
+        logoHeader: "/mtdi-banner.png",
+        logoFooter: "/mtdi-banner.png",
+        favicon: "/favicon.ico",
+        facebook: "https://www.facebook.com/innovationbenin",
+        twitter: "",
+        linkedin: "https://www.linkedin.com/company/innovationbenin",
+        instagram: "https://www.instagram.com/benin.innov/",
+        youtube: "",
+        contactEmail: "contact@gouv.bj",
+        contactPhone: "",
+        contactAddress: "",
+      })}::jsonb)
+      ON CONFLICT (key) DO NOTHING
+    `;
+
     // ── Pilote Actualités : colonne read_time + import des articles existants ──
     await sql.query(
       `ALTER TABLE actualites ADD COLUMN IF NOT EXISTS read_time TEXT DEFAULT '3 min'`

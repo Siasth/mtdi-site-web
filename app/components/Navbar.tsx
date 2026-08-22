@@ -10,6 +10,18 @@ const VERT = "#006828";
 export default function Navbar({ locale: _locale, dict }: { locale?: string; dict?: any } = {}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoHeader, setLogoHeader] = useState("/mtdi-banner.png");
+  const [siteName, setSiteName] = useState("Ministère de la Transformation Digitale et de l'Innovation — République du Bénin");
+
+  useEffect(() => {
+    fetch("/api/general-settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.logoHeader) setLogoHeader(d.logoHeader);
+        if (d.siteName) setSiteName(d.siteName);
+      })
+      .catch(() => {}); // repli silencieux sur les valeurs par défaut ci-dessus
+  }, []);
   const pathname = usePathname();
   const isEn = pathname.startsWith("/en");
   const prefix = isEn ? "/en" : "";
@@ -154,8 +166,8 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
             <Link href={`${prefix}/`} className="flex items-center group">
               {/* eslint-disable-next-line @next/next/no-img-élément */}
               <img
-                src="/mtdi-banner.png"
-                alt="Ministère de la Transformation Digitale et de l'Innovation — République du Bénin"
+                src={logoHeader}
+                alt={siteName}
                 className="h-16 w-auto"
                 style={{ filter: solid ? "none" : "brightness(0) invert(1)" }}
               />
