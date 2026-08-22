@@ -475,6 +475,191 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises PROPOSÉES par défaut (idempotent : ne remplit
+    // que les champs encore vides/NULL, jamais une traduction déjà saisie
+    // manuellement). À relire avant publication.
+    // ══════════════════════════════════════════════════════════════════
+
+    // Hero
+    const heroTranslations: Record<string, string> = {
+      "/hero-conference.jpg": "Digital conference in Africa",
+      "/hero-graduation.jpg": "Graduation ceremony",
+      "/hero-city.jpg": "Boulevard de la Marina, Cotonou",
+      "/hero-auditorium.jpg": "Graduates celebrating their achievement",
+      "/chantier-01-ia.jpg": "Artificial intelligence",
+    };
+    for (const [image, altEn] of Object.entries(heroTranslations)) {
+      await sql`UPDATE hero_slides SET alt_en = ${altEn} WHERE image = ${image} AND alt_en IS NULL`;
+    }
+
+    // Grands Chantiers (par numéro)
+    const chantiersTranslations: Record<string, { title: string; subtitle: string; description: string; stats: string[] }> = {
+      "01": {
+        title: "Making Benin an African leader in AI",
+        subtitle: "National strategy · Vision 2030",
+        description: "Benin is adopting its national artificial intelligence strategy. Public laboratories, international partnerships, and ethical governance to position the country as a continental benchmark.",
+        stats: ["ongoing AI projects", "public laboratories", "strategy horizon"],
+      },
+      "02": {
+        title: "100% digital public services",
+        subtitle: "E-government · Accessibility",
+        description: "Birth, marriage, taxes, permits: all administrative procedures available online, with no need to travel, from any phone.",
+        stats: ["digitized services", "active users", "availability"],
+      },
+      "03": {
+        title: "Connecting the entire territory",
+        subtitle: "Infrastructure · Connectivity",
+        description: "Fiber optics, extended 4G, community access points. No municipality in Benin will be left outside the national digital network.",
+        stats: ["km of fiber", "new municipalities", "100% target"],
+      },
+      "04": {
+        title: "Training tomorrow's talent",
+        subtitle: "Digital Academy · Skills",
+        description: "Coding bootcamps, AI certifications, civil servant training: Benin is investing in its digital human capital for the next 10 years.",
+        stats: ["young people trained", "certified civil servants", "partner schools"],
+      },
+      "05": {
+        title: "Protecting the national digital space",
+        subtitle: "Cybersecurity · Trust",
+        description: "National CSIRT, digital legal framework, personal data protection. Digital trust is a prerequisite for sovereignty.",
+        stats: ["operational", "security audit", "incident response"],
+      },
+    };
+    for (const [number, t] of Object.entries(chantiersTranslations)) {
+      const row = await sql`SELECT id, stats, title_en FROM chantiers WHERE number = ${number}`;
+      if (row.rows.length === 0 || row.rows[0].title_en) continue; // déjà traduit
+      const existingStats = row.rows[0].stats as { value: string; labelFr: string; labelEn?: string }[];
+      const mergedStats = existingStats.map((s, i) => ({ ...s, labelEn: s.labelEn || t.stats[i] }));
+      await sql`
+        UPDATE chantiers SET title_en = ${t.title}, subtitle_en = ${t.subtitle}, description_en = ${t.description}, stats = ${JSON.stringify(mergedStats)}::jsonb
+        WHERE number = ${number}
+      `;
+    }
+
+    // Galerie : collections
+    const collectionsTranslations: Record<string, string> = {
+      "Événements officiels": "Official events",
+      "Infrastructures": "Infrastructure",
+      "Formation & Jeunesse": "Training & Youth",
+      "Cybersécurité": "Cybersecurity",
+      "Coopération internationale": "International cooperation",
+    };
+    for (const [nameFr, nameEn] of Object.entries(collectionsTranslations)) {
+      await sql`UPDATE galerie_collections SET name_en = ${nameEn} WHERE name_fr = ${nameFr} AND name_en IS NULL`;
+    }
+
+    // Galerie : éléments (par titre FR, identifiant unique dans le jeu de données)
+    const galerieTranslations: Record<string, { title: string; description: string }> = {
+      "Ouverture du Sommet Afrique Digitale 2026": { title: "Opening of the Africa Digital Summit 2026", description: "The Minister delivers the opening address before delegations from 32 African countries gathered in Cotonou." },
+      "Signature du décret portant création de l'ANAI": { title: "Signing of the decree establishing the ANAI", description: "Official signing ceremony of the decree establishing the National Artificial Intelligence Agency." },
+      "Discours du Ministre : Sommet Afrique Digitale": { title: "Minister's address: Africa Digital Summit", description: "Full address by the Minister during the Summit's plenary session." },
+      "Cérémonie des vœux au corps diplomatique": { title: "New Year greetings ceremony for the diplomatic corps", description: "The Minister receives ambassadors and representatives of international organizations." },
+      "Visite du chantier fibre optique : Parakou": { title: "Visit to the fiber optic construction site: Parakou", description: "Inspection of the national fiber optic backbone deployment. 2,000 km of fiber already laid." },
+      "Inauguration du Data Center souverain : Phase 1": { title: "Inauguration of the sovereign Data Center: Phase 1", description: "First phase of Benin's sovereign data center." },
+      "Lancement de MonIdentité.bj : Saison 2": { title: "Launch of MonIdentité.bj: Season 2", description: "Second phase of the digital identity program, targeting 500,000 users." },
+      "Remise des diplômes : Digital Academy, Promotion 2026": { title: "Graduation ceremony: Digital Academy, Class of 2026", description: "200 young developers and data scientists receive their certificates." },
+      "Hackathon IA étudiants : Université d'Abomey-Calavi": { title: "Student AI Hackathon: University of Abomey-Calavi", description: "48 hours of competition to design AI solutions." },
+      "Présentation de la Stratégie IA 2030 : Assemblée nationale": { title: "Presentation of the AI Strategy 2030: National Assembly", description: "The Minister presents the outline of the SNIAM to members of parliament." },
+      "Déploiement des stations CERT.bj": { title: "Deployment of CERT.bj stations", description: "Installation of monitoring and incident response equipment." },
+      "Forum IA & Éthique : Session plénière UNESCO × Bénin": { title: "AI & Ethics Forum: UNESCO × Benin plenary session", description: "Forum bringing together researchers, policymakers, and civil society." },
+      "Rencontre avec les startups : Bénin IA Challenge": { title: "Meeting with startups: Benin AI Challenge", description: "The Minister meets with the 50 selected startups." },
+      "Interview du Ministre : RFI": { title: "Minister's interview: RFI", description: "Exclusive interview on Benin's digital ambitions." },
+    };
+    for (const [titleFr, t] of Object.entries(galerieTranslations)) {
+      await sql`
+        UPDATE galerie_items SET title_en = ${t.title}, description_en = ${t.description}
+        WHERE title_fr = ${titleFr} AND title_en IS NULL
+      `;
+    }
+
+    // Direct : événements à venir (par titre FR)
+    const upcomingTranslations: Record<string, { title: string; description: string }> = {
+      "Olympiades Internationales d'IA 2026 — Cérémonie d'ouverture à Astana": {
+        title: "2026 International AI Olympiad — Opening ceremony in Astana",
+        description: "Live broadcast of the IOAI 2026 opening ceremony in Kazakhstan. Benin's national team (8 young talents) will represent the country among 60+ nations.",
+      },
+      "IOAI 2026 — Cérémonie de clôture et résultats": {
+        title: "IOAI 2026 — Closing ceremony and results",
+        description: "Announcement of results and medal ceremony for the International AI Olympiad.",
+      },
+    };
+    for (const [titleFr, t] of Object.entries(upcomingTranslations)) {
+      await sql`UPDATE direct_upcoming SET title_en = ${t.title}, description_en = ${t.description} WHERE title_fr = ${titleFr} AND title_en IS NULL`;
+    }
+
+    // Direct : rediffusions (par titre FR)
+    const replaysTranslations: Record<string, string> = {
+      "Intelligence artificielle : pourquoi un ministère y est dédié — Bénin TV": "Artificial intelligence: why a dedicated ministry — Bénin TV",
+      "Olympiades de l'IA : le Bénin sème les graines du futur — Bénin TV": "AI Olympiad: Benin sows the seeds of the future — Bénin TV",
+      "NOAI 2026 : le Bénin prépare ses talents pour les Olympiades internationales d'IA": "NOAI 2026: Benin prepares its talents for the International AI Olympiad",
+      "Conférence RSSI 2026 : IA et cybersécurité — Compte rendu": "CISO Conference 2026: AI and cybersecurity — Report",
+    };
+    for (const [titleFr, titleEn] of Object.entries(replaysTranslations)) {
+      await sql`UPDATE direct_replays SET title_en = ${titleEn} WHERE title_fr = ${titleFr} AND title_en IS NULL`;
+    }
+
+    // Mot du Ministre : paragraphes — la version FR correspond exactement à
+    // celle déjà utilisée, mais la traduction EN officielle du dictionnaire
+    // (dictionaries/en.json → home.ministreP1/P2) est plus précise que celle
+    // que j'avais proposée : on l'utilise à la place.
+    await sql`
+      UPDATE settings SET value = value || ${JSON.stringify({
+        paragraphsEn: [
+          "Technology is only valuable for what it concretely changes in people's lives, and above all for its contribution to eradicating extreme poverty.",
+          "The Ministry of Digital Transformation and Innovation's mission is to lead the technology roadmap in service of public policies, and to build a dynamic, inclusive and competitive innovation ecosystem.",
+        ],
+      })}::jsonb
+      WHERE key = 'ministre_message'
+    `;
+
+    // Grands Chantiers : le dictionnaire (dictionaries/fr.json et en.json,
+    // clé "chantiers") contient une version plus précise et déjà traduite
+    // officiellement (références réelles : SNIAM, loi n°2017-20, SMART GOUV,
+    // SBIN...) que celle importée depuis data/chantiers.json. On remplace le
+    // titre/sous-titre/description par cette version — les 3 mini-chiffres
+    // par chantier n'existent pas dans le dictionnaire, on les garde tels quels.
+    const chantiersOfficiels: Record<string, { titleFr: string; subtitleFr: string; descriptionFr: string; titleEn: string; subtitleEn: string; descriptionEn: string }> = {
+      "01": {
+        titleFr: "Faire du Bénin un leader africain de l'IA", subtitleFr: "SNIAM 2023–2027",
+        descriptionFr: "Adoptée par le Conseil des Ministres le 18 janvier 2023, la Stratégie Nationale d'Intelligence Artificielle et des Mégadonnées (SNIAM) structure l'action du Bénin en 4 programmes sur 5 ans.",
+        titleEn: "Make Benin an African AI leader", subtitleEn: "SNIAM 2023–2027",
+        descriptionEn: "Adopted by the Council of Ministers on January 18, 2023, the National AI and Big Data Strategy (SNIAM) structures Benin's action in 4 programs over 5 years.",
+      },
+      "02": {
+        titleFr: "Des services publics numériques", subtitleFr: "E-gouvernement · SMART GOUV",
+        descriptionFr: "Le programme SMART GOUV (phase 2) poursuit la dématérialisation des services publics pour les rendre accessibles en ligne, sans déplacement, depuis n'importe quel appareil.",
+        titleEn: "Digital public services", subtitleEn: "E-government · SMART GOUV",
+        descriptionEn: "The SMART GOUV program (phase 2) continues the digitization of public services to make them accessible online, without travel, from any device.",
+      },
+      "03": {
+        titleFr: "Connecter tout le territoire", subtitleFr: "Infrastructure · Connectivité",
+        descriptionFr: "La SBIN déploie un réseau backbone à fibre optique national et poursuit le programme Internet haut et très haut débit (phase 2) pour couvrir l'ensemble du territoire, y compris les zones rurales.",
+        titleEn: "Connect the entire territory", subtitleEn: "Infrastructure · Connectivity",
+        descriptionEn: "SBIN is deploying a national fiber optic backbone network and continuing the high and very high-speed internet program (phase 2) to cover the entire territory, including rural areas.",
+      },
+      "04": {
+        titleFr: "Former les talents de demain", subtitleFr: "Formation · Olympiades IA",
+        descriptionFr: "Le Bénin investit dans la formation aux compétences numériques et à l'intelligence artificielle. Les premières Olympiades Nationales d'IA ont réuni des talents de tout le pays.",
+        titleEn: "Training tomorrow's talents", subtitleEn: "Training · AI Olympiads",
+        descriptionEn: "Benin invests in digital skills and artificial intelligence training. The first National AI Olympiads brought together talents from across the country.",
+      },
+      "05": {
+        titleFr: "Protéger l'espace numérique national", subtitleFr: "Cybersécurité · CRSSI",
+        descriptionFr: "Cadre juridique du numérique (loi n°2017-20), protection des données personnelles, et conférences RSSI réunissant les professionnels de la sécurité des systèmes d'information.",
+        titleEn: "Protecting the national digital space", subtitleEn: "Cybersecurity · CRSSI",
+        descriptionEn: "Digital legal framework (Law No. 2017-20), personal data protection, and RSSI conferences bringing together information systems security professionals.",
+      },
+    };
+    for (const [number, c] of Object.entries(chantiersOfficiels)) {
+      await sql`
+        UPDATE chantiers SET
+          title_fr = ${c.titleFr}, subtitle_fr = ${c.subtitleFr}, description_fr = ${c.descriptionFr},
+          title_en = ${c.titleEn}, subtitle_en = ${c.subtitleEn}, description_en = ${c.descriptionEn}
+        WHERE number = ${number}
+      `;
+    }
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
