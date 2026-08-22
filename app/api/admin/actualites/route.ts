@@ -1,43 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
-import { sanitizeRichText } from "@/lib/sanitize";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
 }
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+// Liste complète pour le back-office (inclut les articles supprimés
+// logiquement, distingués par deleted_at, pour permettre la restauration).
+export async function GET() {
   const session = await requireSession();
-  const { id } = await params;
-  const body = await req.json();
-
-  if (body.restore) {
-    if (!hasPerm(session, "actualites.restaurer")) {
-      return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
-    }
-    await sql`UPDATE actualites SET deleted_at = NULL WHERE id = ${id}`;
-    await logAudit({ userId: session.id, action: "restaurer", module: "actualites", resourceId: id, ip: getIp(req) });
-    return NextResponse.json({ ok: true });
+  if (!hasPerm(session, "actualites.voir")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
+  const result = await sql`
+    SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
+    FROM actualites a
+    LEFT JOIN categories c ON c.id = a.category_id
+    ORDER BY a.deleted_at NULLS FIRST, a.published_at DESC, a.display_order ASC
+  `;
+  return NextResponse.json(result.rows);
+}
 
-  if (!hasPerm(session, "actualites.modifier")) {
+export async function POST(req: NextRequest) {
+  const session = await requireSession();
+  if (!hasPerm(session, "actualites.creer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
 
+  const body = await req.json();
   const {
     titleFr, titleEn, excerptFr, excerptEn, categoryId,
     image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
   } = body;
 
-  if (featured === true) {
+  if (!titleFr || !categoryId || !publishedAt) {
+    return NextResponse.json({ error: "Titre (FR), catégorie et date sont requis" }, { status: 400 });
+  }
+
+  if (featured) {
     const count = await sql`
       SELECT COUNT(*) AS count FROM actualites
-      WHERE featured = TRUE AND deleted_at IS NULL AND status = 'publie' AND id != ${id}
+      WHERE featured = TRUE AND deleted_at IS NULL AND status = 'publie'
     `;
     if (Number(count.rows[0].count) >= 8) {
       return NextResponse.json(
@@ -47,38 +53,15 @@ export async function PATCH(
     }
   }
 
-  await sql`
-    UPDATE actualites SET
-      title_fr = COALESCE(${titleFr}, title_fr),
-      title_en = ${titleEn ?? null},
-      excerpt_fr = COALESCE(${excerptFr ? sanitizeRichText(excerptFr) : null}, excerpt_fr),
-      excerpt_en = ${excerptEn ? sanitizeRichText(excerptEn) : null},
-      category_id = COALESCE(${categoryId}, category_id),
-      image = ${image ?? null},
-      href_external = ${hrefExternal ?? null},
-      published_at = COALESCE(${publishedAt}, published_at),
-      read_time = COALESCE(${readTime}, read_time),
-      featured = COALESCE(${featured}, featured),
-      display_order = COALESCE(${displayOrder}, display_order),
-      status = COALESCE(${status}, status),
-      updated_at = now()
-    WHERE id = ${id}
+  const result = await sql`
+    INSERT INTO actualites
+      (title_fr, title_en, excerpt_fr, excerpt_en, category_id, image, href_external, published_at, read_time, featured, display_order, status, created_by)
+    VALUES
+      (${titleFr}, ${titleEn || null}, ${sanitizeRichText(excerptFr || "")}, ${excerptEn ? sanitizeRichText(excerptEn) : null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
+    RETURNING id
   `;
 
-  await logAudit({ userId: session.id, action: "modifier", module: "actualites", resourceId: id, details: { titleFr }, ip: getIp(req) });
-  return NextResponse.json({ ok: true });
-}
+  await logAudit({ userId: session.id, action: "creer", module: "actualites", resourceId: String(result.rows[0].id), details: { titleFr }, ip: getIp(req) });
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const session = await requireSession();
-  if (!hasPerm(session, "actualites.supprimer")) {
-    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
-  }
-  const { id } = await params;
-  await sql`UPDATE actualites SET deleted_at = now() WHERE id = ${id}`;
-  await logAudit({ userId: session.id, action: "supprimer", module: "actualites", resourceId: id, ip: getIp(req) });
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, id: result.rows[0].id }, { status: 201 });
 }
