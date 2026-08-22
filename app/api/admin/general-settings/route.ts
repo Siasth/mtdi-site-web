@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireSession, getSetting, setSetting, logAudit } from "@/lib/auth";
+import { requireSession, setSetting, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
-import type { GeneralSettings } from "@/app/api/general-settings/route";
+import { getGeneralSettings } from "@/lib/general-settings";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -12,8 +12,8 @@ export async function GET() {
   if (!hasPerm(session, "parametres.modifier")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
-  const stored = await getSetting<Partial<GeneralSettings>>("site_general");
-  return NextResponse.json(stored || {});
+  const settings = await getGeneralSettings();
+  return NextResponse.json(settings);
 }
 
 export async function PUT(req: NextRequest) {
@@ -22,7 +22,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const body = await req.json();
-  const current = (await getSetting<Partial<GeneralSettings>>("site_general")) || {};
+  const current = await getGeneralSettings();
   await setSetting("site_general", { ...current, ...body });
   await logAudit({ userId: session.id, action: "modifier", module: "parametres", ip: getIp(req) });
   return NextResponse.json({ ok: true });

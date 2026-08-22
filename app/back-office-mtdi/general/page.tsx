@@ -9,8 +9,12 @@ type FormState = {
   siteName: string; siteNameShort: string; taglineFr: string; taglineEn: string;
   logoHeader: string; logoFooter: string; favicon: string;
   facebook: string; twitter: string; linkedin: string; instagram: string; youtube: string;
-  contactEmail: string; contactPhone: string; contactAddress: string;
+  contactEmail: string; contactPhone: string; contactAddress: string; locationMapUrl: string;
 };
+
+// Format assez permissif : chiffres, espaces, +, -, parenthèses (ex: +229 21 30 00 00)
+const PHONE_RE = /^[+\d][\d\s().-]{5,19}$/;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
 export default function AdminGeneral() {
   const canManage = useHasPermission("parametres.modifier");
@@ -32,6 +36,7 @@ export default function AdminGeneral() {
           facebook: d.facebook || "", twitter: d.twitter || "", linkedin: d.linkedin || "",
           instagram: d.instagram || "", youtube: d.youtube || "",
           contactEmail: d.contactEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
+          locationMapUrl: d.locationMapUrl || "",
         });
         setLoading(false);
       });
@@ -53,6 +58,16 @@ export default function AdminGeneral() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!form) return;
+
+    if (form.contactPhone && !PHONE_RE.test(form.contactPhone.trim())) {
+      setMsg({ type: "error", text: "Numéro de téléphone invalide (ex : +229 21 30 00 00)." });
+      return;
+    }
+    if (form.contactEmail && !EMAIL_RE.test(form.contactEmail.trim())) {
+      setMsg({ type: "error", text: "Adresse email invalide." });
+      return;
+    }
+
     setSaving(true);
     setMsg(null);
     const res = await fetch("/api/admin/general-settings", {
@@ -154,11 +169,27 @@ export default function AdminGeneral() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Téléphone</label>
-            <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse</label>
-            <input value={form.contactAddress} onChange={(e) => setForm({ ...form, contactAddress: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <textarea
+              value={form.contactAddress}
+              onChange={(e) => setForm({ ...form, contactAddress: e.target.value })}
+              placeholder={"Optionnel — ex :\nBoulevard de la Marina\n01 BP 412 Cotonou\nRépublique du Bénin"}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Localisation (lien carte)</label>
+            <input
+              value={form.locationMapUrl}
+              onChange={(e) => setForm({ ...form, locationMapUrl: e.target.value })}
+              placeholder="Optionnel — lien Google Maps par exemple"
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            />
+            <p className="text-xs text-gray-400 mt-1">Affiche un lien "Voir sur la carte" sur la page Contact si renseigné.</p>
           </div>
         </section>
 

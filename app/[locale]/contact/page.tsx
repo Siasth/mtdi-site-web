@@ -2,6 +2,7 @@ import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import ContactForm from "../../components/ContactForm";
+import { getGeneralSettings } from "@/lib/general-settings";
 
 const VERT  = "#006828";
 const ROUGE = "#EB0000";
@@ -41,6 +42,7 @@ export default async function ContactPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.contact;
+  const general = await getGeneralSettings();
 
   return (
     <>
@@ -96,11 +98,21 @@ export default async function ContactPage({ params }: Props) {
                     <p className="text-[10px] font-black uppercase tracking-widest text-anthracite/60 mb-1">
                       {t.adresse}
                     </p>
-                    <p className="text-anthracite font-semibold text-sm leading-relaxed">
-                      Boulevard de la Marina<br />
-                      01 BP 412 Cotonou<br />
-                      République du Bénin
+                    <p className="text-anthracite font-semibold text-sm leading-relaxed whitespace-pre-line">
+                      {general.contactAddress || (locale === "en" ? "Address to be provided" : "Adresse à renseigner")}
                     </p>
+                    {general.locationMapUrl && (
+                      <a
+                        href={general.locationMapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-2 text-xs font-bold uppercase tracking-wider hover:underline"
+                        style={{ color: VERT }}
+                      >
+                        {locale === "en" ? "View on map" : "Voir sur la carte"}
+                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -121,12 +133,18 @@ export default async function ContactPage({ params }: Props) {
                     <p className="text-[10px] font-black uppercase tracking-widest text-anthracite/60 mb-1">
                       {t.telephone}
                     </p>
-                    <a
-                      href="tel:+22921300000"
-                      className="text-anthracite font-semibold text-sm hover:text-vert-benin transition-colors"
-                    >
-                      +229 21 30 00 00
-                    </a>
+                    {general.contactPhone ? (
+                      <a
+                        href={`tel:${general.contactPhone.replace(/[^\d+]/g, "")}`}
+                        className="text-anthracite font-semibold text-sm hover:text-vert-benin transition-colors"
+                      >
+                        {general.contactPhone}
+                      </a>
+                    ) : (
+                      <p className="text-anthracite/40 font-semibold text-sm italic">
+                        {locale === "en" ? "To be provided" : "À renseigner"}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -149,10 +167,10 @@ export default async function ContactPage({ params }: Props) {
                       {t.emailGeneral}
                     </p>
                     <a
-                      href="mailto:contact@gouv.bj"
+                      href={`mailto:${general.contactEmail}`}
                       className="text-anthracite font-semibold text-sm hover:text-vert-benin transition-colors"
                     >
-                      contact@gouv.bj
+                      {general.contactEmail}
                     </a>
                   </div>
                 </div>
