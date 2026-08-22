@@ -94,7 +94,7 @@ export default function AlaUneCarousel({ items, locale }: { items: Actualite[]; 
             style={{ scrollSnapAlign: "start" }}
           >
             {item.image ? (
-              <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="320px" />
+              <Image src={item.image} alt="" fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="320px" />
             ) : (
               <div className="absolute inset-0" style={{ background: "#162233" }} />
             )}

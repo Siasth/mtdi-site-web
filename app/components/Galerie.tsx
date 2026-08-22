@@ -64,7 +64,7 @@ export default function Galerie({ dict, locale = "fr" }: { dict?: HomeDict; loca
               >
                 <Image
                   src={item.image}
-                  alt={item.label}
+                  alt=""
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes={i === 0 ? "50vw" : "25vw"}

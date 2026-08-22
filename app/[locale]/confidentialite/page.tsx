@@ -131,40 +131,43 @@ export default async function ConfidentialitePage({ params }: Props) {
         </section>
 
         {/* Sections */}
-        {sections.map((section, i) => (
-          <section
-            key={section.number}
-            className={`px-4 sm:px-6 lg:px-8 py-16 ${i % 2 === 0 ? "bg-gris-perle" : "bg-white"}`}
-          >
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-baseline gap-4 mb-6">
-                <span className="text-2xl font-black" style={{ color: JAUNE }}>{section.number}</span>
-                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: VERT }}>{section.title}</h2>
-              </div>
+        <ol className="list-none" role="list">
+          {sections.map((section, i) => (
+            <li key={section.number}>
+              <section
+                className={`px-4 sm:px-6 lg:px-8 py-16 ${i % 2 === 0 ? "bg-gris-perle" : "bg-white"}`}
+              >
+                <div className="max-w-4xl mx-auto">
+                  <div className="flex items-baseline gap-4 mb-6">
+                    <span className="text-2xl font-black" style={{ color: JAUNE }}>{section.number}</span>
+                    <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: VERT }}>{section.title}</h2>
+                  </div>
 
-              <div className="flex flex-col gap-4">
-                {section.paragraphs.map((p, j) => (
-                  <p key={j} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">{p}</p>
-                ))}
-
-                {section.list && (
-                  <ul className="flex flex-col gap-3 pl-1">
-                    {section.list.map((item, j) => (
-                      <li key={j} className="flex gap-3 text-anthracite/70 text-sm font-medium leading-relaxed">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-2" style={{ background: JAUNE }} />
-                        {item}
-                      </li>
+                  <div className="flex flex-col gap-4">
+                    {section.paragraphs.map((p, j) => (
+                      <p key={j} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">{p}</p>
                     ))}
-                  </ul>
-                )}
 
-                {section.paragraphs_after?.map((p, j) => (
-                  <p key={`after-${j}`} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">{p}</p>
-                ))}
-              </div>
-            </div>
-          </section>
-        ))}
+                    {section.list && (
+                      <ul className="flex flex-col gap-3 pl-1">
+                        {section.list.map((item, j) => (
+                          <li key={j} className="flex gap-3 text-anthracite/70 text-sm font-medium leading-relaxed">
+                            <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full mt-2" style={{ background: JAUNE }} />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {section.paragraphs_after?.map((p, j) => (
+                      <p key={`after-${j}`} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">{p}</p>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </li>
+          ))}
+        </ol>
 
       </main>
 

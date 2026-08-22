@@ -80,9 +80,9 @@ export default async function DirectionsCentralesPage({ params }: Props) {
             <h2 className="text-xs font-black uppercase tracking-widest mb-10" style={{ color: VERT }}>
               {t.directionsMinistere}
             </h2>
-            <div className="flex flex-col gap-0">
+            <ul className="flex flex-col gap-0 list-none" role="list">
               {directionsData.map((dir, i) => (
-                <div
+                <li
                   key={dir.acronym}
                   className="py-8"
                   style={{ borderBottom: i < directionsData.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
@@ -103,9 +103,9 @@ export default async function DirectionsCentralesPage({ params }: Props) {
                     </p>
                   )}
                   <p className="text-anthracite/75 text-sm font-medium leading-relaxed max-w-3xl">{dir.description}</p>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </section>
 

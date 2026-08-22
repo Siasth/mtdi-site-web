@@ -159,7 +159,7 @@ export default function GrandsChantiers({ dict, chantiersDict }: { dict?: HomeDi
                 ) : (
                   <Image
                     src={c.image}
-                    alt={c.title}
+                    alt=""
                     fill
                     className="object-cover"
                     style={{ objectPosition: c.objectPosition }}

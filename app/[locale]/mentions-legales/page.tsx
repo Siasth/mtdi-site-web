@@ -78,25 +78,28 @@ export default async function MentionsLegalesPage({ params }: Props) {
         </section>
 
         {/* Sections */}
-        {sections.map((section, i) => (
-          <section
-            key={section.title}
-            className={`px-4 sm:px-6 lg:px-8 py-16 ${i % 2 === 0 ? "bg-white" : "bg-gris-perle"}`}
-          >
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: VERT }}>
-                {section.title}
-              </h2>
-              <div className="flex flex-col gap-4">
-                {section.content.map((paragraph, j) => (
-                  <p key={j} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </section>
-        ))}
+        <ol className="list-none" role="list">
+          {sections.map((section, i) => (
+            <li key={section.title}>
+              <section
+                className={`px-4 sm:px-6 lg:px-8 py-16 ${i % 2 === 0 ? "bg-white" : "bg-gris-perle"}`}
+              >
+                <div className="max-w-4xl mx-auto">
+                  <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: VERT }}>
+                    {section.title}
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {section.content.map((paragraph, j) => (
+                      <p key={j} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </li>
+          ))}
+        </ol>
 
       </main>
 
