@@ -1,9 +1,13 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 // Assainissement STRICT du HTML produit par l'éditeur riche du back-office,
 // avant tout enregistrement en base. Liste blanche volontairement limitée
-// aux besoins de l'éditeur (lib/back-office/components/MarkdownEditor.tsx) —
-// aucun <script>, aucun attribut on*, aucune iframe.
+// aux besoins de l'éditeur (app/back-office-mtdi/components/MarkdownEditor.tsx)
+// — aucun <script>, aucun attribut on*, aucune iframe.
+//
+// Utilise "sanitize-html" (pur Node, sans émulation de navigateur) plutôt
+// que "isomorphic-dompurify" (qui s'appuie sur jsdom) : ce dernier a des
+// soucis de compatibilité connus dans les fonctions serverless de Vercel.
 const ALLOWED_TAGS = [
   "p", "br", "strong", "em", "s", "code", "a",
   "h1", "h2", "h3",
@@ -13,18 +17,26 @@ const ALLOWED_TAGS = [
   "span",
 ];
 
-const ALLOWED_ATTR = ["href", "target", "rel", "style", "colspan", "rowspan"];
-
 export function sanitizeRichText(html: string): string {
   if (!html) return "";
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-  }).replace(/style="([^"]*)"/g, (_match, styleContent: string) => {
-    const safeDeclarations = styleContent
-      .split(";")
-      .map((d) => d.trim())
-      .filter((d) => /^(color|font-family)\s*:/i.test(d));
-    return safeDeclarations.length > 0 ? `style="${safeDeclarations.join("; ")}"` : "";
+  return sanitizeHtml(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      span: ["style"],
+      td: ["colspan", "rowspan"],
+      th: ["colspan", "rowspan"],
+    },
+    // Seules les propriétés color/font-family sont conservées dans un style=""
+    allowedStyles: {
+      span: {
+        color: [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/],
+        "font-family": [/^[a-zA-Z0-9\s,'"-]+$/],
+      },
+    },
+    // Force tout lien externe à s'ouvrir de façon sûre
+    transformTags: {
+      a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener noreferrer" }),
+    },
   });
 }
