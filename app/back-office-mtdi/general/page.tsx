@@ -59,12 +59,20 @@ export default function AdminGeneral() {
     e.preventDefault();
     if (!form) return;
 
-    if (form.contactPhone && !PHONE_RE.test(form.contactPhone.trim())) {
-      setMsg({ type: "error", text: "Numéro de téléphone invalide (ex : +229 21 30 00 00)." });
+    if (!form.siteName.trim()) {
+      setMsg({ type: "error", text: "Le nom du ministère est obligatoire." });
       return;
     }
-    if (form.contactEmail && !EMAIL_RE.test(form.contactEmail.trim())) {
+    if (!form.contactEmail.trim()) {
+      setMsg({ type: "error", text: "L'email de contact général est obligatoire." });
+      return;
+    }
+    if (!EMAIL_RE.test(form.contactEmail.trim())) {
       setMsg({ type: "error", text: "Adresse email invalide." });
+      return;
+    }
+    if (form.contactPhone && !PHONE_RE.test(form.contactPhone.trim())) {
+      setMsg({ type: "error", text: "Numéro de téléphone invalide (ex : +229 01 21 30 00 00)." });
       return;
     }
 
@@ -97,13 +105,16 @@ export default function AdminGeneral() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Général</h1>
         <p className="text-sm text-gray-500 mt-1">Nom du site, logos, réseaux sociaux, coordonnées — tout en un seul endroit</p>
+        <p className="text-xs text-gray-400 mt-2"><span className="text-red-500">*</span> Champ obligatoire</p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Identité</h2>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet du ministère</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              Nom complet du ministère <span className="text-red-500">*</span>
+            </label>
             <input value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
@@ -164,12 +175,14 @@ export default function AdminGeneral() {
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Coordonnées (pied de page)</h2>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email de contact général</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              Email de contact général <span className="text-red-500">*</span>
+            </label>
             <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Téléphone</label>
-            <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 01 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse</label>
