@@ -28,7 +28,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
 
-  const { labelFr, labelEn, value, maxValue, unit, unitFrSingular, unitEn, unitEnSingular, noSpace, displayOrder, active } = body;
+  const { labelFr, labelEn, value, maxValue, unit, unitFrSingular, unitEn, unitEnSingular, noSpace, color, displayOrder, active } = body;
 
   await sql`
     UPDATE stats SET
@@ -41,6 +41,7 @@ export async function PATCH(
       unit_en = ${unitEn ?? null},
       unit_en_singular = ${unitEnSingular ?? null},
       no_space = COALESCE(${noSpace}, no_space),
+      color = ${color ?? null},
       display_order = COALESCE(${displayOrder}, display_order),
       active = COALESCE(${active}, active),
       updated_at = now()

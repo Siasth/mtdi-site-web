@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
     await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS unit_en TEXT`);
     await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS unit_en_singular TEXT`);
     await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS no_space BOOLEAN NOT NULL DEFAULT FALSE`);
+    await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS color TEXT`);
 
     // ── Paramètres généraux (nom, logos, réseaux sociaux) ──────────────
     // Valeurs par défaut = ce qui est déjà codé en dur aujourd'hui, pour

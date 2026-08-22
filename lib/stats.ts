@@ -7,6 +7,7 @@ export type StatItem = {
   max: number;
   unit: string;     // déjà résolu : bonne langue + bon singulier/pluriel
   noSpace: boolean; // ex: "%" -> true (pas d'espace), "communes" -> false
+  color: string | null; // null = l'alternance vert/jaune par défaut s'applique
 };
 
 function pickUnit(
@@ -22,7 +23,7 @@ function pickUnit(
 export async function getPublicStats(locale: "fr" | "en"): Promise<StatItem[]> {
   const result = await sql`
     SELECT id, label_fr, label_en, value, max_value,
-           unit, unit_fr_singular, unit_en, unit_en_singular, no_space
+           unit, unit_fr_singular, unit_en, unit_en_singular, no_space, color
     FROM stats
     WHERE deleted_at IS NULL AND active = TRUE
     ORDER BY display_order ASC
@@ -38,6 +39,7 @@ export async function getPublicStats(locale: "fr" | "en"): Promise<StatItem[]> {
       max: Number(r.max_value),
       unit: pickUnit(value, pluralForm, singularForm),
       noSpace: !!r.no_space,
+      color: (r.color as string) || null,
     };
   });
 }

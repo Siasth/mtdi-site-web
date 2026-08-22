@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 const VERT  = "#006828";
 const JAUNE = "#FFBE00";
 
-type StatItem = { id: number; label: string; value: number; max: number; unit: string; noSpace?: boolean };
+type StatItem = { id: number; label: string; value: number; max: number; unit: string; noSpace?: boolean; color?: string | null };
 type Dict = Record<string, string>;
 
 function formatValue(value: number, unit: string, noSpace?: boolean): string {
@@ -24,7 +24,7 @@ function clamp(v: number, min: number, max: number) {
 export default function StatsSection({ stats: externalStats, dict }: { stats?: StatItem[]; dict?: Dict }) {
   const d = dict ?? {};
   const barData = externalStats
-    ? externalStats.map((s, i) => ({ ...s, color: i % 2 === 0 ? VERT : JAUNE }))
+    ? externalStats.map((s, i) => ({ ...s, color: s.color || (i % 2 === 0 ? VERT : JAUNE) }))
     : defaultBarData;
   const [progress, setProgress] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -112,9 +112,9 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
                   onMouseLeave={() => setHovered(null)}
                 >
                   {/* Valeur + pourcentage */}
-                  <div className="flex-shrink-0 mb-3 text-center">
+                  <div className="flex-shrink-0 mb-3 text-center flex flex-col justify-end" style={{ minHeight: "2.6em" }}>
                     <span
-                      className="text-xs font-black tabular-nums block"
+                      className="text-xs font-black tabular-nums block leading-tight line-clamp-2"
                       style={{
                         color: bar.color,
                         opacity: progress,
@@ -123,7 +123,7 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
                       {formatValue(bar.value, bar.unit, bar.noSpace)}
                     </span>
                     <span
-                      className="text-[10px] font-bold block"
+                      className="text-[10px] font-bold block mt-1"
                       style={{
                         color: isHovered ? "rgba(26,26,26,0.50)" : "rgba(26,26,26,0.25)",
                         opacity: progress,
@@ -164,9 +164,9 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
                   </div>
 
                   {/* Label */}
-                  <div className="flex-shrink-0 mt-4 text-center px-1">
+                  <div className="flex-shrink-0 mt-4 text-center px-1" style={{ minHeight: "2.4em" }}>
                     <span
-                      className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide leading-tight block"
+                      className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide leading-tight block line-clamp-2"
                       style={{
                         color: isHovered ? "rgba(26,26,26,0.60)" : "rgba(26,26,26,0.35)",
                         transition: "color 0.2s",

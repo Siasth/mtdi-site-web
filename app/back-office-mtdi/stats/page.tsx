@@ -17,6 +17,7 @@ type Stat = {
   unit_en: string | null;
   unit_en_singular: string | null;
   no_space: boolean;
+  color: string | null;
   display_order: number;
   active: boolean;
   deleted_at: string | null;
@@ -24,13 +25,13 @@ type Stat = {
 
 type FormState = {
   labelFr: string; labelEn: string; value: number; maxValue: number;
-  unit: string; unitFrSingular: string; unitEn: string; unitEnSingular: string; noSpace: boolean;
+  unit: string; unitFrSingular: string; unitEn: string; unitEnSingular: string; noSpace: boolean; color: string;
   displayOrder: number; active: boolean;
 };
 
 const emptyForm: FormState = {
   labelFr: "", labelEn: "", value: 0, maxValue: 100,
-  unit: "", unitFrSingular: "", unitEn: "", unitEnSingular: "", noSpace: false,
+  unit: "", unitFrSingular: "", unitEn: "", unitEnSingular: "", noSpace: false, color: "#006828",
   displayOrder: 0, active: true,
 };
 
@@ -83,7 +84,7 @@ export default function AdminStats() {
       labelFr: s.label_fr, labelEn: s.label_en || "",
       value: Number(s.value), maxValue: Number(s.max_value), unit: s.unit,
       unitFrSingular: s.unit_fr_singular || "", unitEn: s.unit_en || "", unitEnSingular: s.unit_en_singular || "",
-      noSpace: s.no_space,
+      noSpace: s.no_space, color: s.color || "#006828",
       displayOrder: s.display_order, active: s.active,
     });
     setActiveLang("fr");
@@ -260,7 +261,7 @@ export default function AdminStats() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur actuelle *</label>
                 <input required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
@@ -268,6 +269,13 @@ export default function AdminStats() {
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Objectif (max) *</label>
                 <input required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Couleur</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
+                  <span className="text-xs text-gray-400 font-mono">{form.color}</span>
+                </div>
               </div>
             </div>
 

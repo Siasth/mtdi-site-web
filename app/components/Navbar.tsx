@@ -38,6 +38,7 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
+    handleScroll(); // vérifie l'état réel dès le montage (page rechargée déjà défilée, lien d'ancrage...)
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

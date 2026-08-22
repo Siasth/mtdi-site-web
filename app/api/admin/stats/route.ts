@@ -24,15 +24,15 @@ export async function POST(req: NextRequest) {
   if (!hasPerm(session, "stats.gerer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
-  const { labelFr, labelEn, value, maxValue, unit, unitFrSingular, unitEn, unitEnSingular, noSpace, displayOrder, active } = await req.json();
+  const { labelFr, labelEn, value, maxValue, unit, unitFrSingular, unitEn, unitEnSingular, noSpace, color, displayOrder, active } = await req.json();
 
   if (!labelFr) {
     return NextResponse.json({ error: "Le libellé (FR) est requis" }, { status: 400 });
   }
 
   const result = await sql`
-    INSERT INTO stats (label_fr, label_en, value, max_value, unit, unit_fr_singular, unit_en, unit_en_singular, no_space, display_order, active, created_by)
-    VALUES (${labelFr}, ${labelEn || null}, ${value ?? 0}, ${maxValue ?? 100}, ${unit || ""}, ${unitFrSingular || null}, ${unitEn || null}, ${unitEnSingular || null}, ${!!noSpace}, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
+    INSERT INTO stats (label_fr, label_en, value, max_value, unit, unit_fr_singular, unit_en, unit_en_singular, no_space, color, display_order, active, created_by)
+    VALUES (${labelFr}, ${labelEn || null}, ${value ?? 0}, ${maxValue ?? 100}, ${unit || ""}, ${unitFrSingular || null}, ${unitEn || null}, ${unitEnSingular || null}, ${!!noSpace}, ${color || null}, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
     RETURNING id
   `;
   await logAudit({ userId: session.id, action: "creer", module: "stats", resourceId: String(result.rows[0].id), details: { labelFr }, ip: getIp(req) });
