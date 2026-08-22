@@ -6,6 +6,7 @@ import MinistryMessage from "../components/MinistryMessage";
 import GrandsChantiers from "../components/GrandsChantiers";
 import StatsSection from "../components/StatsSection";
 import { getPublicStats } from "@/lib/stats";
+import { getHeroSlides } from "@/lib/hero";
 import Galerie from "../components/Galerie";
 import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
@@ -24,7 +25,7 @@ export default async function HomePage({ params }: Props) {
     <>
       <Navbar locale={locale} dict={dict.nav} />
       <main>
-        <HeroSection dict={home} />
+        <HeroSection dict={home} slides={await getHeroSlides(locale === "en" ? "en" : "fr")} />
         <AlaUne locale={locale} />
         <MinistryMessage dict={home} locale={locale} />
         <GrandsChantiers dict={home} chantiersDict={chantiers} />

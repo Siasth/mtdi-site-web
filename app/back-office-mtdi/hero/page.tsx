@@ -1,27 +1,76 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
-type Slide = { id: number; src: string; alt: string };
+const VERT = "#006828";
+
+type Slide = {
+  id: number;
+  image: string;
+  video: string | null;
+  alt_fr: string;
+  alt_en: string | null;
+  display_order: number;
+  active: boolean;
+  deleted_at: string | null;
+};
+
+type FormState = { image: string; video: string; altFr: string; altEn: string; displayOrder: number; active: boolean };
+const emptyForm: FormState = { image: "", video: "", altFr: "", altEn: "", displayOrder: 0, active: true };
 
 export default function AdminHero() {
+  const canManage = useHasPermission("contenu.modifier");
   const [slides, setSlides] = useState<Slide[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [newAlt, setNewAlt] = useState("");
+  const [saveError, setSaveError] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
-  useEffect(() => {
-    fetch("/api/admin/hero").then((r) => r.json()).then((d) => { setSlides(d); setLoading(false); });
-  }, []);
+  function load() {
+    setLoading(true);
+    setLoadError("");
+    fetch("/api/admin/hero-slides")
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
+        return r.json();
+      })
+      .then((d) => { setSlides(d); setLoading(false); })
+      .catch((err) => { setLoadError(err.message); setLoading(false); });
+  }
+  useEffect(() => { if (canManage) load(); }, [canManage]);
 
-  const save = async (updated: Slide[]) => {
-    setSaving(true);
-    await fetch("/api/admin/hero", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) });
-    setSaving(false);
-  };
+  if (!canManage) {
+    return (
+      <div className="p-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center max-w-md mx-auto mt-12">
+          <p className="font-bold text-gray-900 mb-1">Accès refusé</p>
+          <p className="text-sm text-gray-500">Vous n'avez pas la permission de consulter cette page.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  function openNew() {
+    setForm({ ...emptyForm, displayOrder: slides.length });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingId("new");
+  }
+
+  function openEdit(s: Slide) {
+    setForm({ image: s.image, video: s.video || "", altFr: s.alt_fr, altEn: s.alt_en || "", displayOrder: s.display_order, active: s.active });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingId(s.id);
+  }
+
+  async function handleUpload(field: "image" | "video", e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
@@ -29,87 +78,186 @@ export default function AdminHero() {
     fd.append("file", file);
     const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
     const { url } = await res.json();
-    const newSlide: Slide = { id: Date.now(), src: url, alt: newAlt || file.name };
-    const updated = [...slides, newSlide];
-    setSlides(updated);
-    setNewAlt("");
-    await save(updated);
+    setForm((f) => ({ ...f, [field]: url }));
     setUploading(false);
     e.target.value = "";
-  };
+  }
 
-  const remove = async (id: number) => {
-    const updated = slides.filter((s) => s.id !== id);
-    setSlides(updated);
-    await save(updated);
-  };
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setSaveError("");
+    const isNew = editingId === "new";
+    const res = await fetch(isNew ? "/api/admin/hero-slides" : `/api/admin/hero-slides/${editingId}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) {
+      setSaving(false);
+      setEditingId(null);
+      load();
+    } else {
+      const data = await res.json();
+      setSaveError(data.error || "Erreur lors de l'enregistrement");
+      setSaving(false);
+    }
+  }
 
-  const updateAlt = async (id: number, alt: string) => {
-    const updated = slides.map((s) => (s.id === id ? { ...s, alt } : s));
-    setSlides(updated);
-    await save(updated);
-  };
+  async function handleDelete(s: Slide) {
+    if (!confirm("Supprimer ce slide ? (réversible)")) return;
+    await fetch(`/api/admin/hero-slides/${s.id}`, { method: "DELETE" });
+    load();
+  }
+
+  async function handleRestore(s: Slide) {
+    await fetch(`/api/admin/hero-slides/${s.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restore: true }),
+    });
+    load();
+  }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Hero : Carrousel</h1>
-        <p className="text-sm text-gray-500 mt-1">Gérez les slides du carrousel de la page d'accueil</p>
-      </div>
-
-      {/* Add slide */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">Ajouter un slide</h2>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={newAlt}
-            onChange={(e) => setNewAlt(e.target.value)}
-            placeholder="Description de l'image (alt)"
-            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600"
-          />
-          <label className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg cursor-pointer hover:bg-green-800 transition-colors">
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M12 4v16m8-8H4" strokeLinecap="round" />
-            </svg>
-            {uploading ? "Envoi..." : "Uploader une image"}
-            <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
-          </label>
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-xl p-6 max-w-xl">
+          <p className="font-bold text-red-700 mb-1">Erreur de chargement</p>
+          <p className="text-sm text-red-600 whitespace-pre-wrap">{loadError}</p>
+          <button onClick={load} className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider text-red-700 border border-red-200 rounded-lg hover:bg-red-100">
+            Réessayer
+          </button>
         </div>
       </div>
+    );
+  }
 
-      {/* Slides list */}
-      <div className="space-y-3">
-        {slides.map((slide, i) => (
-          <div key={slide.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-            <span className="text-xs font-bold text-gray-300 w-6">{i + 1}</span>
-            {/* eslint-disable-next-line @next/next/no-img-élément */}
-            <img src={slide.src} alt={slide.alt} className="w-32 h-20 object-cover rounded-lg bg-gray-100" />
-            <div className="flex-1 min-w-0">
-              <input
-                type="text"
-                value={slide.alt}
-                onChange={(e) => updateAlt(slide.id, e.target.value)}
-                className="w-full text-sm font-medium text-gray-900 border-0 border-b border-transparent hover:border-gray-200 focus:border-green-600 focus:outline-none bg-transparent py-1"
-              />
-              <p className="text-xs text-gray-400 mt-1 truncate">{slide.src}</p>
-            </div>
-            <button
-              onClick={() => remove(slide.id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Supprimer"
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        ))}
+  return (
+    <div className="p-8">
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Hero</h1>
+          <p className="text-sm text-gray-500 mt-1">Images/vidéos en carrousel sur la bannière d'accueil</p>
+        </div>
+        <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+          + Nouveau slide
+        </button>
       </div>
 
-      {saving && <p className="mt-4 text-xs text-green-600 font-medium">Sauvegarde...</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {slides.map((s) => (
+          <div key={s.id} className={`bg-white rounded-xl border border-gray-200 overflow-hidden ${s.deleted_at ? "opacity-40" : ""}`}>
+            <div className="relative h-32 bg-gray-100">
+              <img src={s.image} alt="" className="w-full h-full object-cover" />
+              {s.video && <span className="absolute top-2 right-2 px-2 py-0.5 text-[10px] font-bold uppercase bg-black/60 text-white rounded">Vidéo</span>}
+              {!s.active && <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold uppercase bg-gray-700/80 text-white rounded">Masqué</span>}
+            </div>
+            <div className="p-4">
+              <p className="text-sm font-medium text-gray-900 truncate">{s.alt_fr}</p>
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-xs text-gray-400">Ordre : {s.display_order}</span>
+                <div className="flex items-center gap-1">
+                  {s.deleted_at ? (
+                    <RestoreIcon label="Restaurer" onClick={() => handleRestore(s)} />
+                  ) : (
+                    <>
+                      <EditIcon label="Modifier" onClick={() => openEdit(s)} />
+                      <DeleteIcon label="Supprimer" onClick={() => handleDelete(s)} />
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {slides.length === 0 && (
+          <p className="text-gray-400 col-span-full text-center py-8">Aucun slide — ajoutez-en un pour l'afficher sur la page d'accueil</p>
+        )}
+      </div>
+
+      {editingId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
+          <form onSubmit={handleSave} className="bg-white rounded-xl p-6 w-[90%] max-w-2xl shadow-2xl space-y-5 my-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouveau slide" : "Modifier le slide"}</h2>
+              <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
+                <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+                  Français
+                </button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+                  English
+                  {!form.altEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image *</label>
+              {form.image && <img src={form.image} alt="" className="h-28 rounded-lg mb-2 object-cover" />}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                {uploading ? "Envoi..." : "Choisir une image"}
+                <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("image", e)} />
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (optionnel — remplace l'image si présente)</label>
+              {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{form.video}</p>}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                {uploading ? "Envoi..." : "Choisir une vidéo"}
+                <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("video", e)} />
+              </label>
+              {form.video && (
+                <button type="button" onClick={() => setForm({ ...form, video: "" })} className="ml-2 text-xs text-red-500 hover:underline">
+                  Retirer la vidéo
+                </button>
+              )}
+            </div>
+
+            {activeLang === "fr" ? (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Texte alternatif (Français) *</label>
+                <input required value={form.altFr} onChange={(e) => setForm({ ...form, altFr: e.target.value })} placeholder="Décrit l'image pour l'accessibilité" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            ) : (
+              <div>
+                {!form.altFr && <p className="text-xs text-amber-600 mb-2">Renseignez d'abord le texte français.</p>}
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Alt text (English)</label>
+                <input value={form.altEn} onChange={(e) => setForm({ ...form, altEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            )}
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+                Visible sur le site
+              </label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-700">Ordre d'affichage</label>
+                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            {saveError && (
+              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+                <p className="text-sm font-medium text-red-600">{saveError}</p>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setEditingId(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
+                Annuler
+              </button>
+              <button type="submit" disabled={saving} className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+                {saving ? "Enregistrement..." : "Enregistrer"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
