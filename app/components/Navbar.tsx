@@ -80,8 +80,8 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
       title: s.strategieIa ?? "STRATÉGIE IA",
       links: [
         { label: l.strategieNationale ?? "Stratégie nationale", href: `${prefix}/strategie-ia` },
-        { label: l.initiatives ?? "Initiatives", href: `${prefix}/strategie-ia` },
-        { label: l.olympiadesIA ?? "Olympiades IA", href: `${prefix}/strategie-ia` },
+        { label: l.initiatives ?? "Initiatives", href: `${prefix}/strategie-ia/initiatives` },
+        { label: l.olympiadesIA ?? "Olympiades IA", href: `${prefix}/strategie-ia/olympiades-ia` },
       ],
     },
     {

@@ -1,6 +1,7 @@
 import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import StrategieIASubNav from "../../components/StrategieIASubNav";
 import Link from "next/link";
 
 const VERT  = "#006828";
@@ -62,15 +63,6 @@ const piliers = [
   },
 ];
 
-const milestones = [
-  { year: "2024", title: "Diagnostic national", description: "Audit des capacités IA du Bénin, cartographie des acteurs, identification des cas d'usage prioritaires.", done: true },
-  { year: "2025", title: "Adoption de la stratégie", description: "Validation interministérielle et lancement officiel de la Stratégie Nationale d'Intelligence Artificielle.", done: true },
-  { year: "2026", title: "Création de l'ANAI", description: "Mise en place de l'Agence Nationale de l'Intelligence Artificielle. Premiers appels à projets.", done: true },
-  { year: "2027", title: "Montée en charge", description: "10 projets IA sectoriels déployés. Ouverture du premier Data Center souverain du Bénin.", done: false },
-  { year: "2028", title: "Maturité et consolidation", description: "5 000 professionnels certifiés. Cadre juridique IA adopté par l'Assemblée nationale.", done: false },
-  { year: "2030", title: "Bénin, nation de l'IA", description: "Bénin classé dans le top 5 africain pour l'adoption de l'IA. Plateforme continentale d'IA déployée.", done: false },
-];
-
 type Props = {
   params: Promise<{ locale: string }>;
 };
@@ -83,8 +75,9 @@ export default async function StrategieIAPage({ params }: Props) {
   return (
     <>
       <Navbar locale={locale} dict={dict.nav} />
+      <StrategieIASubNav locale={locale} />
 
-      <main style={{ paddingTop: "84px" }}>
+      <main>
 
         {/* Hero */}
         <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-20 overflow-hidden" style={{ background: VERT }}>
@@ -128,10 +121,10 @@ export default async function StrategieIAPage({ params }: Props) {
             {/* Stats row */}
             <div className="mt-16 pt-8 grid grid-cols-2 sm:grid-cols-4 gap-8" style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}>
               {[
-                { value: "5", label: t.piliers },
-                { value: "4", label: t.projets },
+                { value: "4", label: t.piliers },
                 { value: "2030", label: t.horizon },
                 { value: "10 000", label: t.professionnels },
+                { value: "6", label: locale === "en" ? "Milestones" : "Jalons" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <p className="text-3xl sm:text-4xl font-black text-white leading-none mb-1">{stat.value}</p>
@@ -143,72 +136,27 @@ export default async function StrategieIAPage({ params }: Props) {
         </section>
 
         {/* 4 Pillars */}
-        <section id="piliers" className="px-4 sm:px-6 lg:px-8 py-16 bg-white">
+        <section id="piliers" className="px-4 sm:px-6 lg:px-8 py-16" style={{ background: "#0d1826" }}>
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-10" style={{ color: VERT }}>
+            <h2 className="text-xs font-black uppercase tracking-widest mb-10" style={{ color: JAUNE }}>
               {t.les4Piliers}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background: "rgba(255,255,255,0.08)" }}>
               {piliers.map((pilier) => (
-                <div key={pilier.number} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors">
+                <div key={pilier.number} className="group p-8 sm:p-10 transition-colors" style={{ background: "#0d1826" }}>
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: pilier.accent, opacity: 0.3 }}>
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: pilier.accent, opacity: 0.5 }}>
                       {pilier.number}
                     </span>
                     <div className="mt-1 flex-shrink-0" style={{ color: pilier.accent }}>
                       {pilier.icon}
                     </div>
                   </div>
-                  <h3 className="text-anthracite font-black text-xl uppercase leading-snug mb-4">{pilier.title}</h3>
-                  <p className="text-anthracite/75 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors">{pilier.description}</p>
+                  <h3 className="text-white font-black text-xl uppercase leading-snug mb-4">{pilier.title}</h3>
+                  <p className="text-white/60 text-sm font-medium leading-relaxed">{pilier.description}</p>
                   <div className="mt-6 h-0.5 w-12 rounded-full" style={{ background: pilier.accent }} />
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Timeline */}
-        <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-14" style={{ color: VERT }}>
-              {t.jalons}
-            </h2>
-
-            <div className="relative">
-              <div className="absolute left-20 sm:left-28 top-0 bottom-0 w-px" style={{ background: "rgba(0,0,0,0.10)" }} />
-
-              <div className="flex flex-col gap-0">
-                {milestones.map((milestone, i) => (
-                  <div key={i} className="relative flex items-start gap-8 sm:gap-12 pb-12 last:pb-0">
-                    <div className="flex-shrink-0 w-16 sm:w-24 text-right pt-1">
-                      <span className="text-sm font-black tabular-nums" style={{ color: milestone.done ? VERT : "rgba(26,26,26,0.25)" }}>
-                        {milestone.year}
-                      </span>
-                    </div>
-
-                    <div className="absolute flex items-center justify-center" style={{ left: "calc(4rem + 2rem - 6px)", top: "6px" }}>
-                      <div className="w-3 h-3 rounded-full" style={{ background: milestone.done ? VERT : "transparent", border: `2px solid ${milestone.done ? VERT : "rgba(26,26,26,0.20)"}` }} />
-                    </div>
-
-                    <div className="flex-1 min-w-0 pl-6">
-                      <div className="flex items-start gap-3 mb-2">
-                        {milestone.done && (
-                          <span className="flex-shrink-0 mt-0.5 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" style={{ background: `${VERT}14`, color: VERT }}>
-                            {t.accompli}
-                          </span>
-                        )}
-                        <h3 className="text-anthracite font-black text-base uppercase leading-snug" style={{ opacity: milestone.done ? 1 : 0.45 }}>
-                          {milestone.title}
-                        </h3>
-                      </div>
-                      <p className="text-sm font-medium leading-relaxed" style={{ color: milestone.done ? "rgba(26,26,26,0.55)" : "rgba(26,26,26,0.30)" }}>
-                        {milestone.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </section>
