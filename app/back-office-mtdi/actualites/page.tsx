@@ -62,16 +62,30 @@ export default function AdminActualites() {
   const [uploading, setUploading] = useState(false);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
+  const [loadError, setLoadError] = useState("");
+
   function load() {
     setLoading(true);
+    setLoadError("");
     Promise.all([
-      fetch("/api/admin/actualites").then((r) => r.json()),
-      fetch("/api/admin/categories").then((r) => r.json()),
-    ]).then(([articlesData, categoriesData]) => {
-      setArticles(articlesData);
-      setCategories(categoriesData);
-      setLoading(false);
-    });
+      fetch("/api/admin/actualites").then(async (r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status} sur /api/admin/actualites : ${await r.text()}`);
+        return r.json();
+      }),
+      fetch("/api/admin/categories").then(async (r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status} sur /api/admin/categories : ${await r.text()}`);
+        return r.json();
+      }),
+    ])
+      .then(([articlesData, categoriesData]) => {
+        setArticles(articlesData);
+        setCategories(categoriesData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoadError(err.message || "Erreur de chargement");
+        setLoading(false);
+      });
   }
   useEffect(() => { if (canView) load(); }, [canView]);
 
@@ -159,6 +173,20 @@ export default function AdminActualites() {
   }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
+
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-xl p-6 max-w-xl">
+          <p className="font-bold text-red-700 mb-1">Erreur de chargement</p>
+          <p className="text-sm text-red-600 whitespace-pre-wrap">{loadError}</p>
+          <button onClick={load} className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider text-red-700 border border-red-200 rounded-lg hover:bg-red-100">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
