@@ -1,106 +1,271 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
-type KPI = { id: number; label: string; value: number; max: number; unit: string };
+const VERT = "#006828";
+
+type Stat = {
+  id: number;
+  label_fr: string;
+  label_en: string | null;
+  value: string; // NUMERIC renvoyé en string par Postgres
+  max_value: string;
+  unit: string;
+  display_order: number;
+  active: boolean;
+  deleted_at: string | null;
+};
+
+type FormState = {
+  labelFr: string; labelEn: string; value: number; maxValue: number; unit: string; displayOrder: number; active: boolean;
+};
+
+const emptyForm: FormState = { labelFr: "", labelEn: "", value: 0, maxValue: 100, unit: "", displayOrder: 0, active: true };
 
 export default function AdminStats() {
-  const [stats, setStats] = useState<KPI[]>([]);
+  const canView = useHasPermission("stats.voir");
+  const canManage = useHasPermission("stats.gerer");
+
+  const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
-  useEffect(() => {
-    fetch("/api/admin/stats").then((r) => r.json()).then((d) => { setStats(d); setLoading(false); });
-  }, []);
+  function load() {
+    setLoading(true);
+    setLoadError("");
+    fetch("/api/admin/stats")
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
+        return r.json();
+      })
+      .then((d) => { setStats(d); setLoading(false); })
+      .catch((err) => { setLoadError(err.message); setLoading(false); });
+  }
+  useEffect(() => { if (canView) load(); }, [canView]);
 
-  const update = (id: number, field: keyof KPI, val: string) => {
-    setStats(stats.map((s) => {
-      if (s.id !== id) return s;
-      if (field === "value" || field === "max") return { ...s, [field]: Number(val) || 0 };
-      return { ...s, [field]: val };
-    }));
-  };
+  if (!canView) {
+    return (
+      <div className="p-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center max-w-md mx-auto mt-12">
+          <p className="font-bold text-gray-900 mb-1">Accès refusé</p>
+          <p className="text-sm text-gray-500">Vous n'avez pas la permission de consulter cette page.</p>
+        </div>
+      </div>
+    );
+  }
 
-  const save = async () => {
+  function openNew() {
+    setForm({ ...emptyForm, displayOrder: stats.length });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingId("new");
+  }
+
+  function openEdit(s: Stat) {
+    setForm({
+      labelFr: s.label_fr, labelEn: s.label_en || "",
+      value: Number(s.value), maxValue: Number(s.max_value), unit: s.unit,
+      displayOrder: s.display_order, active: s.active,
+    });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingId(s.id);
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
     setSaving(true);
-    await fetch("/api/admin/stats", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(stats) });
-    setSaving(false);
-  };
+    setSaveError("");
+    const isNew = editingId === "new";
+    const res = await fetch(isNew ? "/api/admin/stats" : `/api/admin/stats/${editingId}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    if (res.ok) {
+      setSaving(false);
+      setEditingId(null);
+      load();
+    } else {
+      const data = await res.json();
+      setSaveError(data.error || "Erreur lors de l'enregistrement");
+      setSaving(false);
+    }
+  }
 
-  const addStat = () => {
-    const id = stats.length ? Math.max(...stats.map((s) => s.id)) + 1 : 1;
-    setStats([...stats, { id, label: "", value: 0, max: 100, unit: "" }]);
-  };
+  async function handleDelete(s: Stat) {
+    if (!confirm(`Supprimer "${s.label_fr}" ? (réversible)`)) return;
+    await fetch(`/api/admin/stats/${s.id}`, { method: "DELETE" });
+    load();
+  }
 
-  const removeStat = (id: number) => setStats(stats.filter((s) => s.id !== id));
+  async function handleRestore(s: Stat) {
+    await fetch(`/api/admin/stats/${s.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restore: true }),
+    });
+    load();
+  }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-xl p-6 max-w-xl">
+          <p className="font-bold text-red-700 mb-1">Erreur de chargement</p>
+          <p className="text-sm text-red-600 whitespace-pre-wrap">{loadError}</p>
+          <button onClick={load} className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider text-red-700 border border-red-200 rounded-lg hover:bg-red-100">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Chiffres clés</h1>
-          <p className="text-sm text-gray-500 mt-1">KPIs affichés dans la section statistiques</p>
+          <p className="text-sm text-gray-500 mt-1">Indicateurs affichés sur la page d'accueil</p>
         </div>
-        <div className="flex gap-3">
-          <button onClick={addStat} className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-sm font-medium text-gray-700 rounded-lg hover:border-gray-300 transition-colors">
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" /></svg>
-            Ajouter
+        {canManage && (
+          <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+            + Nouveau chiffre
           </button>
-          <button onClick={save} disabled={saving} className="px-5 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors disabled:opacity-50">
-            {saving ? "Sauvegarde..." : "Enregistrer"}
-          </button>
-        </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-100">
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase">Indicateur</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase w-28">Valeur</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase w-28">Objectif</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase w-20">Unité</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold text-gray-400 uppercase w-20">%</th>
-              <th className="px-5 py-3 w-12"></th>
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+            <tr>
+              <th className="px-5 py-3">Libellé (FR)</th>
+              <th className="px-5 py-3">Traduction EN</th>
+              <th className="px-5 py-3">Valeur / Objectif</th>
+              <th className="px-5 py-3">Unité</th>
+              <th className="px-5 py-3">Visible</th>
+              <th className="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {stats.map((s) => (
-              <tr key={s.id} className="border-b border-gray-50">
+              <tr key={s.id} className={s.deleted_at ? "opacity-40" : ""}>
+                <td className="px-5 py-3 font-medium text-gray-900">{s.label_fr}</td>
                 <td className="px-5 py-3">
-                  <input value={s.label} onChange={(e) => update(s.id, "label", e.target.value)} className="w-full text-sm font-medium text-gray-900 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-green-600 focus:outline-none py-1" />
+                  {s.label_en ? <span className="text-xs text-green-700">✓ traduit</span> : <span className="text-xs text-amber-600">⚠ non traduit</span>}
+                </td>
+                <td className="px-5 py-3 text-gray-500">{Number(s.value).toLocaleString("fr-FR")} / {Number(s.max_value).toLocaleString("fr-FR")}</td>
+                <td className="px-5 py-3 text-gray-500">{s.unit}</td>
+                <td className="px-5 py-3">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${s.active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                    {s.active ? "Actif" : "Masqué"}
+                  </span>
                 </td>
                 <td className="px-5 py-3">
-                  <input type="number" value={s.value} onChange={(e) => update(s.id, "value", e.target.value)} className="w-full text-sm font-bold text-green-700 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-green-600 focus:outline-none py-1" />
-                </td>
-                <td className="px-5 py-3">
-                  <input type="number" value={s.max} onChange={(e) => update(s.id, "max", e.target.value)} className="w-full text-sm text-gray-500 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-green-600 focus:outline-none py-1" />
-                </td>
-                <td className="px-5 py-3">
-                  <input value={s.unit} onChange={(e) => update(s.id, "unit", e.target.value)} className="w-full text-sm text-gray-500 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-green-600 focus:outline-none py-1" />
-                </td>
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-600 rounded-full" style={{ width: `${Math.round((s.value / s.max) * 100)}%` }} />
-                    </div>
-                    <span className="text-xs font-medium text-gray-400">{Math.round((s.value / s.max) * 100)}%</span>
+                  <div className="flex items-center justify-end gap-1">
+                    {s.deleted_at ? (
+                      canManage && <RestoreIcon label="Restaurer" onClick={() => handleRestore(s)} />
+                    ) : (
+                      canManage && (
+                        <>
+                          <EditIcon label="Modifier" onClick={() => openEdit(s)} />
+                          <DeleteIcon label="Supprimer" onClick={() => handleDelete(s)} />
+                        </>
+                      )
+                    )}
                   </div>
-                </td>
-                <td className="px-5 py-3">
-                  <button onClick={() => removeStat(s.id)} className="p-1 text-gray-400 hover:text-red-600 transition-colors">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
                 </td>
               </tr>
             ))}
+            {stats.length === 0 && (
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">Aucun chiffre clé — ajoutez-en un pour l'afficher sur la page d'accueil</td></tr>
+            )}
           </tbody>
         </table>
       </div>
+
+      {editingId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
+          <form onSubmit={handleSave} className="bg-white rounded-xl p-6 w-[90%] max-w-2xl shadow-2xl space-y-5 my-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouveau chiffre clé" : "Modifier"}</h2>
+              <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
+                <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+                  Français
+                </button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+                  English
+                  {!form.labelEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
+                </button>
+              </div>
+            </div>
+
+            {activeLang === "fr" ? (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (Français) *</label>
+                <input required value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} placeholder="ex : Communes connectées à la fibre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            ) : (
+              <div>
+                {!form.labelFr && <p className="text-xs text-amber-600 mb-2">Renseignez d'abord le libellé en français (onglet précédent).</p>}
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (English)</label>
+                <input value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur actuelle *</label>
+                <input required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Objectif (max) *</label>
+                <input required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Unité</label>
+                <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="ex : %, km, K" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+                Visible sur le site
+              </label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-700">Ordre d'affichage</label>
+                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            {saveError && (
+              <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100">
+                <p className="text-sm font-medium text-red-600">{saveError}</p>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setEditingId(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
+                Annuler
+              </button>
+              <button type="submit" disabled={saving} className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+                {saving ? "Enregistrement..." : "Enregistrer"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

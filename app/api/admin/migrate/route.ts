@@ -52,6 +52,26 @@ export async function POST(req: NextRequest) {
       ON CONFLICT (key) DO NOTHING
     `;
 
+    // ── Chiffres clés (page d'accueil) ─────────────────────────────────
+    // Table vide au départ : on n'invente aucun chiffre, le MTDI les
+    // saisira lui-même depuis le back-office.
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS stats (
+        id            SERIAL PRIMARY KEY,
+        label_fr      TEXT NOT NULL,
+        label_en      TEXT,
+        value         NUMERIC NOT NULL DEFAULT 0,
+        max_value     NUMERIC NOT NULL DEFAULT 100,
+        unit          TEXT NOT NULL DEFAULT '',
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active        BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by    INTEGER REFERENCES users(id),
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at    TIMESTAMPTZ
+      )
+    `);
+
     // ── Paramètres généraux (nom, logos, réseaux sociaux) ──────────────
     // Valeurs par défaut = ce qui est déjà codé en dur aujourd'hui, pour
     // qu'aucun changement ne soit visible tant que personne ne modifie rien.

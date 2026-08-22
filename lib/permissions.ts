@@ -14,6 +14,10 @@ export const PERMISSIONS = [
   { code: "categories.voir", module: "categories", description: "Voir les catégories" },
   { code: "categories.gerer", module: "categories", description: "Créer, modifier, supprimer des catégories" },
 
+  // Chiffres clés (page d'accueil)
+  { code: "stats.voir", module: "stats", description: "Voir les chiffres clés" },
+  { code: "stats.gerer", module: "stats", description: "Créer, modifier, supprimer des chiffres clés" },
+
   // Contenu général (hero, chantiers, galerie, direct, ministre, stats)
   { code: "contenu.modifier", module: "contenu", description: "Modifier le contenu des pages (hero, chantiers, galerie, direct, ministre, stats)" },
 

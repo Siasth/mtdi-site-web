@@ -5,9 +5,9 @@ import { hasPerm, type PermissionCode } from "@/lib/permissions";
 
 type Params = { params: Promise<{ resource: string }> };
 
-// "actualites" a migré vers la base de données (voir app/api/admin/actualites/)
-// — retiré d'ici pour éviter toute confusion avec l'ancien data/actualites.json.
-const VALID = ["hero", "galerie", "chantiers", "stats", "direct", "ministre"];
+// "actualites" et "stats" ont migré vers la base de données (voir routes
+// dédiées) — retirés d'ici pour éviter toute confusion.
+const VALID = ["hero", "galerie", "chantiers", "direct", "ministre"];
 
 function requiredPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer"): PermissionCode {
   void resource;
