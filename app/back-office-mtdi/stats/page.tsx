@@ -13,16 +13,26 @@ type Stat = {
   value: string; // NUMERIC renvoyé en string par Postgres
   max_value: string;
   unit: string;
+  unit_fr_singular: string | null;
+  unit_en: string | null;
+  unit_en_singular: string | null;
+  no_space: boolean;
   display_order: number;
   active: boolean;
   deleted_at: string | null;
 };
 
 type FormState = {
-  labelFr: string; labelEn: string; value: number; maxValue: number; unit: string; displayOrder: number; active: boolean;
+  labelFr: string; labelEn: string; value: number; maxValue: number;
+  unit: string; unitFrSingular: string; unitEn: string; unitEnSingular: string; noSpace: boolean;
+  displayOrder: number; active: boolean;
 };
 
-const emptyForm: FormState = { labelFr: "", labelEn: "", value: 0, maxValue: 100, unit: "", displayOrder: 0, active: true };
+const emptyForm: FormState = {
+  labelFr: "", labelEn: "", value: 0, maxValue: 100,
+  unit: "", unitFrSingular: "", unitEn: "", unitEnSingular: "", noSpace: false,
+  displayOrder: 0, active: true,
+};
 
 export default function AdminStats() {
   const canView = useHasPermission("stats.voir");
@@ -72,6 +82,8 @@ export default function AdminStats() {
     setForm({
       labelFr: s.label_fr, labelEn: s.label_en || "",
       value: Number(s.value), maxValue: Number(s.max_value), unit: s.unit,
+      unitFrSingular: s.unit_fr_singular || "", unitEn: s.unit_en || "", unitEnSingular: s.unit_en_singular || "",
+      noSpace: s.no_space,
       displayOrder: s.display_order, active: s.active,
     });
     setActiveLang("fr");
@@ -211,19 +223,44 @@ export default function AdminStats() {
             </div>
 
             {activeLang === "fr" ? (
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (Français) *</label>
-                <input required value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} placeholder="ex : Communes connectées à la fibre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (Français) *</label>
+                  <input required value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} placeholder="ex : Communes connectées à la fibre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unité (pluriel)</label>
+                    <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="ex : communes, %, km" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unité (singulier)</label>
+                    <input value={form.unitFrSingular} onChange={(e) => setForm({ ...form, unitFrSingular: e.target.value })} placeholder="ex : commune (si 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400">Le singulier n'est utilisé que si la valeur affichée est 1 ou -1. Laissez vide si l'unité ne varie pas (%, km...).</p>
               </div>
             ) : (
-              <div>
-                {!form.labelFr && <p className="text-xs text-amber-600 mb-2">Renseignez d'abord le libellé en français (onglet précédent).</p>}
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (English)</label>
-                <input value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <div className="space-y-4">
+                {!form.labelFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français (onglet précédent).</p>}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (English)</label>
+                  <input value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unit (plural)</label>
+                    <input value={form.unitEn} onChange={(e) => setForm({ ...form, unitEn: e.target.value })} placeholder="ex : municipalities, %, km — laisser vide = même qu'en FR" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unit (singular)</label>
+                    <input value={form.unitEnSingular} onChange={(e) => setForm({ ...form, unitEnSingular: e.target.value })} placeholder="ex : municipality (if 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
+            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur actuelle *</label>
                 <input required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
@@ -232,15 +269,17 @@ export default function AdminStats() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Objectif (max) *</label>
                 <input required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Unité</label>
-                <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="ex : %, km, K" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              </div>
             </div>
+
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="checkbox" checked={form.noSpace} onChange={(e) => setForm({ ...form, noSpace: e.target.checked })} />
+              Coller le nombre et l'unité (ex : 40% au lieu de 40 %)
+            </label>
 
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+
                 Visible sur le site
               </label>
               <div className="flex items-center gap-2">

@@ -72,6 +72,13 @@ export async function POST(req: NextRequest) {
       )
     `);
 
+    // Unité bilingue + singulier/pluriel + espacement — "unit" (créée
+    // ci-dessus) devient de facto le pluriel français par défaut.
+    await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS unit_fr_singular TEXT`);
+    await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS unit_en TEXT`);
+    await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS unit_en_singular TEXT`);
+    await sql.query(`ALTER TABLE stats ADD COLUMN IF NOT EXISTS no_space BOOLEAN NOT NULL DEFAULT FALSE`);
+
     // ── Paramètres généraux (nom, logos, réseaux sociaux) ──────────────
     // Valeurs par défaut = ce qui est déjà codé en dur aujourd'hui, pour
     // qu'aucun changement ne soit visible tant que personne ne modifie rien.

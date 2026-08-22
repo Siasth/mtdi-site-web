@@ -5,11 +5,17 @@ import { useEffect, useRef, useState, useCallback } from "react";
 const VERT  = "#006828";
 const JAUNE = "#FFBE00";
 
-type StatItem = { id: number; label: string; value: number; max: number; unit: string };
+type StatItem = { id: number; label: string; value: number; max: number; unit: string; noSpace?: boolean };
 type Dict = Record<string, string>;
 
+function formatValue(value: number, unit: string, noSpace?: boolean): string {
+  const formatted = value.toLocaleString("fr-FR");
+  if (!unit) return formatted;
+  return noSpace ? `${formatted}${unit}` : `${formatted}\u00A0${unit}`; // espace insécable
+}
+
 // Données à renseigner par le MTDI — ne pas inventer de chiffres
-const defaultBarData: { label: string; value: number; max: number; unit: string; color: string }[] = [];
+const defaultBarData: { label: string; value: number; max: number; unit: string; noSpace?: boolean; color: string }[] = [];
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
@@ -114,7 +120,7 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
                         opacity: progress,
                       }}
                     >
-                      {bar.value.toLocaleString("fr-FR")}{bar.unit}
+                      {formatValue(bar.value, bar.unit, bar.noSpace)}
                     </span>
                     <span
                       className="text-[10px] font-bold block"
@@ -152,7 +158,7 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
                           color: bar.color === JAUNE ? "#FFBE00" : "white",
                         }}
                       >
-                        {d.surObjectif ?? "sur"} {bar.max.toLocaleString("fr-FR")}{bar.unit}
+                        {d.surObjectif ?? "sur"} {formatValue(bar.max, bar.unit, bar.noSpace)}
                       </div>
                     )}
                   </div>
