@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
     INSERT INTO actualites
       (title_fr, title_en, excerpt_fr, excerpt_en, category_id, image, href_external, published_at, read_time, featured, display_order, status, created_by)
     VALUES
-      (${titleFr}, ${titleEn || null}, ${excerptFr || ""}, ${excerptEn || null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
+      (${titleFr}, ${titleEn || null}, ${sanitizeRichText(excerptFr || "")}, ${excerptEn ? sanitizeRichText(excerptEn) : null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
     RETURNING id
   `;
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
+import { sanitizeRichText } from "@/lib/sanitize";
 import { hasPerm } from "@/lib/permissions";
 
 function getIp(req: NextRequest): string | null {
@@ -50,8 +51,8 @@ export async function PATCH(
     UPDATE actualites SET
       title_fr = COALESCE(${titleFr}, title_fr),
       title_en = ${titleEn ?? null},
-      excerpt_fr = COALESCE(${excerptFr}, excerpt_fr),
-      excerpt_en = ${excerptEn ?? null},
+      excerpt_fr = COALESCE(${excerptFr ? sanitizeRichText(excerptFr) : null}, excerpt_fr),
+      excerpt_en = ${excerptEn ? sanitizeRichText(excerptEn) : null},
       category_id = COALESCE(${categoryId}, category_id),
       image = ${image ?? null},
       href_external = ${hrefExternal ?? null},
