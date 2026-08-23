@@ -100,11 +100,11 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                   basses/zoom élevé) plutôt que d'être coupé et inaccessible */}
               <div
                 className="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 sm:py-12 overflow-y-auto"
-                style={{ paddingTop: `${PEEK + 32}px`, paddingBottom: `${PEEK + 32}px` }}
+                style={{ paddingTop: `${PEEK + 10}px`, paddingBottom: `${PEEK + 32}px` }}
               >
 
                 {/* Chantier label + dots */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <span
                       className="text-3xl sm:text-4xl font-black leading-none tabular-nums"
