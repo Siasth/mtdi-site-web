@@ -32,7 +32,18 @@ export async function POST(req: NextRequest) {
   const { secret } = await req.json();
 
   if (!process.env.SETUP_SECRET || secret !== process.env.SETUP_SECRET) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+    return NextResponse.json(
+      {
+        error: "Non autorisé",
+        // Diagnostic TEMPORAIRE — ne révèle jamais la valeur elle-même.
+        debug: {
+          envVarDefined: !!process.env.SETUP_SECRET,
+          envVarLength: process.env.SETUP_SECRET?.length ?? 0,
+          receivedLength: (secret || "").length,
+        },
+      },
+      { status: 401 }
+    );
   }
 
   try {
