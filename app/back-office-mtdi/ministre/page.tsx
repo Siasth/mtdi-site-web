@@ -1,148 +1,244 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import MarkdownEditor from "../components/MarkdownEditor";
+import { uploadFile } from "@/lib/client-upload";
 
-type MinistreData = {
-  name: string;
-  title: string;
-  photo: string;
-  badge: string;
-  badgeSub: string;
-  heading: string;
-  paragraphs: string[];
+const VERT = "#006828";
+
+type FormState = {
+  name: string; photo: string;
+  titleFr: string; titleEn: string;
+  badgeFr: string; badgeEn: string;
+  badgeSubFr: string; badgeSubEn: string;
+  headingFr: string; headingEn: string;
+  paragraphsFr: string[]; paragraphsEn: string[];
 };
 
 export default function AdminMinistre() {
-  const [data, setData] = useState<MinistreData | null>(null);
+  const canManage = useHasPermission("contenu.modifier");
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
+  const [form, setForm] = useState<FormState | null>(null);
 
-  useEffect(() => {
-    fetch("/api/admin/ministre").then((r) => r.json()).then((d) => { setData(d); setLoading(false); });
-  }, []);
+  function load() {
+    setLoading(true);
+    setLoadError("");
+    fetch("/api/admin/ministre-settings")
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
+        return r.json();
+      })
+      .then((d: FormState) => { setForm(d); setLoading(false); })
+      .catch((err) => { setLoadError(err.message); setLoading(false); });
+  }
+  useEffect(() => { if (canManage) load(); }, [canManage]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploadError, setUploadError] = useState("");
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !data) return;
+    if (!file || !form) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setData({ ...data, photo: url });
-    setUploading(false);
-  };
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      setForm({ ...form, photo: url });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
-  const updateParagraph = (idx: number, val: string) => {
-    if (!data) return;
-    const paragraphs = [...data.paragraphs];
-    paragraphs[idx] = val;
-    setData({ ...data, paragraphs });
-  };
+  function updateParagraph(lang: "Fr" | "En", idx: number, val: string) {
+    if (!form) return;
+    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
+    const list = [...form[key]];
+    list[idx] = val;
+    setForm({ ...form, [key]: list });
+  }
+  function addParagraph(lang: "Fr" | "En") {
+    if (!form) return;
+    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
+    setForm({ ...form, [key]: [...form[key], ""] });
+  }
+  function removeParagraph(lang: "Fr" | "En", idx: number) {
+    if (!form) return;
+    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
+    setForm({ ...form, [key]: form[key].filter((_, i) => i !== idx) });
+  }
 
-  const addParagraph = () => {
-    if (!data) return;
-    setData({ ...data, paragraphs: [...data.paragraphs, ""] });
-  };
-
-  const removeParagraph = (idx: number) => {
-    if (!data) return;
-    setData({ ...data, paragraphs: data.paragraphs.filter((_, i) => i !== idx) });
-  };
-
-  const save = async () => {
-    if (!data) return;
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form) return;
     setSaving(true);
-    await fetch("/api/admin/ministre", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    setMsg(null);
+    const res = await fetch("/api/admin/ministre-settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
+    setMsg(res.ok ? { type: "success", text: "Enregistré et visible immédiatement sur le site." } : { type: "error", text: "Erreur lors de l'enregistrement" });
     setSaving(false);
-  };
+  }
 
-  if (loading || !data) return <div className="p-8 text-gray-400">Chargement...</div>;
+  if (!canManage) {
+    return (
+      <div className="p-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center max-w-md mx-auto mt-12">
+          <p className="font-bold text-gray-900 mb-1">Accès refusé</p>
+          <p className="text-sm text-gray-500">Vous n'avez pas la permission de consulter cette page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading || !form) return <div className="p-8 text-gray-400">Chargement...</div>;
+
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-xl p-6 max-w-xl">
+          <p className="font-bold text-red-700 mb-1">Erreur de chargement</p>
+          <p className="text-sm text-red-600 whitespace-pre-wrap">{loadError}</p>
+          <button onClick={load} className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider text-red-700 border border-red-200 rounded-lg hover:bg-red-100">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const paragraphs = activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn;
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-8 max-w-3xl">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Mot du Ministre</h1>
-          <p className="text-sm text-gray-500 mt-1">Section &quot;Le mot du Ministre&quot; de la page d'accueil</p>
+          <p className="text-sm text-gray-500 mt-1">Section affichée sur la page d'accueil</p>
         </div>
-        <button onClick={save} disabled={saving} className="px-6 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors disabled:opacity-50">
-          {saving ? "Sauvegarde..." : "Enregistrer"}
+        <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
+          <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+            Français
+          </button>
+          <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+            English
+            {!form.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
+          </button>
+        </div>
+      </div>
+
+      <form onSubmit={handleSave} className="space-y-6">
+        <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+          <h2 className="font-bold text-gray-900">Identité (commun aux deux langues)</h2>
+          <div className="flex items-center gap-4">
+            <div className="relative w-20 h-24 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0">
+              {form.photo && <img src={form.photo} alt="" className="w-full h-full object-cover" />}
+            </div>
+            <label className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50">
+              {uploading ? "Envoi..." : "Changer la photo"}
+              <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleUpload} />
+            </label>
+            {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet</label>
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+        </section>
+
+        {activeLang === "fr" ? (
+          <>
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <h2 className="font-bold text-gray-900">Contenu (Français)</h2>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre / fonction complète</label>
+                <input value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (ligne 1)</label>
+                  <input value={form.badgeFr} onChange={(e) => setForm({ ...form, badgeFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (ligne 2)</label>
+                  <input value={form.badgeSubFr} onChange={(e) => setForm({ ...form, badgeSubFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre accrocheur (une phrase par ligne)</label>
+                <textarea value={form.headingFr} onChange={(e) => setForm({ ...form, headingFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-gray-900">Paragraphes (Français)</h2>
+                <button type="button" onClick={() => addParagraph("Fr")} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter un paragraphe</button>
+              </div>
+              {paragraphs.map((p, i) => (
+                <div key={i} className="relative">
+                  <MarkdownEditor value={p} onChange={(v) => updateParagraph("Fr", i, v)} rows={3} />
+                  <button type="button" onClick={() => removeParagraph("Fr", i)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center hover:bg-red-200">×</button>
+                </div>
+              ))}
+              {paragraphs.length === 0 && <p className="text-sm text-gray-400">Aucun paragraphe.</p>}
+            </section>
+          </>
+        ) : (
+          <>
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              {!form.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français.</p>}
+              <h2 className="font-bold text-gray-900">Content (English)</h2>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title / full function</label>
+                <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (line 1)</label>
+                  <input value={form.badgeEn} onChange={(e) => setForm({ ...form, badgeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (line 2)</label>
+                  <input value={form.badgeSubEn} onChange={(e) => setForm({ ...form, badgeSubEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catchy title (one sentence per line)</label>
+                <textarea value={form.headingEn} onChange={(e) => setForm({ ...form, headingEn: e.target.value })} rows={3} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </section>
+
+            <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-gray-900">Paragraphs (English)</h2>
+                <button type="button" onClick={() => addParagraph("En")} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Add a paragraph</button>
+              </div>
+              {paragraphs.map((p, i) => (
+                <div key={i} className="relative">
+                  <MarkdownEditor value={p} onChange={(v) => updateParagraph("En", i, v)} rows={3} />
+                  <button type="button" onClick={() => removeParagraph("En", i)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center hover:bg-red-200">×</button>
+                </div>
+              ))}
+              {paragraphs.length === 0 && <p className="text-sm text-gray-400">No paragraph yet. Leave empty to keep showing the French version.</p>}
+            </section>
+          </>
+        )}
+
+        {msg && <p className={`text-sm ${msg.type === "success" ? "text-green-600" : "text-red-600"}`}>{msg.text}</p>}
+
+        <button type="submit" disabled={saving} className="px-6 py-3 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+          {saving ? "Enregistrement..." : "Enregistrer"}
         </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Photo */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase mb-4">Photo officielle</h2>
-          <div className="relative aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden mb-4">
-            {data.photo && (
-              /* eslint-disable-next-line @next/next/no-img-élément */
-              <img src={data.photo} alt={data.name} className="w-full h-full object-cover" />
-            )}
-          </div>
-          <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg cursor-pointer hover:bg-gray-200 transition-colors w-full justify-center">
-            {uploading ? "Envoi..." : "Changer la photo"}
-            <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
-          </label>
-        </div>
-
-        {/* Infos + message */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Identité */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase mb-2">Identité</h2>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Nom complet</label>
-              <input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre / Fonction</label>
-              <input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Badge</label>
-                <input value={data.badge} onChange={(e) => setData({ ...data, badge: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Sous-badge</label>
-                <input value={data.badgeSub} onChange={(e) => setData({ ...data, badgeSub: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-            </div>
-          </div>
-
-          {/* Message */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase mb-2">Message</h2>
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre / Accroche</label>
-              <textarea value={data.heading} onChange={(e) => setData({ ...data, heading: e.target.value })} rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600 resize-none" placeholder="Utiliser \n pour les sauts de ligne" />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Paragraphes</label>
-                <button onClick={addParagraph} className="text-xs font-semibold text-green-700 hover:text-green-800">+ Ajouter</button>
-              </div>
-              <div className="space-y-3">
-                {data.paragraphs.map((p, i) => (
-                  <div key={i} className="flex gap-2">
-                    <textarea value={p} onChange={(e) => updateParagraph(i, e.target.value)} rows={3} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600 resize-none" />
-                    {data.paragraphs.length > 1 && (
-                      <button onClick={() => removeParagraph(i)} className="p-2 text-gray-400 hover:text-red-600 self-start transition-colors">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </form>
     </div>
   );
 }

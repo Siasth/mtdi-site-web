@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { uploadFile } from "@/lib/client-upload";
 import MarkdownEditor from "../components/MarkdownEditor";
 
 const VERT = "#006828";
@@ -91,17 +92,21 @@ export default function AdminChantiers() {
     setEditingId(c.id);
   }
 
+  const [uploadError, setUploadError] = useState("");
   async function handleUpload(field: "image" | "video", e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(field);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setForm((f) => ({ ...f, [field]: url }));
-    setUploading(null);
-    e.target.value = "";
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      setForm((f) => ({ ...f, [field]: url }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(null);
+      e.target.value = "";
+    }
   }
 
   function updateStat(i: number, field: "value" | "labelFr" | "labelEn", val: string) {
@@ -302,6 +307,7 @@ export default function AdminChantiers() {
               {form.video && (
                 <button type="button" onClick={() => setForm({ ...form, video: "" })} className="ml-2 text-xs text-red-500 hover:underline">Retirer</button>
               )}
+              {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
             </div>
 
             <div>

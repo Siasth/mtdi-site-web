@@ -37,12 +37,12 @@ export default async function ActualiteDetailPage({ params }: Props) {
 
         {/* ── Bandeau titre : fond uni, comme le reste du site ── */}
         <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8" style={{ background: BANNER }}>
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase leading-snug text-white max-w-3xl mb-5">
+          <div className="max-w-7xl mx-auto text-center">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase leading-snug text-white max-w-3xl mx-auto mb-5">
               {article.title}
             </h1>
 
-            <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center justify-between flex-wrap gap-4 max-w-3xl mx-auto text-left">
               <div className="flex items-center gap-3 text-white/50 text-xs font-semibold uppercase tracking-wider">
                 <span>
                   {new Date(article.publishedAt).toLocaleDateString(isEn ? "en-US" : "fr-FR", { day: "numeric", month: "long", year: "numeric" })}

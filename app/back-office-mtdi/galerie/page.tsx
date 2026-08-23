@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { uploadFile } from "@/lib/client-upload";
 
 type GalerieItem = {
   id: number;
@@ -45,16 +46,20 @@ export default function AdminGalerie() {
   const openEdit = (item: GalerieItem) => { setEditing({ ...item }); setIsNew(false); };
   const close = () => { setEditing(null); setIsNew(false); };
 
+  const [uploadError, setUploadError] = useState("");
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !editing) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setEditing({ ...editing, image: url });
-    setUploading(false);
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      setEditing({ ...editing, image: url });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const saveItem = async () => {
@@ -204,6 +209,7 @@ export default function AdminGalerie() {
                     {uploading ? "Envoi..." : "Choisir une image"}
                     <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
                   </label>
+                  {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { uploadFile } from "@/lib/client-upload";
 import { useHasPermission } from "../AdminLayoutClient";
 
 const VERT = "#006828";
@@ -45,17 +46,21 @@ export default function AdminGeneral() {
       });
   }, [canManage]);
 
+  const [uploadError, setUploadError] = useState("");
   async function handleUpload(field: "logoHeader" | "logoFooter" | "favicon", e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || !form) return;
     setUploadingField(field);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setForm({ ...form, [field]: url });
-    setUploadingField(null);
-    e.target.value = "";
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      setForm({ ...form, [field]: url });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploadingField(null);
+      e.target.value = "";
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -156,6 +161,7 @@ export default function AdminGeneral() {
               </div>
             </div>
           ))}
+          {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">

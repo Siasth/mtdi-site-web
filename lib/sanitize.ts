@@ -24,15 +24,28 @@ export function sanitizeRichText(html: string): string {
     allowedAttributes: {
       a: ["href", "target", "rel"],
       span: ["style"],
-      td: ["colspan", "rowspan"],
-      th: ["colspan", "rowspan"],
+      p: ["style"],
+      h1: ["style"],
+      h2: ["style"],
+      h3: ["style"],
+      td: ["colspan", "rowspan", "style"],
+      th: ["colspan", "rowspan", "style"],
     },
-    // Seules les propriétés color/font-family sont conservées dans un style=""
+    // Propriétés CSS conservées, strictement limitées par élément :
+    // - color/font-family sur le texte en ligne
+    // - text-align sur les paragraphes/titres (alignement de texte)
+    // - background-color sur les cellules de tableau (couleur de fond)
     allowedStyles: {
       span: {
         color: [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/],
         "font-family": [/^[a-zA-Z0-9\s,'"-]+$/],
       },
+      p: { "text-align": [/^(left|center|right|justify)$/] },
+      h1: { "text-align": [/^(left|center|right|justify)$/] },
+      h2: { "text-align": [/^(left|center|right|justify)$/] },
+      h3: { "text-align": [/^(left|center|right|justify)$/] },
+      td: { "background-color": [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/] },
+      th: { "background-color": [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/] },
     },
     // Force tout lien externe à s'ouvrir de façon sûre
     transformTags: {

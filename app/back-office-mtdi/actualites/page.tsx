@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { uploadFile } from "@/lib/client-upload";
 
 const VERT = "#006828";
 
@@ -134,11 +135,7 @@ export default function AdminActualites() {
     setUploading(true);
     setUploadError("");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error(`Erreur ${res.status} : ${await res.text()}`);
-      const { url } = await res.json();
+      const { url } = await uploadFile(file);
       setForm((f) => ({ ...f, image: url }));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
@@ -156,11 +153,7 @@ export default function AdminActualites() {
     setUploadingAttachment(true);
     setAttachmentError("");
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      if (!res.ok) throw new Error(`Erreur ${res.status} : ${await res.text()}`);
-      const { url, name } = await res.json();
+      const { url, name } = await uploadFile(file);
       setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url, kind: "file" }] }));
     } catch (err) {
       setAttachmentError(err instanceof Error ? err.message : "Erreur d'envoi");

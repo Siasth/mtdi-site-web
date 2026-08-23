@@ -10,9 +10,44 @@ import { Color } from "@tiptap/extension-color";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
-import { TableHeader } from "@tiptap/extension-table-header";
-import { TableCell } from "@tiptap/extension-table-cell";
+import { TableHeader as BaseTableHeader } from "@tiptap/extension-table-header";
+import { TableCell as BaseTableCell } from "@tiptap/extension-table-cell";
 import { TextAlign } from "@tiptap/extension-text-align";
+
+// Étend les cellules pour supporter une couleur de fond personnalisée
+// (setCellAttribute("backgroundColor", ...) n'a aucun effet sans ça).
+const TableCell = BaseTableCell.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      backgroundColor: {
+        default: null,
+        parseHTML: (element: HTMLElement) => element.style.backgroundColor || null,
+        renderHTML: (attributes: { backgroundColor?: string | null }) => {
+          if (!attributes.backgroundColor) return {};
+          return { style: `background-color: ${attributes.backgroundColor}` };
+        },
+      },
+    };
+  },
+});
+const TableHeader = BaseTableHeader.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      backgroundColor: {
+        default: null,
+        parseHTML: (element: HTMLElement) => element.style.backgroundColor || null,
+        renderHTML: (attributes: { backgroundColor?: string | null }) => {
+          if (!attributes.backgroundColor) return {};
+          return { style: `background-color: ${attributes.backgroundColor}` };
+        },
+      },
+    };
+  },
+});
+
+const CELL_COLORS = ["#e8f5e9", "#fff8e1", "#ffebee", "#e3f2fd", "#f3e5f5", "#eceff1"];
 
 const VERT = "#006828";
 
@@ -71,6 +106,7 @@ function ToolbarButton({
 
 function Toolbar({ editor }: { editor: Editor | null }) {
   const [showColors, setShowColors] = useState(false);
+  const [showCellColors, setShowCellColors] = useState(false);
 
   if (!editor) return null;
 
@@ -216,7 +252,11 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <ToolbarButton
         title="Insérer un tableau"
-        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+        onClick={() => {
+          const rows = Math.max(1, Math.min(20, Number(window.prompt("Nombre de lignes :", "3")) || 3));
+          const cols = Math.max(1, Math.min(10, Number(window.prompt("Nombre de colonnes :", "3")) || 3));
+          editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+        }}
       >
         <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
           <rect x="3" y="3" width="18" height="18" rx="1" /><path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
@@ -225,13 +265,51 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       {inTable && (
         <>
           <ToolbarButton title="Ajouter une colonne" onClick={() => editor.chain().focus().addColumnAfter().run()}>
-            <span className="text-xs font-bold">+Col</span>
+            <span className="text-[10px] font-bold">+Col</span>
+          </ToolbarButton>
+          <ToolbarButton title="Supprimer la colonne" onClick={() => editor.chain().focus().deleteColumn().run()}>
+            <span className="text-[10px] font-bold text-red-500">−Col</span>
           </ToolbarButton>
           <ToolbarButton title="Ajouter une ligne" onClick={() => editor.chain().focus().addRowAfter().run()}>
-            <span className="text-xs font-bold">+Lig</span>
+            <span className="text-[10px] font-bold">+Lig</span>
           </ToolbarButton>
+          <ToolbarButton title="Supprimer la ligne" onClick={() => editor.chain().focus().deleteRow().run()}>
+            <span className="text-[10px] font-bold text-red-500">−Lig</span>
+          </ToolbarButton>
+          <ToolbarButton title="Fusionner/scinder les cellules" onClick={() => editor.chain().focus().mergeOrSplit().run()}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1" /><path d="M3 12h18" /></svg>
+          </ToolbarButton>
+          <div className="relative">
+            <ToolbarButton title="Couleur de fond de la cellule" onClick={() => setShowCellColors((s) => !s)}>
+              <span className="text-[10px] font-black" style={{ color: VERT }}>▦</span>
+            </ToolbarButton>
+            {showCellColors && (
+              <div className="absolute z-10 top-9 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex flex-wrap gap-1.5 w-40">
+                {CELL_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { editor.chain().focus().setCellAttribute("backgroundColor", c).run(); setShowCellColors(false); }}
+                    className="w-6 h-6 rounded-full border border-black/10"
+                    style={{ background: c }}
+                    title={c}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { editor.chain().focus().setCellAttribute("backgroundColor", null).run(); setShowCellColors(false); }}
+                  className="w-6 h-6 rounded-full border border-black/10 flex items-center justify-center text-[10px] text-gray-400"
+                  title="Réinitialiser"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </div>
           <ToolbarButton title="Supprimer le tableau" onClick={() => editor.chain().focus().deleteTable().run()}>
-            <span className="text-xs font-bold text-red-500">✕Tab</span>
+            <span className="text-[10px] font-bold text-red-500">✕Tab</span>
           </ToolbarButton>
         </>
       )}
@@ -268,7 +346,7 @@ export default function MarkdownEditor({
       TextStyle,
       Color,
       FontFamily,
-      Table.configure({ resizable: false }),
+      Table.configure({ resizable: true, lastColumnResizable: true }),
       TableRow,
       TableHeader,
       TableCell,
@@ -314,7 +392,28 @@ export default function MarkdownEditor({
         .prose-editor blockquote { border-left: 2px solid ${VERT}; padding-left: 0.8em; color: #666; font-style: italic; margin: 0.5em 0; }
         .prose-editor code { background: #f1f1ef; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; }
         .prose-editor a { color: ${VERT}; text-decoration: underline; }
-        .prose-editor table { border-collapse: collapse; margin: 0.6em 0; width: 100%; }
+        .prose-editor table { border-collapse: collapse; margin: 0.6em 0; width: 100%; table-layout: fixed; }
+        .prose-editor .tableWrapper { overflow-x: auto; }
+        .prose-editor .resize-cursor { cursor: col-resize; }
+        .prose-editor .column-resize-handle {
+          position: absolute;
+          right: -2px;
+          top: 0;
+          bottom: -2px;
+          width: 4px;
+          background-color: ${VERT};
+          pointer-events: none;
+        }
+        .prose-editor .selectedCell {
+          position: relative;
+        }
+        .prose-editor .selectedCell:after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 104, 40, 0.12);
+          pointer-events: none;
+        }
         .prose-editor td, .prose-editor th { border: 1px solid #ddd; padding: 6px 10px; text-align: left; }
         .prose-editor th { background: #f5f5f3; font-weight: 700; }
         .prose-editor p.is-editor-empty:first-child::before {

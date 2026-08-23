@@ -1,31 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { NextResponse } from "next/server";
 import { requireSession } from "@/lib/auth";
 
-// Stocke les fichiers sur Vercel Blob (pas sur le disque local — le
-// système de fichiers de Vercel est en lecture seule en production, tout
-// fichier écrit via fs.writeFile disparaît/échoue silencieusement).
-export async function POST(req: NextRequest) {
-  await requireSession(); // n'importe quel utilisateur connecté peut uploader
+// Upload DIRECT navigateur → Vercel Blob : le fichier ne transite jamais par
+// cette fonction serverless (qui a une limite de 4,5 Mo sur Vercel), donc
+// aucune limite de taille pratique ici. Cette route se contente de générer
+// un jeton d'upload signé, après vérification de la session.
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
 
-  const formData = await req.formData();
-  const file = formData.get("file") as File | null;
+  try {
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async () => {
+        await requireSession(); // lève une erreur si non connecté
 
-  if (!file) {
-    return NextResponse.json({ error: "Aucun fichier envoyé" }, { status: 400 });
+        return {
+          allowedContentTypes: [
+            "image/*",
+            "video/*",
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          ],
+          addRandomSuffix: false,
+        };
+      },
+      onUploadCompleted: async () => {
+        // Rien à faire ici pour l'instant (pas de post-traitement nécessaire).
+      },
+    });
+
+    return NextResponse.json(jsonResponse);
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
-
-  const ext = file.name.split(".").pop() || "bin";
-  const base = file.name
-    .replace(/\.[^/.]+$/, "")
-    .replace(/[^a-zA-Z0-9_-]/g, "-")
-    .toLowerCase();
-  const filename = `${base}-${Date.now()}.${ext}`;
-
-  const blob = await put(filename, file, {
-    access: "public",
-    addRandomSuffix: false,
-  });
-
-  return NextResponse.json({ url: blob.url, name: file.name });
 }
