@@ -1,11 +1,21 @@
 // Server Component
 import Image from "next/image";
+import { getMinistreSettings } from "@/lib/ministre-settings";
 
 type HomeDict = Record<string, string>;
 
-export default function MinistryMessage({ dict, locale = "fr" }: { dict?: HomeDict; locale?: string }) {
+export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: HomeDict; locale?: string }) {
   const d = dict ?? {};
   const prefix = locale === "en" ? "/en" : "";
+  const isEn = locale === "en";
+  const m = await getMinistreSettings();
+
+  const title = (isEn && m.titleEn) || m.titleFr;
+  const badge = (isEn && m.badgeEn) || m.badgeFr;
+  const badgeSub = (isEn && m.badgeSubEn) || m.badgeSubFr;
+  const headingLines = ((isEn && m.headingEn) || m.headingFr).split("\n").filter(Boolean);
+  const paragraphs = (isEn && m.paragraphsEn.length > 0) ? m.paragraphsEn : m.paragraphsFr;
+
   return (
     <section className="py-12 sm:py-20 bg-gris-perle">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -17,8 +27,8 @@ export default function MinistryMessage({ dict, locale = "fr" }: { dict?: HomeDi
               style={{ paddingBottom: "125%" }}
             >
               <Image
-                src="/ministre.png"
-                alt="Portrait officiel du Ministre de la Transformation Digitale"
+                src={m.photo}
+                alt=""
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -31,10 +41,10 @@ export default function MinistryMessage({ dict, locale = "fr" }: { dict?: HomeDi
               style={{ background: "#006828" }}
             >
               <p className="text-white text-xs font-bold uppercase tracking-wider">
-                {d.ministreEnCharge ?? "Ministre en charge"}
+                {badge}
               </p>
               <p className="text-white/80 text-[10px] font-medium uppercase tracking-widest">
-                {d.transformationDigitaleIA ?? "Transformation Digitale & IA"}
+                {badgeSub}
               </p>
             </div>
           </div>
@@ -48,30 +58,45 @@ export default function MinistryMessage({ dict, locale = "fr" }: { dict?: HomeDi
             </div>
 
             <h2 className="text-3xl sm:text-4xl font-black text-anthracite uppercase leading-tight mb-8">
-              {d.beninDeploy ?? "Le Bénin déploie."}
-              <br />
-              {d.beninBuild ?? "Le Bénin construit."}
-              <br />
-              <span style={{ color: "#006828" }}>{d.beninInnovate ?? "Le Bénin innove."}</span>
+              {headingLines.map((line, i) => (
+                <span key={i}>
+                  {i === headingLines.length - 1 ? (
+                    <span style={{ color: "#006828" }}>{line}</span>
+                  ) : (
+                    <>
+                      {line}
+                      <br />
+                    </>
+                  )}
+                </span>
+              ))}
             </h2>
 
-            <div className="space-y-4 text-base text-anthracite/80 leading-relaxed">
-              <p>
-                {d.ministreP1 ?? "La technologie ne vaut que par ce qu'elle change concrètement dans la vie des hommes, et d'abord par sa contribution à l'éradication de l'extrême pauvreté."}
-              </p>
-              <p>
-                {d.ministreP2 ?? "Le Ministère de la Transformation Digitale et de l'Innovation a pour mission de conduire la feuille de route technologique au service des politiques publiques, et de bâtir un écosystème d'innovation dynamique, inclusif et compétitif."}
-              </p>
+            <div className="space-y-4 text-base text-anthracite/80 leading-relaxed prose-ministre">
+              {paragraphs.map((p, i) => (
+                // Contenu HTML déjà assaini côté serveur à l'enregistrement
+                // (voir sanitizeRichText dans /api/admin/ministre-settings).
+                <div key={i} dangerouslySetInnerHTML={{ __html: p }} />
+              ))}
             </div>
+            <style>{`
+              .prose-ministre h1, .prose-ministre h2, .prose-ministre h3 { font-weight: 900; margin: 0.6em 0 0.3em; }
+              .prose-ministre ul { list-style: disc; padding-left: 1.4em; margin: 0.5em 0; }
+              .prose-ministre ol { list-style: decimal; padding-left: 1.4em; margin: 0.5em 0; }
+              .prose-ministre blockquote { border-left: 3px solid #006828; padding-left: 1em; font-style: italic; margin: 0.6em 0; }
+              .prose-ministre table { border-collapse: collapse; margin: 0.8em 0; width: 100%; }
+              .prose-ministre td, .prose-ministre th { border: 1px solid rgba(0,0,0,0.12); padding: 6px 10px; }
+              .prose-ministre th { background: rgba(0,0,0,0.03); font-weight: 700; }
+            `}</style>
 
             <div className="mt-8 pt-6 border-t border-black/10">
               <div className="flex items-center gap-4">
                 <div>
                   <p className="font-black text-anthracite text-base uppercase tracking-wide">
-                    Mahuna Akplogan
+                    {m.name}
                   </p>
                   <p className="text-xs text-anthracite/85 font-semibold uppercase tracking-wider mt-0.5">
-                    {d.titreMinistreLong ?? "Ministre de la Transformation Digitale et de l'Innovation, en charge de la Stratégie Nationale d'IA"}
+                    {title}
                   </p>
                 </div>
               </div>

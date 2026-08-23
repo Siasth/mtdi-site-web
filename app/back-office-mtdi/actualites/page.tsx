@@ -16,6 +16,8 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 
 type Category = { id: number; name_fr: string; name_en: string | null; color: string };
 
+type Attachment = { name: string; url: string };
+
 type Article = {
   id: number;
   title_fr: string;
@@ -31,6 +33,7 @@ type Article = {
   featured: boolean;
   display_order: number;
   status: string;
+  attachments: Attachment[];
   deleted_at: string | null;
 };
 
@@ -38,12 +41,14 @@ type FormState = {
   titleFr: string; titleEn: string; excerptFr: string; excerptEn: string;
   categoryId: number | ""; image: string; hrefExternal: string; publishedAt: string;
   readTime: string; featured: boolean; displayOrder: number; status: string;
+  attachments: Attachment[];
 };
 
 const emptyForm: FormState = {
   titleFr: "", titleEn: "", excerptFr: "", excerptEn: "",
   categoryId: "", image: "", hrefExternal: "", publishedAt: new Date().toISOString().slice(0, 10),
   readTime: "3 min", featured: false, displayOrder: 0, status: "publie",
+  attachments: [],
 };
 
 export default function AdminActualites() {
@@ -114,6 +119,7 @@ export default function AdminActualites() {
       categoryId: a.category_id ?? "", image: a.image || "", hrefExternal: a.href_external || "",
       publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
       featured: a.featured, displayOrder: a.display_order, status: a.status,
+      attachments: a.attachments || [],
     });
     setActiveLang("fr");
     setSaveError("");
@@ -131,6 +137,23 @@ export default function AdminActualites() {
     setForm((f) => ({ ...f, image: url }));
     setUploading(false);
     e.target.value = "";
+  }
+
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  async function handleAttachmentUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAttachment(true);
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+    const { url, name } = await res.json();
+    setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url }] }));
+    setUploadingAttachment(false);
+    e.target.value = "";
+  }
+  function removeAttachment(i: number) {
+    setForm((f) => ({ ...f, attachments: f.attachments.filter((_, idx) => idx !== i) }));
   }
 
   const [saveError, setSaveError] = useState("");
@@ -369,6 +392,20 @@ export default function AdminActualites() {
                 <label className="text-sm text-gray-700">Ordre d'affichage</label>
                 <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
+            </div>
+
+            <div className="pt-2 border-t border-gray-100">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pièces jointes</label>
+              {form.attachments.map((a, i) => (
+                <div key={i} className="flex items-center justify-between gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2">
+                  <span className="truncate">{a.name}</span>
+                  <button type="button" onClick={() => removeAttachment(i)} className="text-red-400 hover:text-red-600 text-xs flex-shrink-0">✕ Retirer</button>
+                </div>
+              ))}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                {uploadingAttachment ? "Envoi..." : "Ajouter un fichier (PDF, image...)"}
+                <input type="file" className="hidden" disabled={uploadingAttachment} onChange={handleAttachmentUpload} />
+              </label>
             </div>
 
             {saveError && (

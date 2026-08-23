@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
     titleFr, titleEn, excerptFr, excerptEn, categoryId,
-    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
+    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status, attachments,
   } = body;
 
   if (!titleFr || !categoryId || !publishedAt) {
@@ -55,9 +55,9 @@ export async function POST(req: NextRequest) {
 
   const result = await sql`
     INSERT INTO actualites
-      (title_fr, title_en, excerpt_fr, excerpt_en, category_id, image, href_external, published_at, read_time, featured, display_order, status, created_by)
+      (title_fr, title_en, excerpt_fr, excerpt_en, category_id, image, href_external, published_at, read_time, featured, display_order, status, attachments, created_by)
     VALUES
-      (${titleFr}, ${titleEn || null}, ${sanitizeRichText(excerptFr || "")}, ${excerptEn ? sanitizeRichText(excerptEn) : null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${session.id})
+      (${titleFr}, ${titleEn || null}, ${sanitizeRichText(excerptFr || "")}, ${excerptEn ? sanitizeRichText(excerptEn) : null}, ${categoryId}, ${image || null}, ${hrefExternal || null}, ${publishedAt}, ${readTime || "3 min"}, ${!!featured}, ${displayOrder ?? 0}, ${status || "brouillon"}, ${JSON.stringify(attachments || [])}::jsonb, ${session.id})
     RETURNING id
   `;
 

@@ -31,7 +31,7 @@ export async function PATCH(
 
   const {
     titleFr, titleEn, excerptFr, excerptEn, categoryId,
-    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status,
+    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status, attachments,
   } = body;
 
   if (featured === true) {
@@ -61,6 +61,7 @@ export async function PATCH(
       featured = COALESCE(${featured}, featured),
       display_order = COALESCE(${displayOrder}, display_order),
       status = COALESCE(${status}, status),
+      attachments = COALESCE(${attachments ? JSON.stringify(attachments) : null}::jsonb, attachments),
       updated_at = now()
     WHERE id = ${id}
   `;

@@ -181,6 +181,11 @@ export async function POST(req: NextRequest) {
       `ALTER TABLE actualites ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'brouillon'`
     );
 
+    // Pièces jointes (ex: PDF d'un communiqué) — tableau JSON [{name, url}]
+    await sql.query(
+      `ALTER TABLE actualites ADD COLUMN IF NOT EXISTS attachments JSONB NOT NULL DEFAULT '[]'::jsonb`
+    );
+
     if (!statusColumnAlreadyExisted) {
       // Les articles déjà présents avant l'introduction du statut étaient de
       // facto publiés : on les bascule une seule fois, à la création de la colonne.
