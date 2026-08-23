@@ -99,7 +99,7 @@ export default async function ContactPage({ params }: Props) {
                       {t.adresse}
                     </p>
                     <p className="text-anthracite font-semibold text-sm leading-relaxed whitespace-pre-line">
-                      {general.contactAddress || (locale === "en" ? "Address to be provided" : "Adresse à renseigner")}
+                      {(locale === "en" && general.contactAddressEn) || general.contactAddress || (locale === "en" ? "Address to be provided" : "Adresse à renseigner")}
                     </p>
                     {general.locationMapUrl && (
                       <a
@@ -191,7 +191,7 @@ export default async function ContactPage({ params }: Props) {
                       {t.horaires}
                     </p>
                     <p className="text-anthracite font-semibold text-sm leading-relaxed">
-                      {t.horairesValeur}<br />
+                      {(locale === "en" && general.openingHoursEn) || general.openingHoursFr || t.horairesValeur}<br />
                       <span className="text-anthracite/65 font-medium">
                         {t.ferme}
                       </span>

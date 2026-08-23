@@ -64,6 +64,18 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
   return result.rows.map((r) => mapRow(r, locale));
 }
 
+// Un seul article publié, par id (page de détail interne).
+export async function getActualiteById(id: number, locale: Locale): Promise<Actualite | null> {
+  const result = await sql`
+    SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
+    FROM actualites a
+    LEFT JOIN categories c ON c.id = a.category_id
+    WHERE a.id = ${id} AND a.deleted_at IS NULL AND a.status = 'publie'
+  `;
+  if (result.rows.length === 0) return null;
+  return mapRow(result.rows[0], locale);
+}
+
 export async function getFeaturedActualites(locale: Locale, limit = 8): Promise<Actualite[]> {
   const result = await sql`
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color

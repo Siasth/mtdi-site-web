@@ -17,6 +17,9 @@ export type GeneralSettings = {
   contactEmail: string;
   contactPhone: string;
   contactAddress: string;
+  contactAddressEn: string;
+  openingHoursFr: string;
+  openingHoursEn: string;
   locationMapUrl: string; // optionnel : lien vers une carte (Google Maps...)
 };
 
@@ -36,6 +39,9 @@ export const GENERAL_SETTINGS_DEFAULTS: GeneralSettings = {
   contactEmail: "contact@gouv.bj",
   contactPhone: "+229 01 21 30 00 00",
   contactAddress: "Boulevard de la Marina\n01 BP 412 Cotonou\nRépublique du Bénin",
+  contactAddressEn: "Boulevard de la Marina\n01 BP 412 Cotonou\nRepublic of Benin",
+  openingHoursFr: "Lundi – Vendredi : 8h00 – 17h00",
+  openingHoursEn: "Monday – Friday: 8:00 AM – 5:00 PM",
   locationMapUrl: "",
 };
 

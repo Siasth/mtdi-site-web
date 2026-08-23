@@ -1,13 +1,10 @@
 // Server Component :stacking sticky cards
 import Image from "next/image";
+import type { Chantier } from "@/lib/chantiers";
 
 type HomeDict = Record<string, string>;
-type ChantiersDict = Record<string, { title: string; subtitle: string; description: string }>;
 
 const VERT  = "#162233";
-const JAUNE = "#FFBE00";
-const ROUGE = "#EB0000";
-
 
 const NAV_H  = 80;  // navbar h-20 80px
 const PEEK   = 18;  // px visibles du bord supérieur de chaque carte empilée
@@ -17,100 +14,11 @@ const FLAG_VERT  = "#008751";
 const FLAG_JAUNE = "#FCD116";
 const FLAG_ROUGE = "#E8112D";
 
-// "TOP"  → vert gauche | jaune droite          (moitié supérieure du drapeau)
-// "MID"  → vert gauche | jaune haut / rouge bas (ligne de partage exacte)
-// "BOT"  → vert gauche | rouge droite           (moitié inférieure du drapeau)
-type BandType = "TOP" | "MID" | "BOT";
-
-type Chantier = {
-  number: string;
-  accent: string;
-  bandType: BandType;
-  image: string;
-  video?: string;
-  overlay: string;
-  objectPosition: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  stats: { value: string; label: string }[];
-};
-
-const chantiers: Chantier[] = [
-  {
-    number: "01",
-    accent: VERT,
-    bandType: "TOP" as BandType,
-    image: "/chantier-01-ia.jpg",
-    overlay: "linear-gradient(135deg, rgba(0,80,30,0.75) 0%, rgba(0,40,15,0.65) 100%)",
-    objectPosition: "center center",
-    title: "Faire du Bénin un leader africain de l'IA",
-    subtitle: "SNIAM 2023–2027",
-    description:
-      "Adoptée par le Conseil des Ministres le 18 janvier 2023, la Stratégie Nationale d'Intelligence Artificielle et des Mégadonnées (SNIAM) structure l'action du Bénin en 4 programmes sur 5 ans.",
-    stats: [],
-  },
-  {
-    number: "02",
-    accent: JAUNE,
-    bandType: "TOP" as BandType,
-    image: "/chantier-02-services.jpg",
-    overlay: "linear-gradient(135deg, rgba(140,95,0,0.78) 0%, rgba(70,48,0,0.70) 100%)",
-    objectPosition: "center center",
-    title: "Des services publics numériques",
-    subtitle: "E-gouvernement · SMART GOUV",
-    description:
-      "Le programme SMART GOUV (phase 2) poursuit la dématérialisation des services publics pour les rendre accessibles en ligne, sans déplacement, depuis n'importe quel appareil.",
-    stats: [],
-  },
-  {
-    number: "03",
-    accent: ROUGE,
-    bandType: "MID" as BandType,
-    image: "/chantier-03-connectivite.jpg",
-    overlay: "linear-gradient(135deg, rgba(140,0,0,0.78) 0%, rgba(70,0,0,0.68) 100%)",
-    objectPosition: "center center",
-    title: "Connecter tout le territoire",
-    subtitle: "Infrastructure · Connectivité",
-    description:
-      "La SBIN déploie un réseau backbone à fibre optique national et poursuit le programme Internet haut et très haut débit (phase 2) pour couvrir l'ensemble du territoire, y compris les zones rurales.",
-    stats: [],
-  },
-  {
-    number: "04",
-    accent: VERT,
-    bandType: "BOT" as BandType,
-    image: "/chantier-04-formation.jpg",
-    overlay: "linear-gradient(135deg, rgba(0,65,22,0.78) 0%, rgba(0,32,11,0.68) 100%)",
-    objectPosition: "center center",
-    title: "Former les talents de demain",
-    subtitle: "Formation · Olympiades IA",
-    description:
-      "Le Bénin investit dans la formation aux compétences numériques et à l'intelligence artificielle. Les premières Olympiades Nationales d'IA ont distingué 20 lauréats parmi 150 participants.",
-    stats: [],
-  },
-  {
-    number: "05",
-    accent: ROUGE,
-    bandType: "BOT" as BandType,
-    image: "/chantier-05-cyber.jpg",
-    overlay: "linear-gradient(135deg, rgba(120,0,0,0.80) 0%, rgba(60,0,0,0.70) 100%)",
-    objectPosition: "center center",
-    title: "Protéger l'espace numérique national",
-    subtitle: "Cybersécurité · CRSSI",
-    description:
-      "Cadre juridique du numérique (loi n°2017-20), protection des données personnelles, et conférences RSSI réunissant les professionnels de la sécurité des systèmes d'information.",
-    stats: [],
-  },
-];
-
-export default function GrandsChantiers({ dict, chantiersDict }: { dict?: HomeDict; chantiersDict?: ChantiersDict }) {
+export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeDict; chantiers?: Chantier[] }) {
   const d = dict ?? {};
-  // Merge dict translations over static data
-  const localizedChantiers = chantiers.map((c) => {
-    const t = chantiersDict?.[c.number];
-    return t ? { ...c, title: t.title, subtitle: t.subtitle, description: t.description } : c;
-  });
+
+  if (chantiers.length === 0) return null;
+
   return (
     <section id="chantiers">
 
@@ -128,7 +36,7 @@ export default function GrandsChantiers({ dict, chantiersDict }: { dict?: HomeDi
 
       {/* ── Cartes empilées ── */}
       <div className="relative">
-        {localizedChantiers.map((c, i) => {
+        {chantiers.map((c, i) => {
           const ink    = "#ffffff";
           const inkLow = "rgba(255,255,255,0.65)";
 

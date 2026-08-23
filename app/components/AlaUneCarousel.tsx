@@ -87,7 +87,7 @@ export default function AlaUneCarousel({ items, locale }: { items: Actualite[]; 
         {items.map((item) => (
           <a
             key={item.id}
-            href={item.hrefExternal || `${prefix}/actualites`}
+            href={item.hrefExternal || `${prefix}/actualites/${item.id}`}
             target={item.hrefExternal ? "_blank" : undefined}
             rel={item.hrefExternal ? "noopener noreferrer" : undefined}
             className="group relative flex-shrink-0 w-[280px] sm:w-[320px] h-[380px] overflow-hidden"

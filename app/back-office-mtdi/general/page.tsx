@@ -9,7 +9,8 @@ type FormState = {
   siteName: string; siteNameShort: string; taglineFr: string; taglineEn: string;
   logoHeader: string; logoFooter: string; favicon: string;
   facebook: string; twitter: string; linkedin: string; instagram: string; youtube: string;
-  contactEmail: string; contactPhone: string; contactAddress: string; locationMapUrl: string;
+  contactEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
+  openingHoursFr: string; openingHoursEn: string; locationMapUrl: string;
 };
 
 // Format assez permissif : chiffres, espaces, +, -, parenthèses (ex: +229 21 30 00 00)
@@ -36,6 +37,8 @@ export default function AdminGeneral() {
           facebook: d.facebook || "", twitter: d.twitter || "", linkedin: d.linkedin || "",
           instagram: d.instagram || "", youtube: d.youtube || "",
           contactEmail: d.contactEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
+          contactAddressEn: d.contactAddressEn || "",
+          openingHoursFr: d.openingHoursFr || "", openingHoursEn: d.openingHoursEn || "",
           locationMapUrl: d.locationMapUrl || "",
         });
         setLoading(false);
@@ -185,7 +188,7 @@ export default function AdminGeneral() {
             <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 01 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse (Français)</label>
             <textarea
               value={form.contactAddress}
               onChange={(e) => setForm({ ...form, contactAddress: e.target.value })}
@@ -193,6 +196,26 @@ export default function AdminGeneral() {
               rows={3}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse (English)</label>
+            <textarea
+              value={form.contactAddressEn}
+              onChange={(e) => setForm({ ...form, contactAddressEn: e.target.value })}
+              placeholder={"Laisser vide pour reprendre l'adresse française telle quelle"}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Horaires d'ouverture (Français)</label>
+              <input value={form.openingHoursFr} onChange={(e) => setForm({ ...form, openingHoursFr: e.target.value })} placeholder="ex : Lundi – Vendredi : 8h00 – 17h00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Opening hours (English)</label>
+              <input value={form.openingHoursEn} onChange={(e) => setForm({ ...form, openingHoursEn: e.target.value })} placeholder="Laisser vide = reprend le français" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Localisation (lien carte)</label>

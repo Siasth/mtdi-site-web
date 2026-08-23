@@ -70,7 +70,7 @@ export default function ActualitesListClient({
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
             {visible.map((article) => {
-              const href = article.hrefExternal || `${prefix}/actualites`;
+              const href = article.hrefExternal || `${prefix}/actualites/${article.id}`;
               const isExternal = !!article.hrefExternal;
               return (
                 <article key={article.id} className="group flex flex-col justify-between p-8 bg-white hover:bg-gris-perle transition-colors" style={{ minHeight: "260px" }}>

@@ -5,9 +5,9 @@ import { hasPerm, type PermissionCode } from "@/lib/permissions";
 
 type Params = { params: Promise<{ resource: string }> };
 
-// "actualites", "stats" et "hero" ont migré vers la base de données (tables
-// dédiées), "ministre" et "site_general" vers la table settings.
-const VALID = ["galerie", "chantiers", "direct"];
+// "actualites", "stats", "hero" et "chantiers" ont migré vers la base de
+// données (tables dédiées), "ministre" et "site_general" vers settings.
+const VALID = ["galerie", "direct"];
 
 function requiredPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer"): PermissionCode {
   void resource;

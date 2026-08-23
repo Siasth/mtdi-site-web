@@ -118,8 +118,25 @@ export async function POST(req: NextRequest) {
         contactEmail: "contact@gouv.bj",
         contactPhone: "",
         contactAddress: "",
+        contactAddressEn: "",
       })}::jsonb)
       ON CONFLICT (key) DO NOTHING
+    `;
+
+    // Correction : ajouter l'adresse anglaise si absente (site_general déjà
+    // créé lors d'une migration précédente, sans ce champ à l'époque).
+    await sql`
+      UPDATE settings
+      SET value = value || '{"contactAddressEn": "Boulevard de la Marina\\n01 BP 412 Cotonou\\nRepublic of Benin"}'::jsonb
+      WHERE key = 'site_general' AND (value->>'contactAddressEn' IS NULL OR value->>'contactAddressEn' = '')
+    `;
+
+    // Correction : ajouter les horaires d'ouverture bilingues si absents
+    // (regroupés avec l'adresse — "coordonnées" au sens large, comme demandé).
+    await sql`
+      UPDATE settings
+      SET value = value || '{"openingHoursFr": "Lundi – Vendredi : 8h00 – 17h00", "openingHoursEn": "Monday – Friday: 8:00 AM – 5:00 PM"}'::jsonb
+      WHERE key = 'site_general' AND (value->>'openingHoursFr' IS NULL OR value->>'openingHoursFr' = '')
     `;
 
     // ── Mot du Ministre (page d'accueil) ────────────────────────────────
@@ -320,9 +337,16 @@ export async function POST(req: NextRequest) {
       )
     `);
 
+    await sql.query(`ALTER TABLE chantiers ADD COLUMN IF NOT EXISTS color TEXT`);
+    await sql.query(`ALTER TABLE chantiers ADD COLUMN IF NOT EXISTS video TEXT`);
+
     const chantiersCount = await sql`SELECT COUNT(*) AS count FROM chantiers`;
     if (Number(chantiersCount.rows[0].count) === 0) {
-      const seedChantiers = [
+      // ⚠️ Les valeurs de "stats" ci-dessous (12 projets IA, 47 services...)
+    // sont des exemples PLACEHOLDER non vérifiés — le site public actuel
+    // n'affichait aucune statistique (stats: [] en dur). À valider avec le
+    // MTDI avant publication réelle, ou à vider depuis le back-office.
+    const seedChantiers = [
         { number: "01", title: "Faire du Bénin un leader africain de l'IA", subtitle: "Stratégie nationale · Vision 2030", description: "Le Bénin adopte sa stratégie nationale d'intelligence artificielle. Des laboratoires publics, des partenariats internationaux et une gouvernance éthique pour positionner le pays comme référence continentale.", image: "/chantier-01-ia.jpg", stats: [{ value: "12", labelFr: "projets IA en cours" }, { value: "3", labelFr: "laboratoires publics" }, { value: "2030", labelFr: "horizon stratégie" }] },
         { number: "02", title: "Des services publics 100 % numériques", subtitle: "E-gouvernement · Accessibilité", description: "Naissance, mariage, impôts, permis : tous les actes de la vie administrative accessibles en ligne, sans déplacement, depuis n'importe quel téléphone.", image: "/chantier-02-services.jpg", stats: [{ value: "47", labelFr: "services dématérialisés" }, { value: "200K+", labelFr: "usagers actifs" }, { value: "24/7", labelFr: "disponibilité" }] },
         { number: "03", title: "Connecter tout le territoire", subtitle: "Infrastructure · Connectivité", description: "Fibre optique, 4G étendue, points d'accès communautaires. Aucune commune béninoise ne sera laissée hors du réseau numérique national.", image: "/chantier-03-connectivite.jpg", stats: [{ value: "2 000", labelFr: "km de fibre" }, { value: "14", labelFr: "nouvelles communes" }, { value: "2028", labelFr: "objectif 100 %" }] },

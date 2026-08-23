@@ -7,6 +7,7 @@ import GrandsChantiers from "../components/GrandsChantiers";
 import StatsSection from "../components/StatsSection";
 import { getPublicStats } from "@/lib/stats";
 import { getHeroSlides } from "@/lib/hero";
+import { getChantiers } from "@/lib/chantiers";
 import Galerie from "../components/Galerie";
 import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
@@ -19,7 +20,6 @@ export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const home = dict.home as Record<string, string>;
-  const chantiers = dict.chantiers as Record<string, { title: string; subtitle: string; description: string }>;
 
   return (
     <>
@@ -28,7 +28,7 @@ export default async function HomePage({ params }: Props) {
         <HeroSection dict={home} slides={await getHeroSlides(locale === "en" ? "en" : "fr")} />
         <AlaUne locale={locale} />
         <MinistryMessage dict={home} locale={locale} />
-        <GrandsChantiers dict={home} chantiersDict={chantiers} />
+        <GrandsChantiers dict={home} chantiers={await getChantiers(locale === "en" ? "en" : "fr")} />
         <StatsSection stats={await getPublicStats(locale === "en" ? "en" : "fr")} dict={home} />
         <Galerie dict={home} locale={locale} />
         <Newsletter dict={home} />
