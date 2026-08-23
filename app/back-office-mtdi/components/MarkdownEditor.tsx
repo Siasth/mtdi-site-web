@@ -12,6 +12,7 @@ import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableHeader } from "@tiptap/extension-table-header";
 import { TableCell } from "@tiptap/extension-table-cell";
+import { TextAlign } from "@tiptap/extension-text-align";
 
 const VERT = "#006828";
 
@@ -198,6 +199,21 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
+      <ToolbarButton title="Aligner à gauche" active={editor.isActive({ textAlign: "left" })} onClick={() => editor.chain().focus().setTextAlign("left").run()}>
+        <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13" strokeLinecap="round" /></svg>
+      </ToolbarButton>
+      <ToolbarButton title="Centrer" active={editor.isActive({ textAlign: "center" })} onClick={() => editor.chain().focus().setTextAlign("center").run()}>
+        <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M5.5 18h13" strokeLinecap="round" /></svg>
+      </ToolbarButton>
+      <ToolbarButton title="Aligner à droite" active={editor.isActive({ textAlign: "right" })} onClick={() => editor.chain().focus().setTextAlign("right").run()}>
+        <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M10 12h10M7 18h13" strokeLinecap="round" /></svg>
+      </ToolbarButton>
+      <ToolbarButton title="Justifier" active={editor.isActive({ textAlign: "justify" })} onClick={() => editor.chain().focus().setTextAlign("justify").run()}>
+        <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" /></svg>
+      </ToolbarButton>
+
+      <div className="w-px h-5 bg-gray-200 mx-1" />
+
       <ToolbarButton
         title="Insérer un tableau"
         onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
@@ -256,6 +272,7 @@ export default function MarkdownEditor({
       TableRow,
       TableHeader,
       TableCell,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: value || "",
     onUpdate: ({ editor }) => {
