@@ -48,11 +48,12 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                 top: `${NAV_H + i * PEEK}px`,
                 zIndex: i + 1,
                 minHeight: "100vh",
-                // Chevauchement volontaire d'1px : la carte suivante (z-index
-                // plus élevé) recouvre tout interstice d'arrondi de sous-pixel
-                // entre deux cartes adjacentes (la "ligne" signalée entre
-                // deux bandes drapeau de chantiers différents).
-                marginTop: i === 0 ? 0 : "-1px",
+                // Chevauchement volontaire : la carte suivante (z-index plus
+                // élevé) recouvre tout artefact de rendu entre calques de
+                // composition sticky empilés (arrondi de sous-pixel du
+                // navigateur, pas un problème de mise en page — 1px ne
+                // suffisait pas, on force une marge plus large).
+                marginTop: i === 0 ? 0 : "-3px",
               }}
             >
               {/* Fond : vidéo si disponible, sinon image */}
