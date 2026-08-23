@@ -613,6 +613,22 @@ export async function POST(req: NextRequest) {
       `;
     }
 
+    // Marquer quelques éléments variés comme "à la une" pour le widget accueil
+    // (aucun ne l'était par défaut — sans ça, le widget resterait vide).
+    const featuredHomeTitles = [
+      "Ouverture du Sommet Afrique Digitale 2026",
+      "Signature du décret portant création de l'ANAI",
+      "Discours du Ministre : Sommet Afrique Digitale",
+      "Visite du chantier fibre optique : Parakou",
+      "Remise des diplômes : Digital Academy, Promotion 2026",
+      "Déploiement des stations CERT.bj",
+      "Rencontre avec les startups : Bénin IA Challenge",
+      "Interview du Ministre : RFI",
+    ];
+    for (const titleFr of featuredHomeTitles) {
+      await sql`UPDATE galerie_items SET featured_home = TRUE WHERE title_fr = ${titleFr}`;
+    }
+
     // Direct : événements à venir (par titre FR)
     const upcomingTranslations: Record<string, { title: string; description: string }> = {
       "Olympiades Internationales d'IA 2026 — Cérémonie d'ouverture à Astana": {

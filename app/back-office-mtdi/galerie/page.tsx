@@ -1,225 +1,475 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import MarkdownEditor from "../components/MarkdownEditor";
 import { uploadFile } from "@/lib/client-upload";
+
+const VERT = "#006828";
+
+type Collection = { id: number; name_fr: string; name_en: string | null; display_order: number; usage_count: string };
 
 type GalerieItem = {
   id: number;
-  type: "photo" | "video";
-  title: string;
-  description: string;
-  date: string;
-  credit: string;
-  collection: string;
-  image: string;
+  type: string;
+  title_fr: string; title_en: string | null;
+  description_fr: string; description_en: string | null;
+  event_date: string | null; credit: string | null;
+  collection_id: number | null; coll_name_fr: string | null;
+  image: string | null; video_url: string | null; href_external: string | null;
+  featured_home: boolean; status: string; display_order: number;
+  deleted_at: string | null;
 };
 
-const collections = ["Événements officiels", "Infrastructures", "Formation & Jeunesse", "Cybersécurité", "Coopération internationale"];
+type ItemForm = {
+  type: string; titleFr: string; titleEn: string; descriptionFr: string; descriptionEn: string;
+  eventDate: string; credit: string; collectionId: number | ""; image: string; videoUrl: string;
+  hrefExternal: string; featuredHome: boolean; status: string; displayOrder: number;
+};
 
-const emptyItem: Omit<GalerieItem, "id"> = {
-  type: "photo",
-  title: "",
-  description: "",
-  date: "",
-  credit: "",
-  collection: collections[0],
-  image: "",
+const emptyItemForm: ItemForm = {
+  type: "photo", titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "",
+  eventDate: new Date().toISOString().slice(0, 10), credit: "", collectionId: "", image: "", videoUrl: "",
+  hrefExternal: "", featuredHome: false, status: "publie", displayOrder: 0,
+};
+
+const STATUS_LABELS: Record<string, { label: string; className: string }> = {
+  brouillon: { label: "Brouillon", className: "bg-gray-100 text-gray-600" },
+  publie: { label: "Publié", className: "bg-green-100 text-green-700" },
+  depublie: { label: "Dépublié", className: "bg-amber-100 text-amber-700" },
+  archive: { label: "Archivé", className: "bg-slate-200 text-slate-600" },
 };
 
 export default function AdminGalerie() {
+  const canView = useHasPermission("galerie.voir");
+  const canManage = useHasPermission("galerie.gerer");
+
+  const [tab, setTab] = useState<"items" | "collections">("items");
   const [items, setItems] = useState<GalerieItem[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<GalerieItem | null>(null);
-  const [isNew, setIsNew] = useState(false);
+  const [loadError, setLoadError] = useState("");
+
+  function load() {
+    setLoading(true);
+    setLoadError("");
+    Promise.all([
+      fetch("/api/admin/galerie-items").then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
+      fetch("/api/admin/galerie-collections").then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
+    ])
+      .then(([i, c]) => { setItems(i); setCollections(c); setLoading(false); })
+      .catch((err) => { setLoadError(err.message); setLoading(false); });
+  }
+  useEffect(() => { if (canView) load(); }, [canView]);
+
+  // ── Formulaire élément ──
+  const [editingItem, setEditingItem] = useState<number | "new" | null>(null);
+  const [itemForm, setItemForm] = useState<ItemForm>(emptyItemForm);
+  const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [filter, setFilter] = useState("Toutes");
-
-  const load = () => {
-    fetch("/api/admin/galerie").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); });
-  };
-  useEffect(load, []);
-
-  const filtered = filter === "Toutes" ? items : items.filter((i) => i.collection === filter);
-
-  const openNew = () => { setEditing({ ...emptyItem, id: 0 }); setIsNew(true); };
-  const openEdit = (item: GalerieItem) => { setEditing({ ...item }); setIsNew(false); };
-  const close = () => { setEditing(null); setIsNew(false); };
-
   const [uploadError, setUploadError] = useState("");
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  function openNewItem() {
+    setItemForm({ ...emptyItemForm, collectionId: collections[0]?.id ?? "", displayOrder: items.length });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingItem("new");
+  }
+  function openEditItem(it: GalerieItem) {
+    setItemForm({
+      type: it.type, titleFr: it.title_fr, titleEn: it.title_en || "",
+      descriptionFr: it.description_fr || "", descriptionEn: it.description_en || "",
+      eventDate: (it.event_date || "").slice(0, 10), credit: it.credit || "",
+      collectionId: it.collection_id ?? "", image: it.image || "", videoUrl: it.video_url || "",
+      hrefExternal: it.href_external || "", featuredHome: it.featured_home, status: it.status,
+      displayOrder: it.display_order,
+    });
+    setActiveLang("fr");
+    setSaveError("");
+    setEditingItem(it.id);
+  }
+
+  async function handleUpload(field: "image" | "videoUrl", e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !editing) return;
+    if (!file) return;
     setUploading(true);
     setUploadError("");
     try {
       const { url } = await uploadFile(file);
-      setEditing({ ...editing, image: url });
+      setItemForm((f) => ({ ...f, [field]: url }));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
-  };
+  }
 
-  const saveItem = async () => {
-    if (!editing) return;
+  async function handleSaveItem(e: React.FormEvent) {
+    e.preventDefault();
     setSaving(true);
-    if (isNew) {
-      const { id, ...data } = editing;
-      void id;
-      await fetch("/api/admin/galerie", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    setSaveError("");
+    const isNew = editingItem === "new";
+    const res = await fetch(isNew ? "/api/admin/galerie-items" : `/api/admin/galerie-items/${editingItem}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(itemForm),
+    });
+    if (res.ok) {
+      setSaving(false);
+      setEditingItem(null);
+      load();
     } else {
-      const updated = items.map((i) => (i.id === editing.id ? editing : i));
-      await fetch("/api/admin/galerie", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) });
+      const data = await res.json();
+      setSaveError(data.error || "Erreur lors de l'enregistrement");
+      setSaving(false);
     }
-    close();
-    setSaving(false);
-    load();
-  };
+  }
 
-  const deleteItem = async (id: number) => {
-    await fetch(`/api/admin/galerie?id=${id}`, { method: "DELETE" });
+  async function handleDeleteItem(it: GalerieItem) {
+    if (!confirm(`Supprimer "${it.title_fr}" ? (réversible)`)) return;
+    await fetch(`/api/admin/galerie-items/${it.id}`, { method: "DELETE" });
     load();
-  };
+  }
+  async function handleRestoreItem(it: GalerieItem) {
+    await fetch(`/api/admin/galerie-items/${it.id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }),
+    });
+    load();
+  }
+
+  // ── Formulaire collection ──
+  const [editingColl, setEditingColl] = useState<number | "new" | null>(null);
+  const [collForm, setCollForm] = useState({ nameFr: "", nameEn: "", displayOrder: 0 });
+  const [collError, setCollError] = useState("");
+
+  function openNewColl() {
+    setCollForm({ nameFr: "", nameEn: "", displayOrder: collections.length });
+    setCollError("");
+    setEditingColl("new");
+  }
+  function openEditColl(c: Collection) {
+    setCollForm({ nameFr: c.name_fr, nameEn: c.name_en || "", displayOrder: c.display_order });
+    setCollError("");
+    setEditingColl(c.id);
+  }
+  async function handleSaveColl(e: React.FormEvent) {
+    e.preventDefault();
+    setCollError("");
+    const isNew = editingColl === "new";
+    const res = await fetch(isNew ? "/api/admin/galerie-collections" : `/api/admin/galerie-collections/${editingColl}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(collForm),
+    });
+    if (res.ok) { setEditingColl(null); load(); }
+    else { const d = await res.json(); setCollError(d.error); }
+  }
+  async function handleDeleteColl(c: Collection) {
+    if (!confirm(`Supprimer la collection "${c.name_fr}" ?`)) return;
+    const res = await fetch(`/api/admin/galerie-collections/${c.id}`, { method: "DELETE" });
+    const d = await res.json();
+    if (!res.ok) alert(d.error);
+    load();
+  }
+
+  if (!canView) {
+    return (
+      <div className="p-8">
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center max-w-md mx-auto mt-12">
+          <p className="font-bold text-gray-900 mb-1">Accès refusé</p>
+          <p className="text-sm text-gray-500">Vous n'avez pas la permission de consulter cette page.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  if (loadError) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-100 rounded-xl p-6 max-w-xl">
+          <p className="font-bold text-red-700 mb-1">Erreur de chargement</p>
+          <p className="text-sm text-red-600 whitespace-pre-wrap">{loadError}</p>
+          <button onClick={load} className="mt-4 px-4 py-2 text-sm font-bold uppercase tracking-wider text-red-700 border border-red-200 rounded-lg hover:bg-red-100">
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Galerie</h1>
-          <p className="text-sm text-gray-500 mt-1">{items.length} élément(s)</p>
+          <p className="text-sm text-gray-500 mt-1">Photos et vidéos affichées sur l'accueil et la page Galerie</p>
         </div>
-        <button onClick={openNew} className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors">
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" /></svg>
-          Ajouter un média
+      </div>
+
+      <div className="flex gap-1 mb-6 border-b border-gray-200">
+        <button onClick={() => setTab("items")} className="px-4 py-2 text-sm font-bold" style={tab === "items" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>
+          Éléments ({items.filter((i) => !i.deleted_at).length})
+        </button>
+        <button onClick={() => setTab("collections")} className="px-4 py-2 text-sm font-bold" style={tab === "collections" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>
+          Collections ({collections.length})
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {["Toutes", ...collections].map((c) => (
-          <button
-            key={c}
-            onClick={() => setFilter(c)}
-            className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors ${
-              filter === c ? "bg-green-700 text-white" : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
-            }`}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((item) => (
-          <div key={item.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden group">
-            <div className="relative aspect-[16/10] bg-gray-100">
-              {item.image ? (
-                /* eslint-disable-next-line @next/next/no-img-élément */
-                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                  <svg width="32" height="32" fill="none" stroke="white" strokeWidth="1.5" viewBox="0 0 24 24" className="opacity-30">
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="M21 15l-5-5L5 21" />
-                  </svg>
-                </div>
-              )}
-              {item.type === "video" && (
-                <span className="absolute top-2 left-2 px-2 py-0.5 text-[10px] font-bold bg-red-600 text-white rounded">VIDÉO</span>
-              )}
-            </div>
-            <div className="p-4">
-              <p className="text-xs text-gray-400 mb-1">{item.collection} · {item.date}</p>
-              <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-3">{item.title}</h3>
-              <div className="flex items-center gap-1">
-                <button onClick={() => openEdit(item)} className="p-1.5 text-gray-400 hover:text-green-700 rounded transition-colors" title="Modifier">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <button onClick={() => deleteItem(item.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded transition-colors" title="Supprimer">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={close}>
-          <div className="bg-white rounded-2xl w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">{isNew ? "Ajouter un média" : "Modifier"}</h2>
-              <button onClick={close} className="p-1 text-gray-400 hover:text-gray-600">
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      {tab === "items" && (
+        <>
+          {canManage && (
+            <div className="mb-4 flex justify-end">
+              <button onClick={openNewItem} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+                + Nouvel élément
               </button>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre *</label>
-                <input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Type</label>
-                  <select value={editing.type} onChange={(e) => setEditing({ ...editing, type: e.target.value as "photo" | "video" })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600">
-                    <option value="photo">Photo</option>
-                    <option value="video">Vidéo</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Collection</label>
-                  <select value={editing.collection} onChange={(e) => setEditing({ ...editing, collection: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600">
-                    {collections.map((c) => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Description</label>
-                <textarea value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600 resize-none" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Date</label>
-                  <input value={editing.date} onChange={(e) => setEditing({ ...editing, date: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Crédit</label>
-                  <input value={editing.credit} onChange={(e) => setEditing({ ...editing, credit: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Image</label>
-                <div className="flex items-center gap-3">
-                  {editing.image && (
-                    /* eslint-disable-next-line @next/next/no-img-élément */
-                    <img src={editing.image} alt="" className="w-20 h-14 object-cover rounded bg-gray-100" />
-                  )}
-                  <label className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg cursor-pointer hover:bg-gray-200 transition-colors">
-                    {uploading ? "Envoi..." : "Choisir une image"}
-                    <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
-                  </label>
-                  {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
-                </div>
-              </div>
-            </div>
-            <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={close} className="px-5 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Annuler</button>
-              <button onClick={saveItem} disabled={saving} className="px-6 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors disabled:opacity-50">
-                {saving ? "Sauvegarde..." : "Enregistrer"}
+          )}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <tr>
+                  <th className="px-5 py-3">Titre (FR)</th>
+                  <th className="px-5 py-3">Type</th>
+                  <th className="px-5 py-3">Collection</th>
+                  <th className="px-5 py-3">Date</th>
+                  <th className="px-5 py-3">Statut</th>
+                  <th className="px-5 py-3">Accueil</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {items.map((it) => (
+                  <tr key={it.id} className={it.deleted_at ? "opacity-40" : ""}>
+                    <td className="px-5 py-3 font-medium text-gray-900 max-w-xs truncate">{it.title_fr}</td>
+                    <td className="px-5 py-3 text-gray-500 capitalize">{it.type}</td>
+                    <td className="px-5 py-3 text-gray-500">{it.coll_name_fr || "—"}</td>
+                    <td className="px-5 py-3 text-gray-400 text-xs">{it.event_date ? new Date(it.event_date).toLocaleDateString("fr-FR") : "—"}</td>
+                    <td className="px-5 py-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_LABELS[it.status]?.className || "bg-gray-100 text-gray-600"}`}>
+                        {STATUS_LABELS[it.status]?.label || it.status}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3">{it.featured_home ? "✓" : ""}</td>
+                    <td className="px-5 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        {it.deleted_at ? (
+                          canManage && <RestoreIcon label="Restaurer" onClick={() => handleRestoreItem(it)} />
+                        ) : (
+                          canManage && (
+                            <>
+                              <EditIcon label="Modifier" onClick={() => openEditItem(it)} />
+                              <DeleteIcon label="Supprimer" onClick={() => handleDeleteItem(it)} />
+                            </>
+                          )
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {items.length === 0 && (
+                  <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">Aucun élément</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {tab === "collections" && (
+        <>
+          {canManage && (
+            <div className="mb-4 flex justify-end">
+              <button onClick={openNewColl} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+                + Nouvelle collection
               </button>
             </div>
+          )}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <tr>
+                  <th className="px-5 py-3">Nom (FR)</th>
+                  <th className="px-5 py-3">Nom (EN)</th>
+                  <th className="px-5 py-3">Éléments</th>
+                  {canManage && <th className="px-5 py-3 text-right">Actions</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {collections.map((c) => (
+                  <tr key={c.id}>
+                    <td className="px-5 py-3 font-medium text-gray-900">{c.name_fr}</td>
+                    <td className="px-5 py-3 text-gray-500">{c.name_en || <span className="text-amber-600 text-xs">⚠ non traduit</span>}</td>
+                    <td className="px-5 py-3 text-gray-500">{c.usage_count}</td>
+                    {canManage && (
+                      <td className="px-5 py-3">
+                        <div className="flex items-center justify-end gap-1">
+                          <EditIcon label="Modifier" onClick={() => openEditColl(c)} />
+                          <DeleteIcon label="Supprimer" onClick={() => handleDeleteColl(c)} />
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+                {collections.length === 0 && (
+                  <tr><td colSpan={4} className="px-5 py-8 text-center text-gray-400">Aucune collection</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
+        </>
+      )}
+
+      {/* Modale élément */}
+      {editingItem !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
+          <form onSubmit={handleSaveItem} className="bg-white rounded-xl p-6 w-[90%] max-w-3xl shadow-2xl space-y-5 my-auto">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingItem === "new" ? "Nouvel élément" : "Modifier"}</h2>
+              <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
+                <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>Français</button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
+                  English
+                  {!itemForm.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
+                </button>
+              </div>
+            </div>
+
+            {activeLang === "fr" ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
+                  <input required value={itemForm.titleFr} onChange={(e) => setItemForm({ ...itemForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
+                  <MarkdownEditor value={itemForm.descriptionFr} onChange={(v) => setItemForm({ ...itemForm, descriptionFr: v })} rows={3} />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {!itemForm.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le français.</p>}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title (English)</label>
+                  <input value={itemForm.titleEn} onChange={(e) => setItemForm({ ...itemForm, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
+                  <MarkdownEditor value={itemForm.descriptionEn} onChange={(v) => setItemForm({ ...itemForm, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} />
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Type</label>
+                <select value={itemForm.type} onChange={(e) => setItemForm({ ...itemForm, type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <option value="photo">Photo</option>
+                  <option value="video">Vidéo</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Collection</label>
+                <select value={itemForm.collectionId} onChange={(e) => setItemForm({ ...itemForm, collectionId: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <option value="">Aucune</option>
+                  {collections.map((c) => <option key={c.id} value={c.id}>{c.name_fr}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Date *</label>
+                <input required type="date" value={itemForm.eventDate} onChange={(e) => setItemForm({ ...itemForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Crédit photo/vidéo</label>
+                <input value={itemForm.credit} onChange={(e) => setItemForm({ ...itemForm, credit: e.target.value })} placeholder="ex : MTDI / Direction de la Communication" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
+                <select value={itemForm.status} onChange={(e) => setItemForm({ ...itemForm, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <option value="brouillon">Brouillon</option>
+                  <option value="publie">Publié</option>
+                  <option value="depublie">Dépublié</option>
+                  <option value="archive">Archivé</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
+              {itemForm.image && <img src={itemForm.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                {uploading ? "Envoi..." : "Choisir une image"}
+                <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("image", e)} />
+              </label>
+            </div>
+
+            {itemForm.type === "video" && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (fichier ou lien YouTube)</label>
+                <input value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+                <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                  {uploading ? "Envoi..." : "Ou uploader un fichier vidéo"}
+                  <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("videoUrl", e)} />
+                </label>
+              </div>
+            )}
+            {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel — remplace le lien interne par défaut)</label>
+              <input value={itemForm.hrefExternal} onChange={(e) => setItemForm({ ...itemForm, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" checked={itemForm.featuredHome} onChange={(e) => setItemForm({ ...itemForm, featuredHome: e.target.checked })} />
+                Afficher dans le widget "L'innovation en images" (accueil)
+              </label>
+            </div>
+
+            {saveError && <div className="px-4 py-3 rounded-lg bg-red-50 border border-red-100"><p className="text-sm font-medium text-red-600">{saveError}</p></div>}
+
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setEditingItem(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button>
+              <button type="submit" disabled={saving} className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+                {saving ? "Enregistrement..." : "Enregistrer"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Modale collection */}
+      {editingColl !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <form onSubmit={handleSaveColl} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+            <h2 className="font-bold text-gray-900 text-lg">{editingColl === "new" ? "Nouvelle collection" : "Modifier"}</h2>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (Français) *</label>
+              <input required value={collForm.nameFr} onChange={(e) => setCollForm({ ...collForm, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (English)</label>
+              <input value={collForm.nameEn} onChange={(e) => setCollForm({ ...collForm, nameEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ordre</label>
+              <input type="number" value={collForm.displayOrder} onChange={(e) => setCollForm({ ...collForm, displayOrder: Number(e.target.value) })} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+            </div>
+            {collError && <p className="text-sm text-red-600">{collError}</p>}
+            <div className="flex gap-2 pt-2">
+              <button type="button" onClick={() => setEditingColl(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button>
+              <button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button>
+            </div>
+          </form>
         </div>
       )}
     </div>
