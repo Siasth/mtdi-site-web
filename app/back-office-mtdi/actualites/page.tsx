@@ -126,31 +126,48 @@ export default function AdminActualites() {
     setEditingId(a.id);
   }
 
+  const [uploadError, setUploadError] = useState("");
+
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url } = await res.json();
-    setForm((f) => ({ ...f, image: url }));
-    setUploading(false);
-    e.target.value = "";
+    setUploadError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Erreur ${res.status} : ${await res.text()}`);
+      const { url } = await res.json();
+      setForm((f) => ({ ...f, image: url }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   }
 
   const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [attachmentError, setAttachmentError] = useState("");
   async function handleAttachmentUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingAttachment(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-    const { url, name } = await res.json();
-    setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url, kind: "file" }] }));
-    setUploadingAttachment(false);
-    e.target.value = "";
+    setAttachmentError("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error(`Erreur ${res.status} : ${await res.text()}`);
+      const { url, name } = await res.json();
+      setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url, kind: "file" }] }));
+    } catch (err) {
+      setAttachmentError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploadingAttachment(false);
+      e.target.value = "";
+    }
   }
 
   const [linkLabel, setLinkLabel] = useState("");
@@ -387,6 +404,7 @@ export default function AdminActualites() {
                 {uploading ? "Envoi..." : "Choisir une image"}
                 <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
               </label>
+              {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
             </div>
 
             <div className="flex items-center gap-4">
@@ -429,6 +447,7 @@ export default function AdminActualites() {
                   <input type="file" className="hidden" disabled={uploadingAttachment} onChange={handleAttachmentUpload} />
                 </label>
               </div>
+              {attachmentError && <p className="text-xs text-red-600 mt-1">{attachmentError}</p>}
 
               <div className="flex flex-col sm:flex-row gap-2 mt-3 p-3 bg-gray-50 rounded-lg">
                 <input
