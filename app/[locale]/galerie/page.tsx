@@ -202,6 +202,11 @@ export default function GaleriePage() {
     .filter((item) => activeFilter === "all" || item.collection === activeFilter)
     .filter(matchesSearch);
 
+  // Pagination automatique : n'apparaît que si le seuil est dépassé.
+  const PAGE_SIZE = 12;
+  const [showAll, setShowAll] = useState(false);
+  const visibleFiltered = showAll ? filtered : filtered.slice(0, PAGE_SIZE);
+
   const sections =
     activeFilter === "all"
       ? COLLECTION_KEYS
@@ -209,13 +214,13 @@ export default function GaleriePage() {
           .map((k) => ({
             key: k,
             name: collectionLabels[k][locale as "fr" | "en"] ?? collectionLabels[k].fr,
-            items: filtered.filter((item) => item.collection === k),
+            items: visibleFiltered.filter((item) => item.collection === k),
           }))
           .filter((s) => s.items.length > 0)
       : [{
           key: activeFilter,
           name: collectionLabels[activeFilter][locale as "fr" | "en"] ?? collectionLabels[activeFilter].fr,
-          items: filtered,
+          items: visibleFiltered,
         }];
 
   const resultLabel = filtered.length > 1 ? t.resultatsPluriel : t.resultats;
@@ -364,6 +369,22 @@ export default function GaleriePage() {
             </section>
           ))}
         </div>
+
+        {!showAll && filtered.length > PAGE_SIZE && (
+          <div className="px-4 sm:px-6 lg:px-8 pb-16 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-widest bg-white"
+              style={{ border: "1px solid rgba(0,0,0,0.15)", color: "rgba(26,26,26,0.75)" }}
+            >
+              {locale === "en" ? "Load more" : "Charger plus"}
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        )}
 
       </main>
 
