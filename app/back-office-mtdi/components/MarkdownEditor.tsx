@@ -269,15 +269,18 @@ export default function MarkdownEditor({
     },
   });
 
-  // Synchronise le contenu si `value` change depuis l'extérieur (ex: à
-  // l'ouverture d'un article différent dans la même instance de formulaire).
-  const [lastExternalValue, setLastExternalValue] = useState(value);
+  // Synchronise le contenu si `value` change depuis une source VRAIMENT
+  // externe (changement d'onglet de langue, ouverture d'un autre article) —
+  // en comparant au contenu ACTUEL de l'éditeur, pas à un état mémorisé.
+  // L'ancienne version comparait à "la dernière valeur externe connue", ce
+  // qui déclenchait une réinitialisation à CHAQUE frappe (onChange → nouvelle
+  // prop value → différente de l'ancienne → reset en plein milieu de la
+  // frappe) : c'est ce qui cassait la barre d'espace, faisait sortir le
+  // curseur des tableaux, et perturbait les listes.
   useEffect(() => {
-    if (editor && value !== lastExternalValue) {
+    if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value || "");
-      setLastExternalValue(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, editor]);
 
   return (
