@@ -34,7 +34,6 @@ const navItems: NavEntry[] = [
   { type: "link", label: "Chiffres clés", href: "/back-office-mtdi/stats", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z", perm: "contenu.modifier" },
   { type: "link", label: "Direct", href: "/back-office-mtdi/direct", icon: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z", perm: "contenu.modifier" },
   { type: "link", label: "Mot du Ministre", href: "/back-office-mtdi/ministre", icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z", perm: "contenu.modifier" },
-  { type: "link", label: "Mon profil", href: "/back-office-mtdi/securite", icon: "M12 2L3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7z", perm: null },
   {
     type: "group",
     label: "Paramètres",
@@ -45,7 +44,7 @@ const navItems: NavEntry[] = [
       { type: "link", label: "Rôles & permissions", href: "/back-office-mtdi/roles", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z", perm: "roles.voir" },
       { type: "link", label: "Catégories", href: "/back-office-mtdi/categories", icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 11V6a3 3 0 013-3z", perm: "categories.voir" },
       { type: "link", label: "Journal d'audit", href: "/back-office-mtdi/logs", icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4", perm: "logs.voir" },
-      { type: "link", label: "Autres", href: "/back-office-mtdi/administration", icon: "M4 6h16M4 12h16M4 18h7", perm: "securite.modifier" },
+      { type: "link", label: "Autres", href: "/back-office-mtdi/autres", icon: "M4 6h16M4 12h16M4 18h7", perm: "securite.modifier" },
     ],
   },
 ];
@@ -245,6 +244,20 @@ export default function AdminLayoutClient({
 
       {/* Main content */}
       <main className="flex-1 min-w-0">
+        <div className="flex justify-end px-8 pt-4">
+          <Link
+            href="/back-office-mtdi/securite"
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              pathname === "/back-office-mtdi/securite" ? "text-white" : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            }`}
+            style={pathname === "/back-office-mtdi/securite" ? { background: VERT } : undefined}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Mon profil
+          </Link>
+        </div>
         <Breadcrumb />
         {children}
       </main>

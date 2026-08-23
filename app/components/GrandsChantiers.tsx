@@ -35,7 +35,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
       </div>
 
       {/* ── Cartes empilées ── */}
-      <div className="relative">
+      <div className="relative" style={{ background: "#0d1826" }}>
         {chantiers.map((c, i) => {
           const ink    = "#ffffff";
           const inkLow = "rgba(255,255,255,0.65)";

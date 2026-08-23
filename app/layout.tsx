@@ -33,7 +33,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} data-scroll-behavior="smooth" className={`${montserrat.variable} ${baskervville.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        <div id="main-content" tabIndex={-1} className="flex flex-col flex-1 outline-none">
+        <div id="main-content" tabIndex={-1} className="flex flex-col flex-1 outline-none scroll-mt-20">
           {children}
         </div>
       </body>

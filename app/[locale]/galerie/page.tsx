@@ -365,22 +365,6 @@ export default function GaleriePage() {
           ))}
         </div>
 
-        {/* Pagination */}
-        <section className="px-4 sm:px-6 lg:px-8 py-10 bg-white" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2">
-            <button className="px-4 py-2.5 text-xs font-black uppercase tracking-widest text-anthracite/30 hover:text-anthracite transition-colors" disabled>
-              {t.precedent}
-            </button>
-            {[1, 2, 3].map((n) => (
-              <button key={n} aria-current={n === 1 ? "page" : undefined} disabled={n === 1} className="w-10 h-10 flex items-center justify-center text-xs font-black transition-colors" style={{ background: n === 1 ? VERT : "transparent", color: n === 1 ? "white" : "rgba(26,26,26,0.65)" }}>
-                {n}
-              </button>
-            ))}
-            <button className="px-4 py-2.5 text-xs font-black uppercase tracking-widest text-anthracite/70 hover:text-anthracite transition-colors">
-              {t.suivant}
-            </button>
-          </div>
-        </section>
       </main>
 
       <Footer locale={locale} />
