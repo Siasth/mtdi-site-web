@@ -80,16 +80,21 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
               {/* Bande drapeau */}
               <div className="flex-none relative z-10 flex" style={{ height: `${PEEK}px` }}>
                 <div style={{ width: "33.33%", background: FLAG_VERT }} />
-                <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-                  {c.bandType === "TOP" && <div style={{ flex: 1, background: FLAG_JAUNE }} />}
-                  {c.bandType === "MID" && (
-                    <>
-                      <div style={{ flex: 1, background: FLAG_JAUNE }} />
-                      <div style={{ flex: 1, background: FLAG_ROUGE }} />
-                    </>
-                  )}
-                  {c.bandType === "BOT" && <div style={{ flex: 1, background: FLAG_ROUGE }} />}
-                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    background:
+                      c.bandType === "TOP"
+                        ? FLAG_JAUNE
+                        : c.bandType === "BOT"
+                        ? FLAG_ROUGE
+                        // Un seul élément avec dégradé à coupure nette (50/50, sans
+                        // transition) au lieu de deux <div> empilées : évite tout
+                        // interstice dû à un arrondi de sous-pixel du navigateur
+                        // sur une hauteur aussi petite (10px).
+                        : `linear-gradient(to bottom, ${FLAG_JAUNE} 0%, ${FLAG_JAUNE} 50%, ${FLAG_ROUGE} 50%, ${FLAG_ROUGE} 100%)`,
+                  }}
+                />
               </div>
 
               {/* Overlay sombre uniforme */}
