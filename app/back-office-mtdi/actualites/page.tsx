@@ -16,7 +16,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 
 type Category = { id: number; name_fr: string; name_en: string | null; color: string };
 
-type Attachment = { name: string; url: string };
+type Attachment = { name: string; url: string; kind?: "file" | "link" };
 
 type Article = {
   id: number;
@@ -148,9 +148,18 @@ export default function AdminActualites() {
     fd.append("file", file);
     const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
     const { url, name } = await res.json();
-    setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url }] }));
+    setForm((f) => ({ ...f, attachments: [...f.attachments, { name, url, kind: "file" }] }));
     setUploadingAttachment(false);
     e.target.value = "";
+  }
+
+  const [linkLabel, setLinkLabel] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  function addLink() {
+    if (!linkLabel.trim() || !linkUrl.trim()) return;
+    setForm((f) => ({ ...f, attachments: [...f.attachments, { name: linkLabel.trim(), url: linkUrl.trim(), kind: "link" }] }));
+    setLinkLabel("");
+    setLinkUrl("");
   }
   function removeAttachment(i: number) {
     setForm((f) => ({ ...f, attachments: f.attachments.filter((_, idx) => idx !== i) }));
@@ -395,17 +404,55 @@ export default function AdminActualites() {
             </div>
 
             <div className="pt-2 border-t border-gray-100">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Pièces jointes</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                Ressources associées
+              </label>
+              <p className="text-xs text-gray-400 mb-3">
+                Documents, ou liens vers la Galerie, la Vidéothèque, un article externe, etc.
+              </p>
+
               {form.attachments.map((a, i) => (
                 <div key={i} className="flex items-center justify-between gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2">
-                  <span className="truncate">{a.name}</span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`flex-shrink-0 px-1.5 py-0.5 rounded text-[9px] font-black uppercase ${a.kind === "link" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
+                      {a.kind === "link" ? "Lien" : "Fichier"}
+                    </span>
+                    <span className="truncate">{a.name}</span>
+                  </div>
                   <button type="button" onClick={() => removeAttachment(i)} className="text-red-400 hover:text-red-600 text-xs flex-shrink-0">✕ Retirer</button>
                 </div>
               ))}
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploadingAttachment ? "Envoi..." : "Ajouter un fichier (PDF, image...)"}
-                <input type="file" className="hidden" disabled={uploadingAttachment} onChange={handleAttachmentUpload} />
-              </label>
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                  {uploadingAttachment ? "Envoi..." : "📎 Uploader un fichier"}
+                  <input type="file" className="hidden" disabled={uploadingAttachment} onChange={handleAttachmentUpload} />
+                </label>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2 mt-3 p-3 bg-gray-50 rounded-lg">
+                <input
+                  value={linkLabel}
+                  onChange={(e) => setLinkLabel(e.target.value)}
+                  placeholder="Libellé (ex: Voir la galerie photos)"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                />
+                <input
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://... (Galerie, Vidéothèque, YouTube...)"
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={addLink}
+                  disabled={!linkLabel.trim() || !linkUrl.trim()}
+                  className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-40 flex-shrink-0"
+                  style={{ background: VERT }}
+                >
+                  + Ajouter le lien
+                </button>
+              </div>
             </div>
 
             {saveError && (

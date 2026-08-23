@@ -2,7 +2,7 @@ import { sql } from "@/lib/db";
 
 export type ArticleStatus = "brouillon" | "publie" | "depublie" | "archive";
 
-export type Attachment = { name: string; url: string };
+export type Attachment = { name: string; url: string; kind?: "file" | "link" };
 
 export type Actualite = {
   id: number;
