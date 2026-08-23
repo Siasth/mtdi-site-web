@@ -7,7 +7,7 @@ type HomeDict = Record<string, string>;
 const VERT  = "#162233";
 
 const NAV_H  = 80;  // navbar h-20 80px
-const PEEK   = 18;  // px visibles du bord supérieur de chaque carte empilée
+const PEEK   = 10;  // px visibles du bord supérieur de chaque carte empilée
 
 // Couleurs officielles du drapeau du Bénin (Pantone 347 / 116 / 032)
 const FLAG_VERT  = "#008751";
@@ -99,8 +99,8 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                   contenu déborde de la hauteur disponible (résolutions
                   basses/zoom élevé) plutôt que d'être coupé et inaccessible */}
               <div
-                className="relative z-10 flex-1 flex flex-col justify-center max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 sm:py-12 overflow-y-auto"
-                style={{ paddingTop: `${PEEK + 10}px`, paddingBottom: `${PEEK + 32}px` }}
+                className="relative z-10 flex-1 flex flex-col justify-start max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-12 py-8 sm:py-12 overflow-y-auto"
+                style={{ paddingTop: `${PEEK + 10}px`, paddingBottom: `${PEEK + 16}px` }}
               >
 
                 {/* Chantier label + dots */}
@@ -134,7 +134,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
 
                 {/* Titre */}
                 <h3
-                  className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-black uppercase leading-tight max-w-4xl mb-4"
+                  className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-black uppercase leading-tight max-w-4xl mb-3"
                   style={{ color: ink }}
                 >
                   {c.title}
@@ -142,7 +142,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
 
                 {/* Description */}
                 <p
-                  className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mb-6"
+                  className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mb-4 line-clamp-2"
                   style={{ color: "rgba(255,255,255,0.75)" }}
                 >
                   {c.description}
@@ -150,7 +150,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
 
                 {/* Stats */}
                 {c.stats.length > 0 && (
-                  <div className="flex flex-wrap gap-4 sm:gap-8 lg:gap-12 pt-5"
+                  <div className="flex flex-wrap gap-4 sm:gap-8 lg:gap-12 pt-4"
                     style={{ borderTop: "1px solid rgba(255,255,255,0.15)" }}
                   >
                     {c.stats.map((s) => (
