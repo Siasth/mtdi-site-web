@@ -22,9 +22,10 @@ const DEFAULT_ACCENT = "#162233";
 // pas du contenu éditorial, donc pas stocké en base : ça évite qu'une
 // combinaison mal choisie casse le motif du drapeau béninois.
 function computeBandType(index: number, total: number): BandType {
-  const third = total / 3;
-  if (index < third) return "TOP";
-  if (index < third * 2) return "MID";
+  if (total <= 1) return "MID";
+  const midIndex = Math.floor((total - 1) / 2);
+  if (index < midIndex) return "TOP";
+  if (index === midIndex) return "MID";
   return "BOT";
 }
 
