@@ -4,7 +4,7 @@ import Footer from "../../components/Footer";
 import ActualitesListClient from "./ActualitesListClient";
 import { getActualites } from "@/lib/actualites";
 
-const VERT = "#006828";
+const VERT = "#162233";
 
 type Props = {
   params: Promise<{ locale: string }>;

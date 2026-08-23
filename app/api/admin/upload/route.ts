@@ -1,11 +1,16 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
-import { requireSession } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 // Upload DIRECT navigateur → Vercel Blob : le fichier ne transite jamais par
 // cette fonction serverless (qui a une limite de 4,5 Mo sur Vercel), donc
 // aucune limite de taille pratique ici. Cette route se contente de générer
 // un jeton d'upload signé, après vérification de la session.
+//
+// Important : on utilise getSession() (pas requireSession()) car cette
+// dernière appelle redirect("/login") — un mécanisme pensé pour les pages,
+// qui casse silencieusement la réponse JSON attendue ici si la session a
+// expiré, au lieu de renvoyer une erreur claire.
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
 
@@ -14,7 +19,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       body,
       request,
       onBeforeGenerateToken: async () => {
-        await requireSession(); // lève une erreur si non connecté
+        const session = await getSession();
+        if (!session) {
+          throw new Error("Session expirée — reconnectez-vous puis réessayez.");
+        }
 
         return {
           allowedContentTypes: [
@@ -36,6 +44,10 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     return NextResponse.json(jsonResponse);
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
+    console.error("Erreur upload Blob:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Erreur inconnue lors de l'upload" },
+      { status: 400 }
+    );
   }
 }
