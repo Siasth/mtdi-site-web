@@ -897,6 +897,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Galerie : aucune vraie photo d'événement n'existe (le fichier source
+    // data/galerie.json avait déjà image:"" partout) — on associe des
+    // images génériques déjà présentes dans le projet, par thème, en
+    // attendant les vraies photos. Ne touche jamais une image déjà définie
+    // (ex. déjà uploadée depuis le back-office).
+    const galerieImages: Record<string, string> = {
+      "Ouverture du Sommet Afrique Digitale 2026": "/hero-conference.jpg",
+      "Signature du décret portant création de l'ANAI": "/chantier-01-ia.jpg",
+      "Discours du Ministre : Sommet Afrique Digitale": "/hero-conference.jpg",
+      "Cérémonie des vœux au corps diplomatique": "/alaune-partenariat.jpg",
+      "Visite du chantier fibre optique : Parakou": "/chantier-03-connectivite.jpg",
+      "Inauguration du Data Center souverain : Phase 1": "/alaune-infra.jpg",
+      "Lancement de MonIdentité.bj : Saison 2": "/chantier-02-services.jpg",
+      "Remise des diplômes : Digital Academy, Promotion 2026": "/hero-graduation.jpg",
+      "Hackathon IA étudiants : Université d'Abomey-Calavi": "/alaune-formation.jpg",
+      "Présentation de la Stratégie IA 2030 : Assemblée nationale": "/chantier-01-ia.jpg",
+      "Déploiement des stations CERT.bj": "/alaune-cyber.jpg",
+      "Forum IA & Éthique : Session plénière UNESCO × Bénin": "/chantier-01-ia.jpg",
+      "Rencontre avec les startups : Bénin IA Challenge": "/alaune-startups.jpg",
+      "Interview du Ministre : RFI": "/hero-conference.jpg",
+    };
+    for (const [titleFr, image] of Object.entries(galerieImages)) {
+      await sql`UPDATE galerie_items SET image = ${image} WHERE title_fr = ${titleFr} AND (image IS NULL OR image = '')`;
+    }
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
