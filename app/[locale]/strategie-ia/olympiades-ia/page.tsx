@@ -4,6 +4,7 @@ import Footer from "../../../components/Footer";
 import StrategieIASubNav from "../../../components/StrategieIASubNav";
 
 const VERT = "#006828";
+const BANNER = "#162233"; // bandeau titre, harmonisé avec le reste du site
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
@@ -37,7 +38,7 @@ export default async function OlympiadesIAPage({ params }: Props) {
       <StrategieIASubNav locale={locale} />
 
       <main>
-        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-16" style={{ background: VERT }}>
+        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-12" style={{ background: BANNER }}>
           <div className="max-w-7xl mx-auto">
             <span className="inline-block px-4 py-1.5 text-xs font-black uppercase tracking-widest mb-6" style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>
               NOAI 2026

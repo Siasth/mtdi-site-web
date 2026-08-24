@@ -50,7 +50,7 @@ export default function AlaUneCarousel({ items, locale }: { items: Actualite[]; 
   if (items.length === 0) return null;
 
   return (
-    <section className="bg-white py-10 relative">
+    <section id="a-la-une" className="bg-white py-10 relative">
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: "#006828" }}>

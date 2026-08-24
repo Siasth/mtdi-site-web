@@ -4,6 +4,7 @@ import Footer from "../../components/Footer";
 import { getUpcomingEvents, getReplays } from "@/lib/direct";
 
 const VERT  = "#006828";
+const BANNER = "#162233"; // bandeau titre, harmonisé avec le reste du site
 const ROUGE = "#EB0000";
 
 type Props = {
@@ -27,7 +28,7 @@ export default async function DirectPage({ params }: Props) {
       <main style={{ paddingTop: "84px" }}>
 
         {/* Hero */}
-        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-12" style={{ background: VERT }}>
+        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-12" style={{ background: BANNER }}>
           <div className="max-w-7xl mx-auto flex items-center gap-5">
             <span className="relative flex h-5 w-5 flex-shrink-0" aria-hidden="true">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: ROUGE }} />

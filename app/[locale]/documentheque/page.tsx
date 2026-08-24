@@ -195,6 +195,8 @@ export default function DocumenthequePage() {
   ];
 
   const [activeCategory, setActiveCategory] = useState("all");
+  const [showAllDocs, setShowAllDocs] = useState(false);
+  const DOCS_PAGE_SIZE = 8;
 
   const filtered = activeCategory === "all"
     ? documents
@@ -202,6 +204,7 @@ export default function DocumenthequePage() {
 
   const featured = filtered.filter((d) => d.featured);
   const others = filtered.filter((d) => !d.featured);
+  const visibleOthers = showAllDocs ? others : others.slice(0, DOCS_PAGE_SIZE);
 
   return (
     <>
@@ -210,7 +213,7 @@ export default function DocumenthequePage() {
       <main style={{ paddingTop: "80px" }}>
 
         {/* Hero */}
-        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-20 overflow-hidden" style={{ background: VERT }}>
+        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-12 overflow-hidden" style={{ background: VERT }}>
           <div className="relative max-w-7xl mx-auto">
             <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-6">
               {t.sousTitre}
@@ -292,11 +295,11 @@ export default function DocumenthequePage() {
                 {t.tousDocuments}
               </h2>
               <div className="flex flex-col gap-0">
-                {others.map((doc, i) => (
+                {visibleOthers.map((doc, i) => (
                   <div
                     key={doc.title}
                     className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 py-7"
-                    style={{ borderBottom: i < others.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
+                    style={{ borderBottom: i < visibleOthers.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
                   >
                     <div className="flex-shrink-0 flex items-center gap-3 sm:w-40">
                       <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: doc.typeColor }}>
@@ -327,6 +330,22 @@ export default function DocumenthequePage() {
                   </div>
                 ))}
               </div>
+
+              {!showAllDocs && others.length > DOCS_PAGE_SIZE && (
+                <div className="mt-10 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllDocs(true)}
+                    className="inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-widest bg-white"
+                    style={{ border: "1px solid rgba(0,0,0,0.15)", color: "rgba(26,26,26,0.75)" }}
+                  >
+                    {locale === "en" ? "Load more" : "Charger plus"}
+                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         )}

@@ -24,7 +24,7 @@ export default async function MissionsPage({ params }: Props) {
       <main style={{ paddingTop: "80px" }}>
 
         {/* Hero */}
-        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-20" style={{ background: VERT }}>
+        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-12" style={{ background: VERT }}>
           <div className="max-w-7xl mx-auto">
             <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-4">
               {t.breadcrumb}

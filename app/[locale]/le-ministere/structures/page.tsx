@@ -48,7 +48,7 @@ export default async function StructuresPage({ params }: Props) {
       <main style={{ paddingTop: "80px" }}>
 
         {/* Hero */}
-        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-20" style={{ background: VERT }}>
+        <section className="px-4 sm:px-6 lg:px-8 pt-14 pb-12" style={{ background: VERT }}>
           <div className="max-w-7xl mx-auto">
             <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-4">
               {t.breadcrumb}
@@ -174,8 +174,7 @@ export default async function StructuresPage({ params }: Props) {
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
             <div>
               <h2 className="text-3xl sm:text-4xl font-black uppercase text-white leading-tight">
-                {t.decouvrirMissions}<br />
-                <span style={{ color: JAUNE }}>du ministère</span>
+                {t.decouvrirMissions}
               </h2>
             </div>
             <Link

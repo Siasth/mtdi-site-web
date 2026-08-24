@@ -35,9 +35,15 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
 
   // Transparent navbar only on homepage hero; always solid on other pages
   const solid = !isHome || scrolled;
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 60);
+      // Seuil plus généreux que la navbar : n'apparaît que si on a vraiment
+      // quitté le haut de page, pas juste esquissé un léger défilement.
+      setShowBackToTop(window.scrollY > 400);
+    };
     handleScroll(); // vérifie l'état réel dès le montage (page rechargée déjà défilée, lien d'ancrage...)
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -74,7 +80,7 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
       title: s.actualites ?? "ACTUALITÉS",
       links: [
         { label: l.toutesActualites ?? "Toutes les actualités", href: `${prefix}/actualites` },
-        { label: l.alaUne ?? "À la une", href: `${prefix}/actualites` },
+        { label: l.alaUne ?? "À la une", href: `${prefix}/#a-la-une` },
       ],
     },
     {
@@ -151,6 +157,21 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
       >
         {nav.allerAuContenu ?? "Aller au contenu principal"}
       </a>
+
+      {/* Retour en haut : uniquement visible après un vrai défilement */}
+      <button
+        type="button"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label={nav.retourHaut ?? "Retour en haut de page"}
+        className={`fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
+          showBackToTop ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+        style={{ background: VERT }}
+      >
+        <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
+          <path d="M12 19V5M5 12l7-7 7 7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
 
       {/* Navbar */}
       <header
@@ -313,7 +334,7 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
           role="dialog"
           aria-modal="true"
           aria-label={isEn ? "Main navigation menu" : "Menu de navigation principal"}
-          className="fixed inset-0 z-30 mega-menu"
+          className="fixed inset-0 z-50 mega-menu"
           style={{ background: "#1A1A1A", paddingTop: "80px" }}
         >
           <div className="h-full overflow-y-auto">

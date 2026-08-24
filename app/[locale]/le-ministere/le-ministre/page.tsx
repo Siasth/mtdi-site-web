@@ -45,7 +45,7 @@ export default async function LeMinisterPage({ params }: Props) {
       <main style={{ paddingTop: "80px" }}>
 
         {/* Hero */}
-        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-20 overflow-hidden" style={{ background: VERT }}>
+        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-12 overflow-hidden" style={{ background: VERT }}>
           <div className="relative max-w-7xl mx-auto">
             <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-4">
               {t.breadcrumb}

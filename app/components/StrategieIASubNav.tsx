@@ -16,7 +16,7 @@ export default function StrategieIASubNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <div className="sticky top-[84px] z-30 px-4 sm:px-6 lg:px-8 py-3" style={{ background: "#0d1826", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+    <div className="sticky top-[84px] z-30 mt-[84px] px-4 sm:px-6 lg:px-8 py-3" style={{ background: "#0d1826", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
       <div className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         {items.map((item) => {
           const active = pathname === item.href;

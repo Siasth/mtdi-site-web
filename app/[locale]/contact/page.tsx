@@ -5,6 +5,7 @@ import ContactForm from "../../components/ContactForm";
 import { getGeneralSettings } from "@/lib/general-settings";
 
 const VERT  = "#006828";
+const BANNER = "#162233"; // bandeau titre, harmonisé avec le reste du site
 const ROUGE = "#EB0000";
 
 const specificContacts = [
@@ -53,7 +54,7 @@ export default async function ContactPage({ params }: Props) {
         {/* Hero */}
         <section
           className="pt-14 pb-12 px-4 sm:px-6 lg:px-8"
-          style={{ background: VERT }}
+          style={{ background: BANNER }}
         >
           <div className="max-w-7xl mx-auto">
             <div className="mb-6 w-16 h-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.30)" }} />
