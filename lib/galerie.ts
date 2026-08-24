@@ -64,7 +64,7 @@ export async function getFeaturedGalerieItems(locale: Locale, limit = 8): Promis
     FROM galerie_items g
     LEFT JOIN galerie_collections c ON c.id = g.collection_id
     WHERE g.deleted_at IS NULL AND g.status = 'publie' AND g.featured_home = TRUE
-    ORDER BY g.display_order ASC
+    ORDER BY g.updated_at DESC
     LIMIT ${limit}
   `;
   return result.rows.map((r) => mapItem(r, locale));
