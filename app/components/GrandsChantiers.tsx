@@ -152,12 +152,11 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                 </h3>
 
                 {/* Description */}
-                <p
-                  className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mb-4 line-clamp-2"
+                <div
+                  className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mb-4 line-clamp-2 prose-institutionnel"
                   style={{ color: "rgba(255,255,255,0.75)" }}
-                >
-                  {c.description}
-                </p>
+                  dangerouslySetInnerHTML={{ __html: c.description }}
+                />
 
                 {/* Stats */}
                 {c.stats.length > 0 && (
@@ -181,6 +180,12 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
           );
         })}
       </div>
+
+      <style>{`
+        .prose-institutionnel p { margin: 0.3em 0; }
+        .prose-institutionnel strong { font-weight: 900; }
+        .prose-institutionnel a { color: #FFBE00; text-decoration: underline; }
+      `}</style>
 
     </section>
   );

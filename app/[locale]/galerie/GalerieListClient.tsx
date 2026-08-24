@@ -199,7 +199,7 @@ export default function GalerieListClient({
                           <span className="text-anthracite/65 text-[10px] font-medium">{formatDate(item.eventDate)}</span>
                         </div>
                         <h3 className="text-anthracite font-black text-sm sm:text-base uppercase leading-snug mb-2 group-hover:text-vert-benin transition-colors">{item.title}</h3>
-                        <p className="text-anthracite/75 text-sm font-medium leading-relaxed mb-3">{item.description}</p>
+                        <div className="text-anthracite/75 text-sm font-medium leading-relaxed mb-3 prose-institutionnel" dangerouslySetInnerHTML={{ __html: item.description }} />
                         {item.credit && (
                           <p className="text-anthracite/80 text-[10px] font-semibold uppercase tracking-wider">{item.credit}</p>
                         )}
@@ -228,6 +228,11 @@ export default function GalerieListClient({
           </button>
         </div>
       )}
+      <style>{`
+        .prose-institutionnel p { margin: 0.3em 0; }
+        .prose-institutionnel strong { font-weight: 900; }
+        .prose-institutionnel a { color: #006828; text-decoration: underline; }
+      `}</style>
     </>
   );
 }

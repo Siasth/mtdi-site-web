@@ -55,8 +55,8 @@ export default async function StructuresPage({ params }: Props) {
             </p>
 
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black uppercase leading-none tracking-tight text-white max-w-5xl">
-              Structures<br />
-              <span style={{ color: JAUNE }}>sous tutelle</span>
+              {t.titre.split(" ").slice(0, -1).join(" ")}<br />
+              <span style={{ color: JAUNE }}>{t.titre.split(" ").slice(-1)}</span>
             </h1>
 
             <p className="mt-6 text-white/60 text-base sm:text-lg leading-relaxed max-w-2xl">
@@ -99,7 +99,7 @@ export default async function StructuresPage({ params }: Props) {
                         </div>
                       </div>
 
-                      <p className="text-anthracite/75 text-sm font-medium leading-relaxed mb-6">{structure.description}</p>
+                      <div className="text-anthracite/75 text-sm font-medium leading-relaxed mb-6 prose-institutionnel" dangerouslySetInnerHTML={{ __html: structure.description }} />
 
                       <Link
                         href={structure.url}
@@ -192,6 +192,14 @@ export default async function StructuresPage({ params }: Props) {
         </section>
 
       </main>
+
+      <style>{`
+        .prose-institutionnel p { margin: 0.4em 0; }
+        .prose-institutionnel strong { font-weight: 900; }
+        .prose-institutionnel a { color: #006828; text-decoration: underline; }
+        .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }
+        .prose-institutionnel ol { list-style: decimal; padding-left: 1.2em; }
+      `}</style>
 
       <Footer locale={locale} dict={dict.footer} />
     </>

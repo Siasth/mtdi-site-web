@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -37,8 +38,8 @@ export async function PATCH(
       title_en = ${titleEn ?? null},
       subtitle_fr = ${subtitleFr ?? null},
       subtitle_en = ${subtitleEn ?? null},
-      description_fr = ${descriptionFr ?? null},
-      description_en = ${descriptionEn ?? null},
+      description_fr = ${descriptionFr ? sanitizeRichText(descriptionFr) : null},
+      description_en = ${descriptionEn ? sanitizeRichText(descriptionEn) : null},
       image = ${image ?? null},
       video = ${video ?? null},
       color = ${color ?? null},

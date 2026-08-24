@@ -29,8 +29,8 @@ export default async function DirectionsCentralesPage({ params }: Props) {
               {t.breadcrumb}
             </p>
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black uppercase leading-none tracking-tight text-white max-w-5xl">
-              Directions<br />
-              <span style={{ color: JAUNE }}>centrales</span>
+              {t.titre.split(" ").slice(0, -1).join(" ")}<br />
+              <span style={{ color: JAUNE }}>{t.titre.split(" ").slice(-1)}</span>
             </h1>
           </div>
         </section>
@@ -63,10 +63,17 @@ export default async function DirectionsCentralesPage({ params }: Props) {
                       {t.directeur} {dir.director}
                     </p>
                   )}
-                  <p className="text-anthracite/75 text-sm font-medium leading-relaxed max-w-3xl">{dir.description}</p>
+                  <div className="text-anthracite/75 text-sm font-medium leading-relaxed max-w-3xl prose-institutionnel" dangerouslySetInnerHTML={{ __html: dir.description }} />
                 </li>
               ))}
             </ul>
+            <style>{`
+              .prose-institutionnel p { margin: 0.4em 0; }
+              .prose-institutionnel strong { font-weight: 900; }
+              .prose-institutionnel a { color: #006828; text-decoration: underline; }
+              .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }
+              .prose-institutionnel ol { list-style: decimal; padding-left: 1.2em; }
+            `}</style>
           </div>
         </section>
 

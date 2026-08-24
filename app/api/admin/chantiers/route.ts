@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   const result = await sql`
     INSERT INTO chantiers (number, title_fr, title_en, subtitle_fr, subtitle_en, description_fr, description_en, image, video, color, stats, display_order, active, created_by)
-    VALUES (${number || ""}, ${titleFr}, ${titleEn || null}, ${subtitleFr || null}, ${subtitleEn || null}, ${descriptionFr || null}, ${descriptionEn || null}, ${image || null}, ${video || null}, ${color || null}, ${JSON.stringify(stats || [])}::jsonb, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
+    VALUES (${number || ""}, ${titleFr}, ${titleEn || null}, ${subtitleFr || null}, ${subtitleEn || null}, ${sanitizeRichText(descriptionFr || "")}, ${descriptionEn ? sanitizeRichText(descriptionEn) : null}, ${image || null}, ${video || null}, ${color || null}, ${JSON.stringify(stats || [])}::jsonb, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
     RETURNING id
   `;
   await logAudit({ userId: session.id, action: "creer", module: "chantiers", resourceId: String(result.rows[0].id), details: { titleFr }, ip: getIp(req) });

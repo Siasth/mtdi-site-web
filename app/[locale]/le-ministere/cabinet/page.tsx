@@ -72,9 +72,10 @@ export default async function CabinetPage({ params }: Props) {
                     <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: member.accent }}>
                       {member.direction}
                     </p>
-                    <p className="text-anthracite/70 text-sm font-medium leading-relaxed max-w-2xl">
-                      {member.description}
-                    </p>
+                    <div
+                      className="text-anthracite/70 text-sm font-medium leading-relaxed max-w-2xl prose-institutionnel"
+                      dangerouslySetInnerHTML={{ __html: member.description }}
+                    />
                   </div>
                 </li>
               ))}
@@ -83,6 +84,14 @@ export default async function CabinetPage({ params }: Props) {
         </section>
 
       </main>
+
+      <style>{`
+        .prose-institutionnel p { margin: 0.4em 0; }
+        .prose-institutionnel strong { font-weight: 900; }
+        .prose-institutionnel a { color: #006828; text-decoration: underline; }
+        .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }
+        .prose-institutionnel ol { list-style: decimal; padding-left: 1.2em; }
+      `}</style>
 
       <Footer locale={locale} dict={dict.footer} />
     </>
