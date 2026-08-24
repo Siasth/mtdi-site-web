@@ -2,26 +2,11 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import StrategieIASubNav from "../../../components/StrategieIASubNav";
+import { getOlympiadeEditions, getOlympiadeCriteres } from "@/lib/strategie-ia-content";
 
 const VERT = "#006828";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
-
-const editions = [
-  {
-    year: "2026",
-    title: "1ère édition — Olympiades Nationales d'IA (NOAI)",
-    description: "Compétition inaugurale pour sélectionner les jeunes talents béninois qui représenteront le pays aux Olympiades Internationales d'IA (IOAI) 2026 au Kazakhstan, du 2 au 8 août.",
-    highlight: "8 lauréats sélectionnés le 4 juillet à Sèmè One",
-  },
-];
-
-const criteres = [
-  "Être scolarisé au Bénin, niveau lycée ou premier cycle universitaire",
-  "Maîtriser les fondamentaux de la programmation et des mathématiques",
-  "S'inscrire via la plateforme dédiée avant la date limite officielle",
-  "Réussir les épreuves de présélection (algorithmique, machine learning, éthique de l'IA)",
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -30,6 +15,11 @@ type Props = {
 export default async function OlympiadesIAPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
+  const isEn = locale === "en";
+  const [editions, criteres] = await Promise.all([
+    getOlympiadeEditions(isEn ? "en" : "fr"),
+    getOlympiadeCriteres(isEn ? "en" : "fr"),
+  ]);
 
   return (
     <>
@@ -61,7 +51,7 @@ export default async function OlympiadesIAPage({ params }: Props) {
             </h2>
             <div className="space-y-px" style={{ background: "rgba(255,255,255,0.08)" }}>
               {editions.map((ed) => (
-                <div key={ed.year} className="p-8 sm:p-10" style={{ background: "#0d1826" }}>
+                <div key={ed.id} className="p-8 sm:p-10" style={{ background: "#0d1826" }}>
                   <div className="flex items-start gap-6">
                     <span className="text-4xl font-black flex-shrink-0" style={{ color: JAUNE }}>{ed.year}</span>
                     <div>

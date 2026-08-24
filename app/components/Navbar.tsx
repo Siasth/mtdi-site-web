@@ -12,6 +12,11 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
   const [scrolled, setScrolled] = useState(false);
   const [logoHeader, setLogoHeader] = useState("/mtdi-banner.png");
   const [siteName, setSiteName] = useState("Ministère de la Transformation Digitale et de l'Innovation — République du Bénin");
+  const [liensUtiles, setLiensUtiles] = useState<{ label: string; href: string }[]>([]);
+
+  useEffect(() => {
+    fetch("/api/liens-utiles").then((r) => r.json()).then(setLiensUtiles).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/general-settings")
@@ -132,18 +137,7 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
     },
     {
       title: s.liensUtiles ?? "LIENS UTILES",
-      links: [
-        { label: "Sèmè City", href: "https://semecity.bj/" },
-        { label: "ASIN", href: "https://asin.bj/" },
-        { label: "ANIP", href: "https://eservices.anip.bj/" },
-        { label: "e-services", href: "https://service-public.bj/" },
-        { label: "e-pme", href: "https://epme.adpme.bj/" },
-        { label: "e-visa", href: "https://evisa.bj/" },
-        { label: "Centre de services", href: "https://cds.asin.bj/" },
-        { label: "APDP", href: "https://service.apdp.bj/" },
-        { label: "CSIRT Bénin", href: "https://csirt.bj/" },
-        { label: l.presidence ?? "Présidence de la République", href: "https://presidence.bj/" },
-      ],
+      links: liensUtiles.map((l) => ({ label: l.label, href: l.href })),
     },
   ];
 

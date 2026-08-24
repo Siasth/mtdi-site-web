@@ -3,37 +3,10 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import ContactForm from "../../components/ContactForm";
 import { getGeneralSettings } from "@/lib/general-settings";
+import { getContactsSpecifiques } from "@/lib/contacts-specifiques";
 
 const VERT  = "#006828";
 const BANNER = "#162233"; // bandeau titre, harmonisé avec le reste du site
-const ROUGE = "#EB0000";
-
-const specificContacts = [
-  {
-    role: "Presse & Accréditations",
-    name: "Service Communication",
-    email: "presse@gouv.bj",
-    phone: "+229 01 21 30 00 01",
-    note: "Pour les demandes d'interview, accréditations et dossiers de presse.",
-    accent: VERT,
-  },
-  {
-    role: "Partenariats & Coopération",
-    name: "Direction des Partenariats",
-    email: "partenariats@gouv.bj",
-    phone: "+229 01 21 30 00 02",
-    note: "Organisations internationales, bailleurs de fonds, partenaires techniques.",
-    accent: "#7A5800",
-  },
-  {
-    role: "Réclamations & Signalements",
-    name: "Cellule Citoyenne",
-    email: "reclamations@gouv.bj",
-    phone: "+229 01 21 30 00 03",
-    note: "Traitement des signalements et réclamations relatives aux services numériques publics.",
-    accent: ROUGE,
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -44,6 +17,7 @@ export default async function ContactPage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.contact;
   const general = await getGeneralSettings();
+  const specificContacts = await getContactsSpecifiques(locale === "en" ? "en" : "fr");
 
   return (
     <>

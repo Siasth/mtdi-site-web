@@ -2,34 +2,10 @@ import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
+import { getTextesJuridiques } from "@/lib/textes-juridiques";
 
 const VERT  = "#162233";
 const JAUNE = "#FFBE00";
-
-const textes = [
-  {
-    title: "Code du numérique en République du Bénin",
-    type: "Loi",
-    typeColor: VERT,
-    référence: "Loi n°2017-20",
-    date: "28 avril 2018",
-    status: "En vigueur",
-    description: "Cadre juridique fondateur régissant l'économie numérique au Bénin. Couvre la protection des données à caractère personnel, la cybersécurité, les transactions électroniques, le commerce en ligne, les communications électroniques et les infractions liées aux technologies de l'information et de la communication.",
-    articles: "478 articles répartis en 8 livres",
-    href: "https://innovation.gouv.bj/assets/Documents/loi-2017-20.pdf",
-  },
-  {
-    title: "Loi portant modification du code du numérique en République du Bénin",
-    type: "Loi",
-    typeColor: VERT,
-    référence: "Loi n°2020-35",
-    date: "2020",
-    status: "En vigueur",
-    description: "Loi portant modification de la loi n°2017-20 du 20 avril 2018 portant code du numérique en République du Bénin. Actualise et complète le cadre juridique fondateur du numérique.",
-    articles: "Texte modificatif",
-    href: "https://innovation.gouv.bj/assets/Documents/loi-2020-35.pdf",
-  },
-];
 
 const stats = [
   { value: "2", label: "Textes en vigueur", suffix: "répertoriés" },
@@ -47,6 +23,7 @@ export default async function TextesJuridiquesPage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.textesjuridiques;
   const prefix = locale === "en" ? "/en" : "";
+  const textes = await getTextesJuridiques(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -102,15 +79,15 @@ export default async function TextesJuridiquesPage({ params }: Props) {
             <div className="flex flex-col gap-0">
               {textes.map((texte, i) => (
                 <div
-                  key={texte.référence}
+                  key={texte.id}
                   className="py-8"
                   style={{ borderBottom: i < textes.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
                 >
                   <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: texte.typeColor }}>
+                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: VERT }}>
                       {texte.type}
                     </span>
-                    <span className="text-xs font-bold text-anthracite/70 tabular-nums">{texte.référence}</span>
+                    <span className="text-xs font-bold text-anthracite/70 tabular-nums">{texte.reference}</span>
                     <span className="text-xs font-medium text-anthracite/60">{texte.date}</span>
                     <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" style={{ background: "#16a34a20", color: "#16a34a" }}>
                       {texte.status}

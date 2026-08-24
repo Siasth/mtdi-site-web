@@ -2,36 +2,10 @@ import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
+import { getVideos } from "@/lib/videos";
 
 const VERT  = "#162233";
 const ROUGE = "#EB0000";
-
-const videos = [
-  {
-    title: "2ème Conférence des RSSI : la sécurité numérique au cœur de l'État augmenté",
-    date: "26 juin 2026",
-    duration: "35 min",
-    source: "MTDI",
-    url: "https://youtu.be/HrBWcxO24WI",
-    color: "#2a1a0a",
-  },
-  {
-    title: "Cyberdrill RSSI : Exercice de cybersécurité national",
-    date: "2026",
-    duration: "20 min",
-    source: "MTDI",
-    url: "https://youtu.be/20ZGGa1d8kg",
-    color: "#0a2218",
-  },
-  {
-    title: "« J'aime ma langue » : Intégration des langues nationales dans l'IA",
-    date: "2025",
-    duration: "1 min",
-    source: "MTDI",
-    url: "https://youtube.com/shorts/Kg_s0_8Tnuw",
-    color: "#0D132D",
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -41,6 +15,7 @@ export default async function VideothequePage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.videotheque;
+  const videos = await getVideos(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -68,7 +43,7 @@ export default async function VideothequePage({ params }: Props) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
               {videos.map((video) => (
-                <article key={video.title} className="group bg-white hover:bg-gris-perle transition-colors">
+                <article key={video.id} className="group bg-white hover:bg-gris-perle transition-colors">
                   {/* Thumbnail */}
                   <Link
                     href={video.url}

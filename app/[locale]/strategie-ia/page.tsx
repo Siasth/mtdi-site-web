@@ -3,65 +3,14 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import StrategieIASubNav from "../../components/StrategieIASubNav";
 import Link from "next/link";
+import { getPiliers } from "@/lib/strategie-ia-content";
+import { IconPreset } from "../../components/IconPreset";
 
 const VERT  = "#006828";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
-const piliers = [
-  {
-    number: "01",
-    accent: VERT,
-    title: "Gouvernance & Éthique",
-    description: "Un cadre réglementaire africain de référence garantissant une IA transparente, équitable et respectueuse des droits fondamentaux. Comité national d'éthique, audit algorithmique et protection des données personnelles.",
-    icon: (
-      <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-        <path d="M12 2 3 7v5c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7z" />
-        <path d="m9 12 2 2 4-4" />
-      </svg>
-    ),
-  },
-  {
-    number: "02",
-    accent: "#7A5800",
-    title: "Infrastructures IA",
-    description: "Souveraineté numérique par le cloud public béninois, des data centers à haute disponibilité et un réseau national d'open data structuré pour l'entraînement des modèles d'IA.",
-    icon: (
-      <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-        <rect x="2" y="3" width="20" height="4" rx="1" />
-        <rect x="2" y="10" width="20" height="4" rx="1" />
-        <rect x="2" y="17" width="20" height="4" rx="1" />
-        <circle cx="6" cy="5" r="0.8" fill="currentColor" />
-        <circle cx="6" cy="12" r="0.8" fill="currentColor" />
-        <circle cx="6" cy="19" r="0.8" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    number: "03",
-    accent: ROUGE,
-    title: "Talents & Compétences",
-    description: "Formation de 10 000 professionnels de l'IA d'ici 2030 via la Digital Academy, des partenariats universitaires, des bourses d'excellence et des programmes de certification reconnus à l'international.",
-    icon: (
-      <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-        <path d="M6 12v5c3 3 9 3 12 0v-5" />
-      </svg>
-    ),
-  },
-  {
-    number: "04",
-    accent: VERT,
-    title: "Projets & Innovation",
-    description: "Déploiement de l'IA dans l'agriculture, la santé, l'éducation et les services publics. Bénin IA Challenge, incubateur national, et fonds de soutien aux startups deeptech béninoises.",
-    icon: (
-      <svg width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-        <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.3 4.7-3.3 6L15 21H9l-.3-6C6.8 13.7 5 11.5 5 9a7 7 0 0 1 7-7z" />
-        <path d="M9 21h6" />
-      </svg>
-    ),
-  },
-];
+const PILIER_ACCENTS = [VERT, "#7A5800", ROUGE, VERT];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -71,6 +20,7 @@ export default async function StrategieIAPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.strategie;
+  const piliers = await getPiliers(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -142,19 +92,19 @@ export default async function StrategieIAPage({ params }: Props) {
               {t.les4Piliers}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background: "rgba(255,255,255,0.08)" }}>
-              {piliers.map((pilier) => (
-                <div key={pilier.number} className="group p-8 sm:p-10 transition-colors" style={{ background: "#0d1826" }}>
+              {piliers.map((pilier, i) => (
+                <div key={pilier.id} className="group p-8 sm:p-10 transition-colors" style={{ background: "#0d1826" }}>
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: pilier.accent, opacity: 0.5 }}>
-                      {pilier.number}
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: PILIER_ACCENTS[i % 4], opacity: 0.5 }}>
+                      {String(i + 1).padStart(2, "0")}
                     </span>
-                    <div className="mt-1 flex-shrink-0" style={{ color: pilier.accent }}>
-                      {pilier.icon}
+                    <div className="mt-1 flex-shrink-0" style={{ color: PILIER_ACCENTS[i % 4] }}>
+                      <IconPreset name={pilier.icon} color={PILIER_ACCENTS[i % 4]} size={28} />
                     </div>
                   </div>
                   <h3 className="text-white font-black text-xl uppercase leading-snug mb-4">{pilier.title}</h3>
                   <p className="text-white/60 text-sm font-medium leading-relaxed">{pilier.description}</p>
-                  <div className="mt-6 h-0.5 w-12 rounded-full" style={{ background: pilier.accent }} />
+                  <div className="mt-6 h-0.5 w-12 rounded-full" style={{ background: PILIER_ACCENTS[i % 4] }} />
                 </div>
               ))}
             </div>

@@ -15,6 +15,7 @@ export type GeneralSettings = {
   instagram: string;
   youtube: string;
   contactEmail: string;
+  ministreEmail: string;
   contactPhone: string;
   contactAddress: string;
   contactAddressEn: string;
@@ -37,6 +38,7 @@ export const GENERAL_SETTINGS_DEFAULTS: GeneralSettings = {
   instagram: "https://www.instagram.com/benin.innov/",
   youtube: "",
   contactEmail: "contact@gouv.bj",
+  ministreEmail: "mtdi.contact@gouv.bj",
   contactPhone: "+229 01 21 30 00 00",
   contactAddress: "Boulevard de la Marina\n01 BP 412 Cotonou\nRépublique du Bénin",
   contactAddressEn: "Boulevard de la Marina\n01 BP 412 Cotonou\nRepublic of Benin",

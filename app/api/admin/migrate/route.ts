@@ -930,6 +930,432 @@ export async function POST(req: NextRequest) {
       ON CONFLICT (key) DO NOTHING
     `;
 
+
+    // ══════════════════════════════════════════════════════════════════
+    // Pages secondaires + mini-site Strategie IA. Contenu texte simple
+    // (pas de mise en forme riche jusqu'ici) - champs texte classiques,
+    // pas besoin d'assainissement HTML pour ces modules.
+    // ══════════════════════════════════════════════════════════════════
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS documents (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        category TEXT NOT NULL DEFAULT 'rapport',
+        date_label TEXT,
+        description_fr TEXT, description_en TEXT,
+        href TEXT NOT NULL,
+        featured BOOLEAN NOT NULL DEFAULT FALSE,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const documentsCount = await sql`SELECT COUNT(*) AS count FROM documents`;
+    if (Number(documentsCount.rows[0].count) === 0) {
+      const seedDocuments = [
+        { title: "Plan d'Engagement Environnemental et Social (PEES) : WARDIP", category: "rapport", date: "Octobre 2025", description: "Plan d'Engagement Environnemental et Social dans le cadre du projet WARDIP (West Africa Regional Digital Intégration Program).", href: "https://innovation.gouv.bj/assets/documents/pees-version-d'octobre-2025-publie_bm.pdf", featured: false },
+        { title: "Plan de Gestion de la Main-d'œuvre (PGMO) : WARDIP", category: "rapport", date: "Octobre 2025", description: "Plan de Gestion de la Main-d'œuvre dans le cadre du projet WARDIP.", href: "https://innovation.gouv.bj/assets/documents/pgmo-version-d'octobre-2025-publie_bm.pdf", featured: false },
+        { title: "Plan de Mobilisation des Parties Prenantes (PMPP) incluant le MGP : WARDIP", category: "rapport", date: "Octobre 2025", description: "Plan de Mobilisation des Parties Prenantes incluant le Mécanisme de Gestion des Plaintes dans le cadre du projet WARDIP.", href: "https://innovation.gouv.bj/assets/documents/pmpp-version-d'octobre-2025-publie_bm.pdf", featured: false },
+        { title: "Résultats de la sélection dans le cadre de la participation du Bénin aux OIIA 2025", category: "rapport", date: "2025", description: "Résultats de la sélection des candidats béninois pour la participation aux Olympiades Internationales d'Intelligence Artificielle 2025.", href: "https://innovation.gouv.bj/assets/documents/resultats-de-la-selection-dans-le-cadre-de-la-participation-du-benin-aux-oiia-2025.pdf", featured: false },
+        { title: "Magazine Bénin Numérique N°3", category: "rapport", date: "2024", description: "Troisième édition du magazine Bénin Numérique.", href: "https://innovation.gouv.bj/assets/documents/magazine-benin-numerique---n0003.pdf", featured: false },
+        { title: "Liste des Fournisseurs de Services de Sécurité Numérique qualifiés en République du Bénin", category: "juridique", date: "2024", description: "Liste officielle des fournisseurs de services de sécurité numérique qualifiés en République du Bénin.", href: "https://innovation.gouv.bj/assets/documents/liste-des-fournisseurs-de-services-de-securite-numerique-qualifies-en-republique-du-benin.pdf", featured: false },
+        { title: "Rapport de vulnérabilités et d'incidents du cyberespace béninois", category: "rapport", date: "2024", description: "Rapport sur les vulnérabilités et incidents de sécurité relevés dans le cyberespace béninois.", href: "https://innovation.gouv.bj/assets/documents/rapport-de-vulnerabilites-et-d'incidents-du-cyberespace-beninois.pdf", featured: false },
+        { title: "Magazine Bénin Numérique N°2", category: "rapport", date: "Octobre 2023", description: "Deuxième édition du magazine Bénin Numérique : actualités, innovations et avancées du secteur numérique.", href: "https://innovation.gouv.bj/assets/documents/magazine-benin-numerique---n0002---octobre-2023-1698406338.pdf", featured: false },
+        { title: "Référentiel des exigences relatives à la qualification des fournisseurs de services de sécurité numérique en République du Bénin", category: "juridique", date: "Octobre 2023", description: "Référentiel définissant les exigences pour la qualification des fournisseurs de services de sécurité numérique au Bénin.", href: "https://innovation.gouv.bj/assets/documents/referentiel-des-exigences-relatives-a-la-qualification-des-fournisseurs-de-services-de-securite-numerique-en-republique-du-benin-1698397466.pdf", featured: false },
+        { title: "Stratégie Nationale d'Intelligence Artificielle et des Mégadonnées 2023-2027", category: "stratégie", date: "2023", description: "Feuille de route officielle pour le développement de l'intelligence artificielle et des mégadonnées au Bénin sur la période 2023-2027.", href: "https://innovation.gouv.bj/assets/documents/strategie-nationale-d'intelligence-artificielle-et-des-megadonnees-2023-2027.pdf", featured: true },
+        { title: "National Artificial Intelligence and Big Data Strategy", category: "stratégie", date: "2023", description: "English version of Bénin's National Artificial Intelligence and Big Data Strategy.", href: "https://innovation.gouv.bj/assets/documents/national-artificial-intelligence-and-big-data-strategy-1682673348.pdf", featured: true },
+        { title: "Magazine Bénin Numérique N°1", category: "rapport", date: "2023", description: "Première édition du magazine Bénin Numérique : bilan, projets et perspectives du numérique au Bénin.", href: "https://innovation.gouv.bj/assets/documents/magazine-benin-numerique_.pdf", featured: false },
+        { title: "Règles de politique de protection des infrastructures d'information critiques en République du Bénin", category: "juridique", date: "2023", description: "Document définissant les règles de protection des infrastructures d'information critiques de la République du Bénin.", href: "https://innovation.gouv.bj/assets/documents/regles-de-politique-de-protection-des-infrastructures-dinformation-critiques-en-republique-du-benin.pdf", featured: false },
+        { title: "État des lieux de l'écosystème digital et de l'entrepreneuriat numérique au Bénin", category: "rapport", date: "2023", description: "Rapport sur l'état de l'écosystème digital et de l'entrepreneuriat numérique en République du Bénin.", href: "https://innovation.gouv.bj/assets/documents/rapport_etat-de-l'ecosysteme-et-de-l'entrepreneuriat-numerique-au-benin.pdf", featured: false },
+        { title: "Guide de l'Entrepreneur Digital : Bénin", category: "guide", date: "2023", description: "Guide pratique à destination des entrepreneurs du numérique au Bénin.", href: "https://innovation.gouv.bj/assets/documents/guide-entrepreneur-digital-ctd-2023.pdf", featured: false },
+      ];
+      for (let i = 0; i < seedDocuments.length; i++) {
+        const d = seedDocuments[i];
+        await sql`
+          INSERT INTO documents (title_fr, category, date_label, description_fr, href, featured, display_order)
+          VALUES (${d.title}, ${d.category}, ${d.date}, ${d.description}, ${d.href}, ${d.featured}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS textes_juridiques (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        type_fr TEXT, type_en TEXT,
+        reference TEXT,
+        date_label TEXT,
+        status_fr TEXT, status_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        articles_fr TEXT, articles_en TEXT,
+        href TEXT NOT NULL,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const textesCount = await sql`SELECT COUNT(*) AS count FROM textes_juridiques`;
+    if (Number(textesCount.rows[0].count) === 0) {
+      const seedTextes = [
+        { title: "Code du numérique en République du Bénin", type: "Loi", reference: "Loi n°2017-20", date: "28 avril 2018", status: "En vigueur", description: "Cadre juridique fondateur régissant l'économie numérique au Bénin. Couvre la protection des données à caractère personnel, la cybersécurité, les transactions électroniques, le commerce en ligne, les communications électroniques et les infractions liées aux technologies de l'information et de la communication.", articles: "478 articles répartis en 8 livres", href: "https://innovation.gouv.bj/assets/Documents/loi-2017-20.pdf" },
+        { title: "Loi portant modification du code du numérique en République du Bénin", type: "Loi", reference: "Loi n°2020-35", date: "2020", status: "En vigueur", description: "Loi portant modification de la loi n°2017-20 du 20 avril 2018 portant code du numérique en République du Bénin. Actualise et complète le cadre juridique fondateur du numérique.", articles: "Texte modificatif", href: "https://innovation.gouv.bj/assets/Documents/loi-2020-35.pdf" },
+      ];
+      for (let i = 0; i < seedTextes.length; i++) {
+        const t = seedTextes[i];
+        await sql`
+          INSERT INTO textes_juridiques (title_fr, type_fr, reference, date_label, status_fr, description_fr, articles_fr, href, display_order)
+          VALUES (${t.title}, ${t.type}, ${t.reference}, ${t.date}, ${t.status}, ${t.description}, ${t.articles}, ${t.href}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS kit_presse_items (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        type TEXT NOT NULL DEFAULT 'PDF',
+        href TEXT NOT NULL,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const kitCount = await sql`SELECT COUNT(*) AS count FROM kit_presse_items`;
+    if (Number(kitCount.rows[0].count) === 0) {
+      // Note : la charte graphique (PDF) n'est PAS incluse ici - son fichier
+      // n'a jamais existé sur le serveur (lien mort connu depuis l'audit
+      // initial). A ajouter depuis le back-office une fois le vrai PDF
+      // disponible.
+      const seedKit = [
+        { title: "Logo MTDI — Usage officiel", description: "Logo vectoriel officiel du Ministère de la Transformation Digitale et de l'Innovation.", type: "PNG", href: "/logo_MTDI.png" },
+        { title: "Bannière officielle MTDI", description: "Bannière horizontale avec identité visuelle complète du Ministère.", type: "PNG", href: "/mtdi-banner.png" },
+      ];
+      for (let i = 0; i < seedKit.length; i++) {
+        const k = seedKit[i];
+        await sql`
+          INSERT INTO kit_presse_items (title_fr, description_fr, type, href, display_order)
+          VALUES (${k.title}, ${k.description}, ${k.type}, ${k.href}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS videos (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        date_label TEXT, duration TEXT, source TEXT,
+        url TEXT NOT NULL, color TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const videosCount = await sql`SELECT COUNT(*) AS count FROM videos`;
+    if (Number(videosCount.rows[0].count) === 0) {
+      const seedVideos = [
+        { title: "2ème Conférence des RSSI : la sécurité numérique au cœur de l'État augmenté", date: "26 juin 2026", duration: "35 min", source: "MTDI", url: "https://youtu.be/HrBWcxO24WI", color: "#2a1a0a" },
+        { title: "Cyberdrill RSSI : Exercice de cybersécurité national", date: "2026", duration: "20 min", source: "MTDI", url: "https://youtu.be/20ZGGa1d8kg", color: "#0a2218" },
+        { title: "« J'aime ma langue » : Intégration des langues nationales dans l'IA", date: "2025", duration: "1 min", source: "MTDI", url: "https://youtube.com/shorts/Kg_s0_8Tnuw", color: "#0D132D" },
+      ];
+      for (let i = 0; i < seedVideos.length; i++) {
+        const v = seedVideos[i];
+        await sql`
+          INSERT INTO videos (title_fr, date_label, duration, source, url, color, display_order)
+          VALUES (${v.title}, ${v.date}, ${v.duration}, ${v.source}, ${v.url}, ${v.color}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS media_mentions (
+        id SERIAL PRIMARY KEY,
+        type_fr TEXT NOT NULL DEFAULT 'Médias', type_en TEXT,
+        type_color TEXT NOT NULL DEFAULT 'ROUGE',
+        title_fr TEXT NOT NULL, title_en TEXT,
+        date_label TEXT, source TEXT,
+        excerpt_fr TEXT, excerpt_en TEXT,
+        url TEXT NOT NULL,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const mediasCount = await sql`SELECT COUNT(*) AS count FROM media_mentions`;
+    if (Number(mediasCount.rows[0].count) === 0) {
+      const seedMedias = [
+        { type: "Médias", color: "ROUGE", title: "MTDI sur Instagram : Reel 1", date: "2026", source: "Instagram", excerpt: "Découvrez les activités du Ministère de la Transformation Digitale et de l'Innovation en vidéo sur Instagram.", url: "https://www.instagram.com/reel/DankF6VCOFa/" },
+        { type: "Médias", color: "ROUGE", title: "MTDI sur Instagram : Reel 2", date: "2026", source: "Instagram", excerpt: "Suivez les dernières actualités du MTDI sur les réseaux sociaux.", url: "https://www.instagram.com/reel/DY4oIfrNjKh/" },
+        { type: "Médias", color: "JAUNE", title: "MTDI sur YouTube : Interview et reportage", date: "2026", source: "YouTube", excerpt: "Retrouvez les interviews et reportages du Ministère de la Transformation Digitale et de l'Innovation.", url: "https://www.youtube.com/watch?v=MXxdVtomLJM" },
+      ];
+      for (let i = 0; i < seedMedias.length; i++) {
+        const m = seedMedias[i];
+        await sql`
+          INSERT INTO media_mentions (type_fr, type_color, title_fr, date_label, source, excerpt_fr, url, display_order)
+          VALUES (${m.type}, ${m.color}, ${m.title}, ${m.date}, ${m.source}, ${m.excerpt}, ${m.url}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS eservices (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        href TEXT NOT NULL,
+        icon_key TEXT NOT NULL DEFAULT 'document',
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const eservicesCount = await sql`SELECT COUNT(*) AS count FROM eservices`;
+    if (Number(eservicesCount.rows[0].count) === 0) {
+      const seedEservices = [
+        { title: "État civil", description: "Demandez vos actes de naissance, de mariage et de décès en ligne. Retirez vos documents dans le centre d'état civil de votre choix.", href: "https://service-public.bj/public/services/service-ede", icon: "document" },
+        { title: "Fiscalité", description: "Déclarez et payez vos impôts en ligne via la plateforme e-Impôts. Accédez à votre espace contribuable et suivez vos obligations fiscales.", href: "https://service-public.bj/public/services/service-impots", icon: "card" },
+        { title: "Identité", description: "Obtenez votre carte nationale d'identité biométrique ou votre passeport via MonIdentite.bj. Suivez l'avancement de votre demande en temps réel.", href: "https://service-public.bj/public/services/service-identite", icon: "id-card" },
+        { title: "Permis & autorisations", description: "Demandez vos permis de construire, licences commerciales et autorisations administratives. Toutes vos démarches regroupées en un seul portail.", href: "https://service-public.bj/public/services/service-permis", icon: "check-doc" },
+        { title: "Éducation", description: "Inscriptions scolaires et universitaires, demandes de bourses d'études, équivalences de diplômes et orientation professionnelle en ligne.", href: "https://service-public.bj/public/services/service-education", icon: "graduation" },
+        { title: "Santé", description: "Gérez votre assurance maladie universelle (ARCH), consultez votre carnet de vaccination numérique et accédez aux services de santé en ligne.", href: "https://service-public.bj/public/services/service-sante", icon: "heart" },
+        { title: "Emploi", description: "Consultez les offres d'emploi public, déposez votre candidature et suivez vos démarches auprès des administrations en un seul endroit.", href: "https://service-public.bj/public/services/service-emploi", icon: "briefcase" },
+        { title: "Foncier", description: "Sécurisez vos titres fonciers, effectuez vos démarches cadastrales et suivez vos dossiers immobiliers en ligne.", href: "https://service-public.bj/public/services/service-foncier", icon: "home" },
+      ];
+      for (let i = 0; i < seedEservices.length; i++) {
+        const s = seedEservices[i];
+        await sql`
+          INSERT INTO eservices (title_fr, description_fr, href, icon_key, display_order)
+          VALUES (${s.title}, ${s.description}, ${s.href}, ${s.icon}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS ia_piliers (
+        id SERIAL PRIMARY KEY,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        icon_key TEXT NOT NULL DEFAULT 'shield-check',
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const piliersCount = await sql`SELECT COUNT(*) AS count FROM ia_piliers`;
+    if (Number(piliersCount.rows[0].count) === 0) {
+      const seedPiliers = [
+        { title: "Gouvernance & Éthique", description: "Un cadre réglementaire africain de référence garantissant une IA transparente, équitable et respectueuse des droits fondamentaux. Comité national d'éthique, audit algorithmique et protection des données personnelles.", icon: "shield-check" },
+        { title: "Infrastructures IA", description: "Souveraineté numérique par le cloud public béninois, des data centers à haute disponibilité et un réseau national d'open data structuré pour l'entraînement des modèles d'IA.", icon: "server-stack" },
+        { title: "Talents & Compétences", description: "Formation de 10 000 professionnels de l'IA d'ici 2030 via la Digital Academy, des partenariats universitaires, des bourses d'excellence et des programmes de certification reconnus à l'international.", icon: "graduation" },
+        { title: "Projets & Innovation", description: "Déploiement de l'IA dans l'agriculture, la santé, l'éducation et les services publics. Bénin IA Challenge, incubateur national, et fonds de soutien aux startups deeptech béninoises.", icon: "lightbulb" },
+      ];
+      for (let i = 0; i < seedPiliers.length; i++) {
+        const p = seedPiliers[i];
+        await sql`
+          INSERT INTO ia_piliers (title_fr, description_fr, icon_key, display_order)
+          VALUES (${p.title}, ${p.description}, ${p.icon}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS ia_jalons (
+        id SERIAL PRIMARY KEY,
+        year TEXT NOT NULL,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        done BOOLEAN NOT NULL DEFAULT FALSE,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const jalonsCount = await sql`SELECT COUNT(*) AS count FROM ia_jalons`;
+    if (Number(jalonsCount.rows[0].count) === 0) {
+      const seedJalons = [
+        { year: "2024", title: "Diagnostic national", description: "Audit des capacités IA du Bénin, cartographie des acteurs, identification des cas d'usage prioritaires.", done: true },
+        { year: "2025", title: "Adoption de la stratégie", description: "Validation interministérielle et lancement officiel de la Stratégie Nationale d'Intelligence Artificielle.", done: true },
+        { year: "2026", title: "Création de l'ANAI", description: "Mise en place de l'Agence Nationale de l'Intelligence Artificielle. Premiers appels à projets.", done: true },
+        { year: "2027", title: "Montée en charge", description: "10 projets IA sectoriels déployés. Ouverture du premier Data Center souverain du Bénin.", done: false },
+        { year: "2028", title: "Maturité et consolidation", description: "5 000 professionnels certifiés. Cadre juridique IA adopté par l'Assemblée nationale.", done: false },
+        { year: "2030", title: "Bénin, nation de l'IA", description: "Bénin classé dans le top 5 africain pour l'adoption de l'IA. Plateforme continentale d'IA déployée.", done: false },
+      ];
+      for (let i = 0; i < seedJalons.length; i++) {
+        const j = seedJalons[i];
+        await sql`
+          INSERT INTO ia_jalons (year, title_fr, description_fr, done, display_order)
+          VALUES (${j.year}, ${j.title}, ${j.description}, ${j.done}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS ia_olympiades_editions (
+        id SERIAL PRIMARY KEY,
+        year TEXT NOT NULL,
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        highlight_fr TEXT, highlight_en TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const editionsCount = await sql`SELECT COUNT(*) AS count FROM ia_olympiades_editions`;
+    if (Number(editionsCount.rows[0].count) === 0) {
+      const seedEditions = [
+        { year: "2026", title: "1ère édition — Olympiades Nationales d'IA (NOAI)", description: "Compétition inaugurale pour sélectionner les jeunes talents béninois qui représenteront le pays aux Olympiades Internationales d'IA (IOAI) 2026 au Kazakhstan, du 2 au 8 août.", highlight: "8 lauréats sélectionnés le 4 juillet à Sèmè One" },
+      ];
+      for (let i = 0; i < seedEditions.length; i++) {
+        const e = seedEditions[i];
+        await sql`
+          INSERT INTO ia_olympiades_editions (year, title_fr, description_fr, highlight_fr, display_order)
+          VALUES (${e.year}, ${e.title}, ${e.description}, ${e.highlight}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS ia_criteres (
+        id SERIAL PRIMARY KEY,
+        text_fr TEXT NOT NULL, text_en TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const criteresCount = await sql`SELECT COUNT(*) AS count FROM ia_criteres`;
+    if (Number(criteresCount.rows[0].count) === 0) {
+      const seedCriteres = [
+        "Être scolarisé au Bénin, niveau lycée ou premier cycle universitaire",
+        "Maîtriser les fondamentaux de la programmation et des mathématiques",
+        "S'inscrire via la plateforme dédiée avant la date limite officielle",
+        "Réussir les épreuves de présélection (algorithmique, machine learning, éthique de l'IA)",
+      ];
+      for (let i = 0; i < seedCriteres.length; i++) {
+        await sql`INSERT INTO ia_criteres (text_fr, display_order) VALUES (${seedCriteres[i]}, ${i})`;
+      }
+    }
+
+
+
+    // ══════════════════════════════════════════════════════════════════
+    // Contacts spécifiques, opportunités (Participer), liens utiles.
+    // ══════════════════════════════════════════════════════════════════
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS contacts_specifiques (
+        id SERIAL PRIMARY KEY,
+        role_fr TEXT NOT NULL, role_en TEXT,
+        name_fr TEXT NOT NULL, name_en TEXT,
+        email TEXT NOT NULL, phone TEXT,
+        note_fr TEXT, note_en TEXT,
+        accent TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const contactsSpecCount = await sql`SELECT COUNT(*) AS count FROM contacts_specifiques`;
+    if (Number(contactsSpecCount.rows[0].count) === 0) {
+      const seedContacts = [
+        { role: "Presse & Accréditations", name: "Service Communication", email: "presse@gouv.bj", phone: "+229 01 21 30 00 01", note: "Pour les demandes d'interview, accréditations et dossiers de presse.", accent: "#006828" },
+        { role: "Partenariats & Coopération", name: "Direction des Partenariats", email: "partenariats@gouv.bj", phone: "+229 01 21 30 00 02", note: "Organisations internationales, bailleurs de fonds, partenaires techniques.", accent: "#7A5800" },
+        { role: "Réclamations & Signalements", name: "Cellule Citoyenne", email: "reclamations@gouv.bj", phone: "+229 01 21 30 00 03", note: "Traitement des signalements et réclamations relatives aux services numériques publics.", accent: "#EB0000" },
+      ];
+      for (let i = 0; i < seedContacts.length; i++) {
+        const c = seedContacts[i];
+        await sql`
+          INSERT INTO contacts_specifiques (role_fr, name_fr, email, phone, note_fr, accent, display_order)
+          VALUES (${c.role}, ${c.name}, ${c.email}, ${c.phone}, ${c.note}, ${c.accent}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS opportunites (
+        id SERIAL PRIMARY KEY,
+        type TEXT NOT NULL DEFAULT 'emplois', -- emplois | stages | appels-offres
+        title_fr TEXT NOT NULL, title_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        href TEXT,
+        deadline_label TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    // Aucune donnée de départ : les 3 sections affichent leur message
+    // "aucune offre publiée" existant tant que rien n'est ajouté depuis le
+    // back-office (comportement demandé).
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS liens_utiles (
+        id SERIAL PRIMARY KEY,
+        label TEXT NOT NULL,
+        href TEXT NOT NULL,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by INTEGER REFERENCES users(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `);
+    const liensCount = await sql`SELECT COUNT(*) AS count FROM liens_utiles`;
+    if (Number(liensCount.rows[0].count) === 0) {
+      const seedLiens = [
+        { label: "Sèmè City", href: "https://semecity.bj/" },
+        { label: "ASIN", href: "https://asin.bj/" },
+        { label: "ANIP", href: "https://eservices.anip.bj/" },
+        { label: "e-services", href: "https://service-public.bj/" },
+        { label: "e-pme", href: "https://epme.adpme.bj/" },
+        { label: "e-visa", href: "https://evisa.bj/" },
+        { label: "Centre de services", href: "https://cds.asin.bj/" },
+        { label: "APDP", href: "https://service.apdp.bj/" },
+        { label: "CSIRT Bénin", href: "https://csirt.bj/" },
+        { label: "Présidence de la République", href: "https://presidence.bj/" },
+      ];
+      for (let i = 0; i < seedLiens.length; i++) {
+        const l = seedLiens[i];
+        await sql`INSERT INTO liens_utiles (label, href, display_order) VALUES (${l.label}, ${l.href}, ${i})`;
+      }
+    }
+
+    // Ajout du champ e-mail de destination pour "Écrire au Ministre" au
+    // réglage site_general déjà existant (idempotent, ne remplace jamais
+    // une valeur déjà définie).
+    await sql`
+      UPDATE settings
+      SET value = value || '{"ministreEmail": "mtdi.contact@gouv.bj"}'::jsonb
+      WHERE key = 'site_general' AND (value->>'ministreEmail' IS NULL OR value->>'ministreEmail' = '')
+    `;
+
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

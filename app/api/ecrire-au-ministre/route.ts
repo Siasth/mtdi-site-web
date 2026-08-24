@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { getGeneralSettings } from "@/lib/general-settings";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const general = await getGeneralSettings();
     const transporter = nodemailer.createTransport({
       host:   process.env.SMTP_HOST ?? "smtp.gmail.com",
       port:   Number(process.env.SMTP_PORT) || 587,
@@ -44,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     await transporter.sendMail({
       from:        process.env.SMTP_FROM ?? process.env.SMTP_USER,
-      to:          "mtdi.contact@gouv.bj",
+      to:          general.ministreEmail,
       replyTo:     email,
       subject:     `[Écrire au Ministre] ${subject}`,
       text:        `De : ${name} <${email}>\n\n${message}`,

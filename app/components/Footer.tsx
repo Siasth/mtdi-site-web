@@ -25,20 +25,6 @@ const footerColumns = [
       { label: "MTDI dans les médias", href: "/medias/mtdi-dans-les-medias" },
     ],
   },
-  {
-    title: "Liens utiles",
-    links: [
-      { label: "Sèmè City", href: "https://semecity.bj/", external: true },
-      { label: "ANIP", href: "https://eservices.anip.bj/", external: true },
-      { label: "e-pme", href: "https://epme.adpme.bj/", external: true },
-      { label: "e-services", href: "https://service-public.bj/", external: true },
-      { label: "e-visa", href: "https://evisa.bj/", external: true },
-      { label: "Centre de services", href: "https://cds.asin.bj/", external: true },
-      { label: "ASIN", href: "https://asin.bj/", external: true },
-      { label: "APDP", href: "https://service.apdp.bj/", external: true },
-      { label: "Présidence", href: "https://presidence.bj/", external: true },
-    ],
-  },
 ];
 
 const SOCIAL_ICONS: Record<string, React.ReactNode> = {
@@ -66,6 +52,11 @@ export default function Footer({ locale: _locale, dict: _dict }: { locale?: stri
     instagram: "https://www.instagram.com/benin.innov/",
     youtube: "",
   });
+
+  const [liensUtiles, setLiensUtiles] = useState<{ label: string; href: string }[]>([]);
+  useEffect(() => {
+    fetch("/api/liens-utiles").then((r) => r.json()).then(setLiensUtiles).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/general-settings")
@@ -117,7 +108,7 @@ export default function Footer({ locale: _locale, dict: _dict }: { locale?: stri
     },
     {
       title: prefix ? "Useful links" : "Liens utiles",
-      links: footerColumns[2].links,
+      links: liensUtiles.map((l) => ({ label: l.label, href: l.href, external: true })),
     },
   ];
 

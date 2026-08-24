@@ -10,7 +10,7 @@ type FormState = {
   siteName: string; siteNameShort: string; taglineFr: string; taglineEn: string;
   logoHeader: string; logoFooter: string; favicon: string;
   facebook: string; twitter: string; linkedin: string; instagram: string; youtube: string;
-  contactEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
+  contactEmail: string; ministreEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
   openingHoursFr: string; openingHoursEn: string; locationMapUrl: string;
 };
 
@@ -37,7 +37,7 @@ export default function AdminGeneral() {
           logoHeader: d.logoHeader || "", logoFooter: d.logoFooter || "", favicon: d.favicon || "",
           facebook: d.facebook || "", twitter: d.twitter || "", linkedin: d.linkedin || "",
           instagram: d.instagram || "", youtube: d.youtube || "",
-          contactEmail: d.contactEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
+          contactEmail: d.contactEmail || "", ministreEmail: d.ministreEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
           contactAddressEn: d.contactAddressEn || "",
           openingHoursFr: d.openingHoursFr || "", openingHoursEn: d.openingHoursEn || "",
           locationMapUrl: d.locationMapUrl || "",
@@ -188,6 +188,13 @@ export default function AdminGeneral() {
               Email de contact général <span className="text-red-500">*</span>
             </label>
             <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              Email destinataire — formulaire "Écrire au Ministre"
+            </label>
+            <input value={form.ministreEmail} onChange={(e) => setForm({ ...form, ministreEmail: e.target.value })} placeholder="mtdi.contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <p className="text-xs text-gray-400 mt-1">Boîte mail qui reçoit les messages envoyés depuis /ecrire-au-ministre</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Téléphone</label>

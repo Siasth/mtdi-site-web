@@ -2,18 +2,10 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import StrategieIASubNav from "../../../components/StrategieIASubNav";
+import { getJalons } from "@/lib/strategie-ia-content";
 
 const VERT = "#006828";
 const JAUNE = "#FFBE00";
-
-const milestones = [
-  { year: "2024", title: "Diagnostic national", description: "Audit des capacités IA du Bénin, cartographie des acteurs, identification des cas d'usage prioritaires.", done: true },
-  { year: "2025", title: "Adoption de la stratégie", description: "Validation interministérielle et lancement officiel de la Stratégie Nationale d'Intelligence Artificielle.", done: true },
-  { year: "2026", title: "Création de l'ANAI", description: "Mise en place de l'Agence Nationale de l'Intelligence Artificielle. Premiers appels à projets.", done: true },
-  { year: "2027", title: "Montée en charge", description: "10 projets IA sectoriels déployés. Ouverture du premier Data Center souverain du Bénin.", done: false },
-  { year: "2028", title: "Maturité et consolidation", description: "5 000 professionnels certifiés. Cadre juridique IA adopté par l'Assemblée nationale.", done: false },
-  { year: "2030", title: "Bénin, nation de l'IA", description: "Bénin classé dans le top 5 africain pour l'adoption de l'IA. Plateforme continentale d'IA déployée.", done: false },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -23,6 +15,7 @@ export default async function InitiativesPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.strategie;
+  const milestones = await getJalons(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -53,8 +46,8 @@ export default async function InitiativesPage({ params }: Props) {
               <div className="absolute left-20 sm:left-28 top-0 bottom-0 w-px" style={{ background: "rgba(255,255,255,0.12)" }} />
 
               <div className="flex flex-col gap-0">
-                {milestones.map((milestone, i) => (
-                  <div key={i} className="relative flex items-start gap-8 sm:gap-12 pb-12 last:pb-0">
+                {milestones.map((milestone) => (
+                  <div key={milestone.id} className="relative flex items-start gap-8 sm:gap-12 pb-12 last:pb-0">
                     <div className="flex-shrink-0 w-16 sm:w-24 text-right pt-1">
                       <span className="text-sm font-black tabular-nums" style={{ color: milestone.done ? JAUNE : "rgba(255,255,255,0.25)" }}>
                         {milestone.year}

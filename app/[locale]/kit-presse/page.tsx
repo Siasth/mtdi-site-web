@@ -1,6 +1,7 @@
 import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { getKitPresseItems } from "@/lib/kit-presse";
 
 const VERT = "#162233";
 
@@ -12,27 +13,7 @@ export default async function KitPressePage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.kitpresse;
-
-  const docs = [
-    {
-      title: "Logo MTDI — Usage officiel",
-      desc: "Logo vectoriel officiel du Ministère de la Transformation Digitale et de l'Innovation.",
-      type: "PNG",
-      href: "/logo_MTDI.png",
-    },
-    {
-      title: "Bannière officielle MTDI",
-      desc: "Bannière horizontale avec identité visuelle complète du Ministère.",
-      type: "PNG",
-      href: "/mtdi-banner.png",
-    },
-    {
-      title: "Charte graphique La Mariana",
-      desc: "Charte graphique et lignes directrices de l'identité visuelle institutionnelle.",
-      type: "PDF",
-      href: "/LA_MARIANA_CHARTE_GRAPHIQUE_2016 2.pdf",
-    },
-  ];
+  const docs = await getKitPresseItems(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -60,7 +41,7 @@ export default async function KitPressePage({ params }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
               {docs.map((doc) => (
-                <div key={doc.title} className="p-8 bg-white flex flex-col gap-4">
+                <div key={doc.id} className="p-8 bg-white flex flex-col gap-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <span
@@ -76,7 +57,7 @@ export default async function KitPressePage({ params }: Props) {
                       <polyline points="14 2 14 8 20 8" />
                     </svg>
                   </div>
-                  <p className="text-anthracite/75 text-sm font-medium leading-relaxed">{doc.desc}</p>
+                  <p className="text-anthracite/75 text-sm font-medium leading-relaxed">{doc.description}</p>
                   <a
                     href={doc.href}
                     download
