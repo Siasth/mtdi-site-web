@@ -58,7 +58,7 @@ export async function getGalerieItems(locale: Locale): Promise<GalerieItem[]> {
 }
 
 // Éléments mis en avant (widget "L'innovation en images" de l'accueil).
-export async function getFeaturedGalerieItems(locale: Locale, limit = 8): Promise<GalerieItem[]> {
+export async function getFeaturedGalerieItems(locale: Locale, limit = 9): Promise<GalerieItem[]> {
   const result = await sql`
     SELECT g.*, c.name_fr AS coll_name_fr, c.name_en AS coll_name_en
     FROM galerie_items g

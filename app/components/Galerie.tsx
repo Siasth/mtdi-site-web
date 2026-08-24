@@ -7,7 +7,7 @@ type HomeDict = Record<string, string>;
 export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict; locale?: string }) {
   const d = dict ?? {};
   const prefix = locale === "en" ? "/en" : "";
-  const items = await getFeaturedGalerieItems(locale === "en" ? "en" : "fr", 8);
+  const items = await getFeaturedGalerieItems(locale === "en" ? "en" : "fr", 9);
 
   if (items.length === 0) return null;
 
