@@ -5,9 +5,10 @@ import { hasPerm, type PermissionCode } from "@/lib/permissions";
 
 type Params = { params: Promise<{ resource: string }> };
 
-// "actualites", "stats", "hero", "chantiers" et "galerie" ont migré vers la
-// base de données (tables dédiées), "ministre" et "site_general" vers settings.
-const VALID = ["direct"];
+// Tous les modules de contenu ont migré vers des routes dédiées + la base de
+// données. Cette route générique JSON legacy n'a plus d'utilité mais reste en
+// place (inoffensive, VALID vide = tout rejeté) au cas où.
+const VALID: string[] = [];
 
 function requiredPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer"): PermissionCode {
   void resource;

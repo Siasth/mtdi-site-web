@@ -716,6 +716,187 @@ export async function POST(req: NextRequest) {
       `;
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // Modules institutionnels : Directions, Structures, Cabinet, Missions,
+    // Partenaires. Traductions anglaises NON fournies dans ce lot (volume
+    // trop important pour ce tour) — à ajouter dans une passe séparée.
+    // ══════════════════════════════════════════════════════════════════
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS directions (
+        id             SERIAL PRIMARY KEY,
+        acronym        TEXT NOT NULL,
+        type_fr        TEXT, type_en TEXT,
+        name_fr        TEXT NOT NULL, name_en TEXT,
+        director       TEXT,
+        description_fr TEXT, description_en TEXT,
+        accent         TEXT,
+        display_order  INTEGER NOT NULL DEFAULT 0,
+        active         BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by     INTEGER REFERENCES users(id),
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at     TIMESTAMPTZ
+      )
+    `);
+    const directionsCount = await sql`SELECT COUNT(*) AS count FROM directions`;
+    if (Number(directionsCount.rows[0].count) === 0) {
+      const seedDirections = [
+        { acronym: "DPAF", type: "Direction centrale", name: "Direction de la Programmation, de l'Administration et des Finances", director: "", description: "Assure la programmation, la gestion administrative et financière du ministère. Supervise le budget, les ressources humaines, les marchés publics et la logistique.", accent: "#162233" },
+        { acronym: "DSI", type: "Direction centrale", name: "Direction des Systèmes d'Information", director: "Pontien DEGUENON", description: "La Direction des Systèmes d'Information veille à garantir l'alignement du système d'information du ministère avec la politique nationale. Elle est chargée de définir et superviser la politique de système d'information et sa mise en œuvre, définir les orientations stratégiques IT du Ministère, garantir la sécurité informatique, la fiabilité, la confidentialité et l'intégrité des systèmes d'information.", accent: "#162233" },
+        { acronym: "DN", type: "Direction technique", name: "Direction du Numérique", director: "Geoffroy BONOU", description: "La Direction du Numérique est chargée d'élaborer la politique de développement des infrastructures, des usages et des contenus numériques. Elle contribue au pilotage de la stratégie nationale de développement des infrastructures haut débit et très haut débit, veille à la mise en place des infrastructures numériques de télévision et radio, promeut les communications électroniques et incite au développement de l'industrie dans le domaine de l'économie numérique.", accent: "#7A5800" },
+        { acronym: "DD", type: "Direction technique", name: "Direction de la Digitalisation", director: "Boris Rodrigue SEHLOUAN Y.M.", description: "La Direction de la Digitalisation est chargée de superviser la mise en œuvre du programme de gouvernance électronique de l'État par l'usage des TIC dans l'administration et la dématérialisation des services publics. Elle promeut la transformation digitale des entreprises, contribue au développement des compétences numériques et à la promotion de l'entrepreneuriat numérique, et contribue à l'élaboration de la politique de sécurité numérique et à la mise en œuvre de la stratégie nationale de cybersécurité.", accent: "#7A5800" },
+        { acronym: "DM", type: "Direction technique", name: "Direction des Médias", director: "", description: "La Direction des Médias est chargée de la politique audiovisuelle et de la transition numérique des médias publics et privés.", accent: "#EB0000" },
+      ];
+      for (let i = 0; i < seedDirections.length; i++) {
+        const d = seedDirections[i];
+        await sql`
+          INSERT INTO directions (acronym, type_fr, name_fr, director, description_fr, accent, display_order)
+          VALUES (${d.acronym}, ${d.type}, ${d.name}, ${d.director || null}, ${d.description}, ${d.accent}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS structures (
+        id             SERIAL PRIMARY KEY,
+        acronym        TEXT NOT NULL,
+        name_fr        TEXT NOT NULL, name_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        missions_fr    JSONB NOT NULL DEFAULT '[]'::jsonb,
+        missions_en    JSONB NOT NULL DEFAULT '[]'::jsonb,
+        url            TEXT,
+        accent         TEXT,
+        logo_src       TEXT,
+        label_fr       TEXT, label_en TEXT,
+        display_order  INTEGER NOT NULL DEFAULT 0,
+        active         BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by     INTEGER REFERENCES users(id),
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at     TIMESTAMPTZ
+      )
+    `);
+    const structuresCount = await sql`SELECT COUNT(*) AS count FROM structures`;
+    if (Number(structuresCount.rows[0].count) === 0) {
+      const seedStructures = [
+        { acronym: "SBIN", name: "Société Béninoise d'Infrastructures Numériques", description: "La SBIN (Celtiis) est l'opérateur national d'infrastructures numériques, chargé du déploiement et de la gestion des réseaux de télécommunications et de la connectivité sur le territoire béninois.", missions: ["Déploiement de la fibre optique et des réseaux de télécommunications", "Gestion des infrastructures numériques nationales", "Fourniture de connectivité haut débit sur le territoire", "Développement de l'accès au numérique pour les citoyens et entreprises", "Soutien à la transformation digitale de l'État"], url: "https://celtiis.bj/", accent: "#005f99", logoSrc: "/logo-sbin.png", label: "Infrastructures numériques & connectivité" },
+        { acronym: "ASIN", name: "Agence des Systèmes d'Information et du Numérique", description: "L'ASIN est l'agence gouvernementale en charge de la mise en œuvre opérationnelle des projets numériques transverses et mutualisés de l'État ainsi que les projets sectoriels dont l'exécution lui est déléguée.", missions: ["Exploitation et sécurisation des systèmes d'information mutualisés de l'État", "Infrastructures numériques publiques : connectivité des sites publics, centres de données, hébergement souverain", "Cybersécurité : bjCSIRT (centre national de réponse aux incidents), audits et qualification de sécurité, veille sur les menaces", "Interopérabilité et confiance numérique : plateforme nationale d'échange de données (X-Road BJ), PKI nationale, signature électronique", "E-services et portail national des services publics", "Accompagnement des administrations dans leur transformation digitale", "Intégration de l'intelligence artificielle dans les services publics, en appui à la Stratégie Nationale d'IA"], url: "https://asin.bj/", accent: "#006828", logoSrc: "/logo-asin.png", label: "Systèmes d'information & cybersécurité" },
+      ];
+      for (let i = 0; i < seedStructures.length; i++) {
+        const s = seedStructures[i];
+        await sql`
+          INSERT INTO structures (acronym, name_fr, description_fr, missions_fr, url, accent, logo_src, label_fr, display_order)
+          VALUES (${s.acronym}, ${s.name}, ${s.description}, ${JSON.stringify(s.missions)}::jsonb, ${s.url}, ${s.accent}, ${s.logoSrc}, ${s.label}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS cabinet_members (
+        id             SERIAL PRIMARY KEY,
+        role_fr        TEXT NOT NULL, role_en TEXT,
+        direction_fr   TEXT, direction_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        accent         TEXT,
+        level          INTEGER NOT NULL DEFAULT 0,
+        display_order  INTEGER NOT NULL DEFAULT 0,
+        active         BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by     INTEGER REFERENCES users(id),
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at     TIMESTAMPTZ
+      )
+    `);
+    const cabinetCount = await sql`SELECT COUNT(*) AS count FROM cabinet_members`;
+    if (Number(cabinetCount.rows[0].count) === 0) {
+      const seedCabinet = [
+        { role: "Ministre", direction: "Ministère de la Transformation Digitale et de l'Innovation", description: "Autorité politique en charge de la définition et de la mise en œuvre de la politique gouvernementale en matière de transformation digitale, d'innovation et d'intelligence artificielle.", accent: "#006828", level: 0 },
+        { role: "Directeur de Cabinet", direction: "Cabinet du Ministre", description: "Coordonne l'ensemble des activités du cabinet ministériel, assure la liaison avec les autres institutions gouvernementales et supervise la mise en œuvre des décisions du Ministre.", accent: "#162233", level: 1 },
+        { role: "Secrétaire Général du Ministère", direction: "Secrétariat Général", description: "Assure la coordination administrative de l'ensemble des directions et services du ministère. Garantit la continuité et la cohérence de l'action ministérielle.", accent: "#162233", level: 1 },
+        { role: "Conseillers Techniques (CT)", direction: "Cabinet du Ministre", description: "Les Conseillers Techniques assistent le Ministre et le Directeur de Cabinet dans l'expertise sectorielle, l'analyse des dossiers et la préparation des décisions stratégiques. Ils interviennent dans les domaines de l'intelligence artificielle, de la transformation digitale, de la cybersécurité, des politiques publiques numériques et de la coopération internationale.", accent: "#7A5800", level: 2 },
+      ];
+      for (let i = 0; i < seedCabinet.length; i++) {
+        const m = seedCabinet[i];
+        await sql`
+          INSERT INTO cabinet_members (role_fr, direction_fr, description_fr, accent, level, display_order)
+          VALUES (${m.role}, ${m.direction}, ${m.description}, ${m.accent}, ${m.level}, ${i})
+        `;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS missions (
+        id            SERIAL PRIMARY KEY,
+        text_fr       TEXT NOT NULL, text_en TEXT,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        active        BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by    INTEGER REFERENCES users(id),
+        created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at    TIMESTAMPTZ
+      )
+    `);
+    const missionsCount = await sql`SELECT COUNT(*) AS count FROM missions`;
+    if (Number(missionsCount.rows[0].count) === 0) {
+      const seedMissions = [
+        "Élaborer les politiques sectorielles et exécuter les stratégies liées à l'agenda numérique de l'État",
+        "Favoriser le développement des infrastructures, des usages et des contenus numériques par les technologies innovantes",
+        "Intégrer les technologies numériques dans les structures de l'État pour améliorer la performance, l'accessibilité, la transparence et l'efficacité des services publics",
+        "Promouvoir la transformation digitale des entreprises",
+        "Mettre en place l'infrastructure numérique de collecte, de transport et de distribution de la télévision et de la radiodiffusion",
+        "Conduire des études prospectives et formuler des recommandations sur les projets numériques de l'État",
+        "Promouvoir les communications électroniques et les services numériques innovants en partenariat avec les autorités de régulation",
+        "Assurer la gestion optimale des licences et des ressources de l'État",
+        "Établir un cadre législatif et réglementaire favorable au développement du numérique",
+        "Réduire la fracture numérique entre les régions et les populations",
+        "Promouvoir les compétences numériques et l'entrepreneuriat digital",
+        "Lutter contre les déchets électroniques en coordination avec les agences environnementales",
+        "Instaurer des mécanismes durables de confiance numérique",
+        "Développer les partenariats avec le secteur privé et les institutions internationales",
+        "Représenter le Bénin dans les instances internationales de gouvernance du numérique",
+        "Accompagner les médias publics et privés dans leur transition numérique",
+        "Renforcer la qualité du paysage audiovisuel",
+      ];
+      for (let i = 0; i < seedMissions.length; i++) {
+        await sql`INSERT INTO missions (text_fr, display_order) VALUES (${seedMissions[i]}, ${i})`;
+      }
+    }
+
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS partners (
+        id             SERIAL PRIMARY KEY,
+        category       TEXT NOT NULL DEFAULT 'institutionnel', -- institutionnel | technologique | academique
+        name           TEXT NOT NULL,
+        full_fr        TEXT, full_en TEXT,
+        description_fr TEXT, description_en TEXT,
+        accent         TEXT,
+        logo_src       TEXT,
+        display_order  INTEGER NOT NULL DEFAULT 0,
+        active         BOOLEAN NOT NULL DEFAULT TRUE,
+        created_by     INTEGER REFERENCES users(id),
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at     TIMESTAMPTZ
+      )
+    `);
+    const partnersCount = await sql`SELECT COUNT(*) AS count FROM partners`;
+    if (Number(partnersCount.rows[0].count) === 0) {
+      const seedPartners = [
+        { category: "institutionnel", name: "APDP", full: "Autorité de Protection des Données Personnelles", description: "Instance nationale de contrôle du traitement des données à caractère personnel, garante du respect de la vie privée numérique au Bénin.", accent: "#006828" },
+        { category: "institutionnel", name: "ANIP", full: "Agence Nationale d'Identification des Personnes", description: "Gère l'identité civile et délivre les documents d'identité officiels des citoyens béninois, dont le programme MonIdentité.bj.", accent: "#006828", logoSrc: "/logo-anip.png" },
+        { category: "institutionnel", name: "Présidence", full: "Présidence de la République du Bénin", description: "Autorité de tutelle du gouvernement béninois, dont les priorités numériques guident la feuille de route du ministère.", accent: "#006828" },
+        { category: "institutionnel", name: "Sèmè City", full: "Cité de l'Innovation et du Savoir", description: "Hub d'innovation et d'entrepreneuriat du Bénin, laboratoire de la transformation digitale africaine situé à Cotonou.", accent: "#006828", logoSrc: "/logo-seme-city.svg" },
+        { category: "technologique", name: "Banque Mondiale", full: "Groupe de la Banque Mondiale", description: "Partenaire financier et technique des grands projets d'infrastructure numérique et de renforcement de capacités numériques.", accent: "#7A5800" },
+        { category: "technologique", name: "Smart Africa", full: "Alliance Smart Africa", description: "Alliance continentale promouvant la transformation numérique inclusive en Afrique ; le Bénin en est membre actif.", accent: "#7A5800" },
+        { category: "technologique", name: "ITU", full: "Union Internationale des Télécommunications", description: "Agence spécialisée des Nations Unies pour les TIC ; appuie le Bénin sur la gouvernance et les politiques de connectivité.", accent: "#7A5800" },
+        { category: "academique", name: "UAC", full: "Université d'Abomey-Calavi", description: "Principale université du Bénin, partenaire des programmes de formation aux métiers du numérique et de la recherche en intelligence artificielle.", accent: "#EB0000" },
+        { category: "academique", name: "INFOTI", full: "Institut National de Formation aux Technologies de l'Information", description: "Institut public de formation professionnelle dans les domaines des TIC, du numérique et des télécommunications.", accent: "#EB0000" },
+      ];
+      for (let i = 0; i < seedPartners.length; i++) {
+        const p = seedPartners[i];
+        await sql`
+          INSERT INTO partners (category, name, full_fr, description_fr, accent, logo_src, display_order)
+          VALUES (${p.category}, ${p.name}, ${p.full}, ${p.description}, ${p.accent}, ${p.logoSrc || null}, ${i})
+        `;
+      }
+    }
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

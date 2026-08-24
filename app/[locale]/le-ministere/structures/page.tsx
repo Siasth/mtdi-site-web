@@ -3,48 +3,11 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
 import Image from "next/image";
+import { getStructures } from "@/lib/structures";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
 
-const structures = [
-  {
-    acronym: "SBIN",
-    name: "Société Béninoise d'Infrastructures Numériques",
-    description: "La SBIN (Celtiis) est l'opérateur national d'infrastructures numériques, chargé du déploiement et de la gestion des réseaux de télécommunications et de la connectivité sur le territoire béninois.",
-    missions: [
-      "Déploiement de la fibre optique et des réseaux de télécommunications",
-      "Gestion des infrastructures numériques nationales",
-      "Fourniture de connectivité haut débit sur le territoire",
-      "Développement de l'accès au numérique pour les citoyens et entreprises",
-      "Soutien à la transformation digitale de l'État",
-    ],
-    url: "https://celtiis.bj/",
-    accent: "#005f99",
-    logo: "Celtiis",
-    logoSrc: "/logo-sbin.png",
-    label: "Infrastructures numériques & connectivité",
-  },
-  {
-    acronym: "ASIN",
-    name: "Agence des Systèmes d'Information et du Numérique",
-    description: "L'ASIN est l'agence gouvernementale en charge de la mise en œuvre opérationnelle des projets numériques transverses et mutualisés de l'État ainsi que les projets sectoriels dont l'exécution lui est déléguée.",
-    missions: [
-      "Exploitation et sécurisation des systèmes d'information mutualisés de l'État",
-      "Infrastructures numériques publiques : connectivité des sites publics, centres de données, hébergement souverain",
-      "Cybersécurité : bjCSIRT (centre national de réponse aux incidents), audits et qualification de sécurité, veille sur les menaces",
-      "Interopérabilité et confiance numérique : plateforme nationale d'échange de données (X-Road BJ), PKI nationale, signature électronique",
-      "E-services et portail national des services publics",
-      "Accompagnement des administrations dans leur transformation digitale",
-      "Intégration de l'intelligence artificielle dans les services publics, en appui à la Stratégie Nationale d'IA",
-    ],
-    url: "https://asin.bj/",
-    accent: "#006828",
-    logo: "ASIN",
-    logoSrc: "/logo-asin.png",
-    label: "Systèmes d'information & cybersécurité",
-  },
-];
 
 function StructureIcon({ acronym, color }: { acronym: string; color: string }) {
   if (acronym === "SBIN") {
@@ -75,6 +38,7 @@ export default async function StructuresPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.ministere.structures;
+  const structures = await getStructures(locale === "en" ? "en" : "fr");
   const prefix = locale === "en" ? "/en" : "";
 
   return (

@@ -1,214 +1,129 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHasPermission } from "../AdminLayoutClient";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
-type UpcomingEvent = { id: number; date: string; title: string; description: string };
-type Replay = { id: number; title: string; source: string; date: string; url: string };
-type DirectData = { upcoming: UpcomingEvent[]; replays: Replay[] };
+const VERT = "#006828";
+
+type Upcoming = { id: number; event_date: string; title_fr: string; title_en: string | null; description_fr: string | null; description_en: string | null; display_order: number; active: boolean; deleted_at: string | null };
+type Replay = { id: number; title_fr: string; title_en: string | null; source: string | null; replay_date: string | null; url: string; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminDirect() {
-  const [data, setData] = useState<DirectData>({ upcoming: [], replays: [] });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const canManage = useHasPermission("contenu.modifier");
   const [tab, setTab] = useState<"upcoming" | "replays">("upcoming");
-  const [editingEvent, setEditingEvent] = useState<UpcomingEvent | null>(null);
-  const [editingReplay, setEditingReplay] = useState<Replay | null>(null);
-  const [isNew, setIsNew] = useState(false);
+  const [upcoming, setUpcoming] = useState<Upcoming[]>([]);
+  const [replays, setReplays] = useState<Replay[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const load = () => {
-    fetch("/api/admin/direct").then((r) => r.json()).then((d) => { setData(d); setLoading(false); });
-  };
-  useEffect(load, []);
+  function load() {
+    setLoading(true);
+    Promise.all([
+      fetch("/api/admin/direct-upcoming").then((r) => r.json()),
+      fetch("/api/admin/direct-replays").then((r) => r.json()),
+    ]).then(([u, r]) => { setUpcoming(u); setReplays(r); setLoading(false); });
+  }
+  useEffect(() => { if (canManage) load(); }, [canManage]);
 
-  const save = async (updated: DirectData) => {
-    setSaving(true);
-    await fetch("/api/admin/direct", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updated) });
-    setData(updated);
-    setSaving(false);
-  };
+  // Événement à venir
+  const [editU, setEditU] = useState<number | "new" | null>(null);
+  const [uForm, setUForm] = useState({ eventDate: "", titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "" });
+  function openNewU() { setUForm({ eventDate: new Date().toISOString().slice(0, 16), titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "" }); setEditU("new"); }
+  function openEditU(u: Upcoming) { setUForm({ eventDate: u.event_date.slice(0, 16), titleFr: u.title_fr, titleEn: u.title_en || "", descriptionFr: u.description_fr || "", descriptionEn: u.description_en || "" }); setEditU(u.id); }
+  async function saveU(e: React.FormEvent) {
+    e.preventDefault();
+    const isNew = editU === "new";
+    await fetch(isNew ? "/api/admin/direct-upcoming" : `/api/admin/direct-upcoming/${editU}`, {
+      method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(uForm),
+    });
+    setEditU(null); load();
+  }
+  async function deleteU(u: Upcoming) { if (confirm(`Supprimer "${u.title_fr}" ?`)) { await fetch(`/api/admin/direct-upcoming/${u.id}`, { method: "DELETE" }); load(); } }
+  async function restoreU(u: Upcoming) { await fetch(`/api/admin/direct-upcoming/${u.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) }); load(); }
 
-  // Upcoming events
-  const addEvent = () => { setEditingEvent({ id: 0, date: "", title: "", description: "" }); setIsNew(true); };
-  const editEvent = (e: UpcomingEvent) => { setEditingEvent({ ...e }); setIsNew(false); };
-  const saveEvent = async () => {
-    if (!editingEvent) return;
-    let updated: DirectData;
-    if (isNew) {
-      const id = data.upcoming.length ? Math.max(...data.upcoming.map((e) => e.id)) + 1 : 1;
-      updated = { ...data, upcoming: [...data.upcoming, { ...editingEvent, id }] };
-    } else {
-      updated = { ...data, upcoming: data.upcoming.map((e) => (e.id === editingEvent.id ? editingEvent : e)) };
-    }
-    await save(updated);
-    setEditingEvent(null);
-    setIsNew(false);
-  };
-  const deleteEvent = async (id: number) => {
-    await save({ ...data, upcoming: data.upcoming.filter((e) => e.id !== id) });
-  };
+  // Rediffusion
+  const [editR, setEditR] = useState<number | "new" | null>(null);
+  const [rForm, setRForm] = useState({ titleFr: "", titleEn: "", source: "", replayDate: "", url: "" });
+  function openNewR() { setRForm({ titleFr: "", titleEn: "", source: "", replayDate: new Date().toISOString().slice(0, 10), url: "" }); setEditR("new"); }
+  function openEditR(r: Replay) { setRForm({ titleFr: r.title_fr, titleEn: r.title_en || "", source: r.source || "", replayDate: (r.replay_date || "").slice(0, 10), url: r.url }); setEditR(r.id); }
+  async function saveR(e: React.FormEvent) {
+    e.preventDefault();
+    const isNew = editR === "new";
+    await fetch(isNew ? "/api/admin/direct-replays" : `/api/admin/direct-replays/${editR}`, {
+      method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rForm),
+    });
+    setEditR(null); load();
+  }
+  async function deleteR(r: Replay) { if (confirm(`Supprimer "${r.title_fr}" ?`)) { await fetch(`/api/admin/direct-replays/${r.id}`, { method: "DELETE" }); load(); } }
+  async function restoreR(r: Replay) { await fetch(`/api/admin/direct-replays/${r.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) }); load(); }
 
-  // Replays
-  const addReplay = () => { setEditingReplay({ id: 0, title: "", source: "", date: "", url: "" }); setIsNew(true); };
-  const editReplay = (r: Replay) => { setEditingReplay({ ...r }); setIsNew(false); };
-  const saveReplay = async () => {
-    if (!editingReplay) return;
-    let updated: DirectData;
-    if (isNew) {
-      const id = data.replays.length ? Math.max(...data.replays.map((r) => r.id)) + 1 : 1;
-      updated = { ...data, replays: [...data.replays, { ...editingReplay, id }] };
-    } else {
-      updated = { ...data, replays: data.replays.map((r) => (r.id === editingReplay.id ? editingReplay : r)) };
-    }
-    await save(updated);
-    setEditingReplay(null);
-    setIsNew(false);
-  };
-  const deleteReplay = async (id: number) => {
-    await save({ ...data, replays: data.replays.filter((r) => r.id !== id) });
-  };
-
+  if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
   return (
     <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Direct</h1>
-        <p className="text-sm text-gray-500 mt-1">Événements à venir et replays</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Direct</h1>
+
+      <div className="flex gap-1 mb-6 border-b border-gray-200">
+        <button onClick={() => setTab("upcoming")} className="px-4 py-2 text-sm font-bold" style={tab === "upcoming" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>À venir ({upcoming.filter((u) => !u.deleted_at).length})</button>
+        <button onClick={() => setTab("replays")} className="px-4 py-2 text-sm font-bold" style={tab === "replays" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>Rediffusions ({replays.filter((r) => !r.deleted_at).length})</button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        <button onClick={() => setTab("upcoming")} className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-colors ${tab === "upcoming" ? "bg-green-700 text-white" : "bg-white text-gray-500 border border-gray-200"}`}>
-          Prochains directs ({data.upcoming.length})
-        </button>
-        <button onClick={() => setTab("replays")} className={`px-5 py-2.5 text-sm font-semibold rounded-lg transition-colors ${tab === "replays" ? "bg-green-700 text-white" : "bg-white text-gray-500 border border-gray-200"}`}>
-          Replays ({data.replays.length})
-        </button>
-      </div>
-
-      {/* Upcoming */}
       {tab === "upcoming" && (
         <>
-          <div className="flex justify-end mb-4">
-            <button onClick={addEvent} className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" /></svg>
-              Ajouter un événement
-            </button>
-          </div>
-          <div className="space-y-3">
-            {data.upcoming.map((event) => (
-              <div key={event.id} className="bg-white rounded-xl border border-gray-200 p-5 flex items-start gap-4">
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-amber-600 mb-1">{event.date}</p>
-                  <h3 className="text-sm font-bold text-gray-900">{event.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">{event.description}</p>
-                </div>
-                <div className="flex gap-1">
-                  <button onClick={() => editEvent(event)} className="p-2 text-gray-400 hover:text-green-700 rounded-lg transition-colors">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </button>
-                  <button onClick={() => deleteEvent(event.id)} className="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-colors">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </button>
-                </div>
+          <div className="mb-4 flex justify-end"><button onClick={openNewU} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvel événement</button></div>
+          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+            {upcoming.map((u) => (
+              <div key={u.id} className={`flex items-center justify-between p-4 ${u.deleted_at ? "opacity-40" : ""}`}>
+                <div><p className="font-medium text-gray-900 text-sm">{u.title_fr}</p><p className="text-xs text-gray-400">{new Date(u.event_date).toLocaleString("fr-FR")}</p></div>
+                <div className="flex gap-1">{u.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreU(u)} /> : <><EditIcon label="Modifier" onClick={() => openEditU(u)} /><DeleteIcon label="Supprimer" onClick={() => deleteU(u)} /></>}</div>
               </div>
             ))}
+            {upcoming.length === 0 && <p className="p-8 text-center text-gray-400">Aucun événement</p>}
           </div>
         </>
       )}
 
-      {/* Replays */}
       {tab === "replays" && (
         <>
-          <div className="flex justify-end mb-4">
-            <button onClick={addReplay} className="inline-flex items-center gap-2 px-4 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors">
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" strokeLinecap="round" /></svg>
-              Ajouter un replay
-            </button>
-          </div>
-          <div className="space-y-3">
-            {data.replays.map((replay) => (
-              <div key={replay.id} className="bg-white rounded-xl border border-gray-200 p-5 flex items-start gap-4">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-gray-900">{replay.title}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{replay.source} · {replay.date}</p>
-                  {replay.url && <p className="text-xs text-green-700 mt-1 truncate">{replay.url}</p>}
-                </div>
-                <div className="flex gap-1">
-                  <button onClick={() => editReplay(replay)} className="p-2 text-gray-400 hover:text-green-700 rounded-lg transition-colors">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </button>
-                  <button onClick={() => deleteReplay(replay.id)} className="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-colors">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                  </button>
-                </div>
+          <div className="mb-4 flex justify-end"><button onClick={openNewR} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle rediffusion</button></div>
+          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
+            {replays.map((r) => (
+              <div key={r.id} className={`flex items-center justify-between p-4 ${r.deleted_at ? "opacity-40" : ""}`}>
+                <div><p className="font-medium text-gray-900 text-sm">{r.title_fr}</p><p className="text-xs text-gray-400">{r.source}</p></div>
+                <div className="flex gap-1">{r.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreR(r)} /> : <><EditIcon label="Modifier" onClick={() => openEditR(r)} /><DeleteIcon label="Supprimer" onClick={() => deleteR(r)} /></>}</div>
               </div>
             ))}
+            {replays.length === 0 && <p className="p-8 text-center text-gray-400">Aucune rediffusion</p>}
           </div>
         </>
       )}
 
-      {/* Event modal */}
-      {editingEvent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingEvent(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">{isNew ? "Nouvel événement" : "Modifier"}</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Date & heure</label>
-                <input value={editingEvent.date} onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })} placeholder="Ex: Samedi 2 août 2026 · 09h00" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre</label>
-                <input value={editingEvent.title} onChange={(e) => setEditingEvent({ ...editingEvent, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Description</label>
-                <textarea value={editingEvent.description} onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600 resize-none" />
-              </div>
-            </div>
-            <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setEditingEvent(null)} className="px-5 py-2.5 text-sm font-medium text-gray-600">Annuler</button>
-              <button onClick={saveEvent} disabled={saving} className="px-6 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors">Enregistrer</button>
-            </div>
-          </div>
+      {editU !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <form onSubmit={saveU} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+            <h2 className="font-bold text-gray-900 text-lg">{editU === "new" ? "Nouvel événement" : "Modifier"}</h2>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date et heure *</label><input required type="datetime-local" value={uForm.eventDate} onChange={(e) => setUForm({ ...uForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={uForm.titleFr} onChange={(e) => setUForm({ ...uForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={uForm.titleEn} onChange={(e) => setUForm({ ...uForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><textarea value={uForm.descriptionFr} onChange={(e) => setUForm({ ...uForm, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><textarea value={uForm.descriptionEn} onChange={(e) => setUForm({ ...uForm, descriptionEn: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditU(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
+          </form>
         </div>
       )}
 
-      {/* Replay modal */}
-      {editingReplay && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setEditingReplay(null)}>
-          <div className="bg-white rounded-2xl w-full max-w-md mx-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900">{isNew ? "Nouveau replay" : "Modifier"}</h2>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Titre</label>
-                <input value={editingReplay.title} onChange={(e) => setEditingReplay({ ...editingReplay, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Source</label>
-                  <input value={editingReplay.source} onChange={(e) => setEditingReplay({ ...editingReplay, source: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">Date</label>
-                  <input value={editingReplay.date} onChange={(e) => setEditingReplay({ ...editingReplay, date: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1.5">URL</label>
-                <input value={editingReplay.url} onChange={(e) => setEditingReplay({ ...editingReplay, url: e.target.value })} placeholder="https://..." className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-green-600" />
-              </div>
-            </div>
-            <div className="p-6 border-t border-gray-100 flex justify-end gap-3">
-              <button onClick={() => setEditingReplay(null)} className="px-5 py-2.5 text-sm font-medium text-gray-600">Annuler</button>
-              <button onClick={saveReplay} disabled={saving} className="px-6 py-2.5 bg-green-700 text-white text-sm font-semibold rounded-lg hover:bg-green-800 transition-colors">Enregistrer</button>
-            </div>
-          </div>
+      {editR !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <form onSubmit={saveR} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+            <h2 className="font-bold text-gray-900 text-lg">{editR === "new" ? "Nouvelle rediffusion" : "Modifier"}</h2>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={rForm.titleFr} onChange={(e) => setRForm({ ...rForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={rForm.titleEn} onChange={(e) => setRForm({ ...rForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Source</label><input value={rForm.source} onChange={(e) => setRForm({ ...rForm, source: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date</label><input type="date" value={rForm.replayDate} onChange={(e) => setRForm({ ...rForm, replayDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien *</label><input required value={rForm.url} onChange={(e) => setRForm({ ...rForm, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditR(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
+          </form>
         </div>
       )}
     </div>

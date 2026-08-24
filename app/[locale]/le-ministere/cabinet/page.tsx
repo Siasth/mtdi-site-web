@@ -1,40 +1,11 @@
 import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import { getCabinetMembers } from "@/lib/cabinet";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
 
-const cabinetMembers = [
-  {
-    rôle: "Ministre",
-    direction: "Ministère de la Transformation Digitale et de l'Innovation",
-    description: "Autorité politique en charge de la définition et de la mise en œuvre de la politique gouvernementale en matière de transformation digitale, d'innovation et d'intelligence artificielle.",
-    accent: "#006828",
-    level: 0,
-  },
-  {
-    rôle: "Directeur de Cabinet",
-    direction: "Cabinet du Ministre",
-    description: "Coordonne l'ensemble des activités du cabinet ministériel, assure la liaison avec les autres institutions gouvernementales et supervise la mise en œuvre des décisions du Ministre.",
-    accent: VERT,
-    level: 1,
-  },
-  {
-    rôle: "Secrétaire Général du Ministère",
-    direction: "Secrétariat Général",
-    description: "Assure la coordination administrative de l'ensemble des directions et services du ministère. Garantit la continuité et la cohérence de l'action ministérielle.",
-    accent: VERT,
-    level: 1,
-  },
-  {
-    rôle: "Conseillers Techniques (CT)",
-    direction: "Cabinet du Ministre",
-    description: "Les Conseillers Techniques assistent le Ministre et le Directeur de Cabinet dans l'expertise sectorielle, l'analyse des dossiers et la préparation des décisions stratégiques. Ils interviennent dans les domaines de l'intelligence artificielle, de la transformation digitale, de la cybersécurité, des politiques publiques numériques et de la coopération internationale.",
-    accent: "#7A5800",
-    level: 2,
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -44,6 +15,7 @@ export default async function CabinetPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.ministere.cabinet;
+  const cabinetMembers = await getCabinetMembers(locale === "en" ? "en" : "fr");
 
   return (
     <>
@@ -90,7 +62,7 @@ export default async function CabinetPage({ params }: Props) {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-3 mb-2">
-                      <h3 className="text-anthracite font-black text-lg uppercase leading-snug">{member.rôle}</h3>
+                      <h3 className="text-anthracite font-black text-lg uppercase leading-snug">{member.role}</h3>
                       {member.level === 0 && (
                         <span className="px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white" style={{ background: "#006828" }}>
                           {t.autoritePolitique}

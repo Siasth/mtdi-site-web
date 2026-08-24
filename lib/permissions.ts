@@ -23,7 +23,7 @@ export const PERMISSIONS = [
   { code: "galerie.gerer", module: "galerie", description: "Créer, modifier, supprimer des éléments et collections de la galerie" },
 
   // Contenu général (hero, chantiers, galerie, direct, ministre, stats)
-  { code: "contenu.modifier", module: "contenu", description: "Modifier le contenu des pages (hero, chantiers, galerie, direct, ministre, stats)" },
+  { code: "contenu.modifier", module: "contenu", description: "Modifier le contenu des pages (hero, chantiers, galerie, direct, ministre, stats, directions, structures, cabinet, missions, partenaires)" },
 
   // Utilisateurs
   { code: "utilisateurs.voir", module: "utilisateurs", description: "Voir la liste des utilisateurs" },

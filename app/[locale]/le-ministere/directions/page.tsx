@@ -1,50 +1,10 @@
 import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
+import { getDirections } from "@/lib/directions";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
-
-const directionsData = [
-  {
-    type: "Direction centrale",
-    acronym: "DPAF",
-    name: "Direction de la Programmation, de l'Administration et des Finances",
-    description: "Assure la programmation, la gestion administrative et financière du ministère. Supervise le budget, les ressources humaines, les marchés publics et la logistique.",
-    accent: VERT,
-  },
-  {
-    type: "Direction centrale",
-    acronym: "DSI",
-    name: "Direction des Systèmes d'Information",
-    director: "Pontien DEGUENON",
-    description: "La Direction des Systèmes d'Information veille à garantir l'alignement du système d'information du ministère avec la politique nationale. Elle est chargée de définir et superviser la politique de système d'information et sa mise en œuvre, définir les orientations stratégiques IT du Ministère, garantir la sécurité informatique, la fiabilité, la confidentialité et l'intégrité des systèmes d'information.",
-    accent: VERT,
-  },
-  {
-    type: "Direction technique",
-    acronym: "DN",
-    name: "Direction du Numérique",
-    director: "Geoffroy BONOU",
-    description: "La Direction du Numérique est chargée d'élaborer la politique de développement des infrastructures, des usages et des contenus numériques. Elle contribue au pilotage de la stratégie nationale de développement des infrastructures haut débit et très haut débit, veille à la mise en place des infrastructures numériques de télévision et radio, promeut les communications électroniques et incite au développement de l'industrie dans le domaine de l'économie numérique.",
-    accent: "#7A5800",
-  },
-  {
-    type: "Direction technique",
-    acronym: "DD",
-    name: "Direction de la Digitalisation",
-    director: "Boris Rodrigue SEHLOUAN Y.M.",
-    description: "La Direction de la Digitalisation est chargée de superviser la mise en œuvre du programme de gouvernance électronique de l'État par l'usage des TIC dans l'administration et la dématérialisation des services publics. Elle promeut la transformation digitale des entreprises, contribue au développement des compétences numériques et à la promotion de l'entrepreneuriat numérique, et contribue à l'élaboration de la politique de sécurité numérique et à la mise en œuvre de la stratégie nationale de cybersécurité.",
-    accent: "#7A5800",
-  },
-  {
-    type: "Direction technique",
-    acronym: "DM",
-    name: "Direction des Médias",
-    description: "La Direction des Médias est chargée de la politique audiovisuelle et de la transition numérique des médias publics et privés.",
-    accent: "#EB0000",
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -54,6 +14,7 @@ export default async function DirectionsCentralesPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
   const t = dict.ministere.directions;
+  const directionsData = await getDirections(locale === "en" ? "en" : "fr");
 
   return (
     <>

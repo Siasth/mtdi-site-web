@@ -1,14 +1,10 @@
 import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { readData } from "../../../lib/data";
+import { getUpcomingEvents, getReplays } from "@/lib/direct";
 
 const VERT  = "#006828";
 const ROUGE = "#EB0000";
-
-type UpcomingEvent = { id: number; date: string; title: string; description: string };
-type Replay = { id: number; title: string; source: string; date: string; url: string };
-type DirectData = { upcoming: UpcomingEvent[]; replays: Replay[] };
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -16,13 +12,13 @@ type Props = {
 
 export default async function DirectPage({ params }: Props) {
   const { locale } = await params;
-  const [dict, directData] = await Promise.all([
+  const isEn = locale === "en";
+  const [dict, upcomingEvents, replays] = await Promise.all([
     getDictionary(locale as Locale),
-    readData<DirectData>("direct"),
+    getUpcomingEvents(isEn ? "en" : "fr"),
+    getReplays(isEn ? "en" : "fr"),
   ]);
   const t = dict.direct;
-  const upcomingEvents = directData.upcoming ?? [];
-  const replays = directData.replays ?? [];
 
   return (
     <>
