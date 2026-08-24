@@ -53,6 +53,7 @@ const navItems: NavEntry[] = [
     label: "Le Ministère",
     icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5",
     children: [
+      { type: "link", label: "Le Ministre (biographie)", href: "/back-office-mtdi/ministre-bio", icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z", perm: "contenu.modifier" },
       { type: "link", label: "Directions centrales", href: "/back-office-mtdi/directions", icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5", perm: "contenu.modifier" },
       { type: "link", label: "Structures sous tutelle", href: "/back-office-mtdi/structures", icon: "M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z", perm: "contenu.modifier" },
       { type: "link", label: "Cabinet", href: "/back-office-mtdi/cabinet", icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-4a4 4 0 100-8 4 4 0 000 8zm-6 8v-2a4 4 0 013-3.87", perm: "contenu.modifier" },

@@ -3,6 +3,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
 import Image from "next/image";
+import { getMinistreBio } from "@/lib/ministre-bio";
 
 const VERT  = "#162233";
 const JAUNE = "#FFBE00";
@@ -37,6 +38,20 @@ export default async function LeMinisterPage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.ministere.ministre;
   const prefix = locale === "en" ? "/en" : "";
+  const isEn = locale === "en";
+  const bio = await getMinistreBio();
+
+  const breadcrumb = isEn ? bio.breadcrumbEn : bio.breadcrumbFr;
+  const sousTitre = isEn ? bio.sousTitreEn : bio.sousTitreFr;
+  const badge = isEn ? bio.badgeEn : bio.badgeFr;
+  const badgeSousTitre = isEn ? bio.badgeSousTitreEn : bio.badgeSousTitreFr;
+  const signatureTitre = isEn ? bio.signatureTitreEn : bio.signatureTitreFr;
+  const imageAlt = isEn ? bio.imageAltEn : bio.imageAltFr;
+  const bioParagraphs = (isEn && bio.bioParagraphsEn.length > 0) ? bio.bioParagraphsEn : bio.bioParagraphsFr;
+  const parcoursItems = (isEn && bio.parcoursEn.length > 0) ? bio.parcoursEn : bio.parcoursFr;
+  const prioritesItems = (isEn && bio.prioritesEn.length > 0) ? bio.prioritesEn : bio.prioritesFr;
+  const [firstName, ...restName] = bio.name.split(" ");
+  const lastName = restName.join(" ");
 
   return (
     <>
@@ -48,16 +63,16 @@ export default async function LeMinisterPage({ params }: Props) {
         <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-12 overflow-hidden" style={{ background: VERT }}>
           <div className="relative max-w-7xl mx-auto">
             <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-4">
-              {t.breadcrumb}
+              {breadcrumb}
             </p>
 
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black uppercase leading-none tracking-tight text-white max-w-5xl">
-              Mahuna<br />
-              <span style={{ color: JAUNE }}>Akplogan</span>
+              {firstName}<br />
+              <span style={{ color: JAUNE }}>{lastName}</span>
             </h1>
 
             <p className="mt-6 text-white/60 text-base sm:text-lg leading-relaxed max-w-2xl">
-              {t.sousTitre}
+              {sousTitre}
             </p>
           </div>
         </section>
@@ -70,8 +85,8 @@ export default async function LeMinisterPage({ params }: Props) {
             <div className="relative">
               <div className="relative overflow-hidden rounded-sm" style={{ paddingBottom: "125%" }}>
                 <Image
-                  src="/ministre.png"
-                  alt={t.imageAlt}
+                  src={bio.photo}
+                  alt={imageAlt}
                   fill
                   className="object-cover object-top"
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -82,8 +97,8 @@ export default async function LeMinisterPage({ params }: Props) {
 
               {/* Floating badge */}
               <div className="absolute -right-4 top-8 px-4 py-2 rounded-sm shadow-lg hidden lg:block" style={{ background: "#006828" }}>
-                <p className="text-white text-xs font-bold uppercase tracking-wider">{t.badge}</p>
-                <p className="text-white/80 text-[10px] font-medium uppercase tracking-widest">{t.badgeSousTitre}</p>
+                <p className="text-white text-xs font-bold uppercase tracking-wider">{badge}</p>
+                <p className="text-white/80 text-[10px] font-medium uppercase tracking-widest">{badgeSousTitre}</p>
               </div>
             </div>
 
@@ -93,18 +108,15 @@ export default async function LeMinisterPage({ params }: Props) {
                 {t.biographie}
               </h2>
 
-              <div className="space-y-5 text-base text-anthracite/80 leading-relaxed">
-                <p>{t.bio.p1}</p>
-                <p>{t.bio.p2}</p>
-                <p>{t.bio.p3}</p>
-                <p>{t.bio.p4}</p>
-                <p>{t.bio.p5}</p>
-                <p>{t.bio.p6}</p>
+              <div className="space-y-5 text-base text-anthracite/80 leading-relaxed prose-institutionnel">
+                {bioParagraphs.map((p, i) => (
+                  <div key={i} dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
               </div>
 
               <div className="mt-6">
                 <Link
-                  href="https://fr.wikipedia.org/wiki/Mahuna_Akplogan"
+                  href={bio.wikipediaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all hover:gap-4"
@@ -119,9 +131,9 @@ export default async function LeMinisterPage({ params }: Props) {
 
               {/* Signature */}
               <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
-                <p className="font-black text-anthracite text-base uppercase tracking-wide">Mahuna Akplogan</p>
+                <p className="font-black text-anthracite text-base uppercase tracking-wide">{bio.name}</p>
                 <p className="text-xs text-anthracite/75 font-semibold uppercase tracking-wider mt-0.5">
-                  {t.signatureTitre}
+                  {signatureTitre}
                 </p>
               </div>
             </div>
@@ -139,7 +151,7 @@ export default async function LeMinisterPage({ params }: Props) {
               <div className="absolute left-[4.5rem] sm:left-[7rem] top-0 bottom-0 w-px" style={{ background: "rgba(0,0,0,0.10)" }} />
 
               <div className="flex flex-col gap-0">
-                {t.parcoursItems.map((item, i) => (
+                {parcoursItems.map((item, i) => (
                   <div key={i} className="relative flex items-start gap-6 sm:gap-12 pb-10 sm:pb-12 last:pb-0">
                     <div className="flex-shrink-0 w-12 sm:w-24 text-right pt-1">
                       <span className="text-sm font-black tabular-nums" style={{ color: VERT }}>{item.period}</span>
@@ -151,7 +163,11 @@ export default async function LeMinisterPage({ params }: Props) {
 
                     <div className="flex-1 min-w-0 pl-6">
                       <h3 className="text-anthracite font-black text-base uppercase leading-snug mb-2">{item.title}</h3>
-                      <p className="text-sm font-medium leading-relaxed" style={{ color: "rgba(26,26,26,0.75)" }}>{item.description}</p>
+                      <div
+                        className="text-sm font-medium leading-relaxed prose-institutionnel"
+                        style={{ color: "rgba(26,26,26,0.75)" }}
+                        dangerouslySetInnerHTML={{ __html: item.description }}
+                      />
                     </div>
                   </div>
                 ))}
@@ -167,14 +183,17 @@ export default async function LeMinisterPage({ params }: Props) {
               {t.priorites}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
-              {t.prioritesItems.map((p, i) => (
-                <div key={p.number} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors">
+              {prioritesItems.map((p, i) => (
+                <div key={i} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors">
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i], opacity: 0.3 }}>{p.number}</span>
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i], opacity: 0.3 }}>{String(i + 1).padStart(2, "0")}</span>
                     <div className="mt-1 flex-shrink-0" style={{ color: priorityAccents[i] }}>{priorityIcons[i]}</div>
                   </div>
                   <h3 className="text-anthracite font-black text-xl uppercase leading-snug mb-4">{p.title}</h3>
-                  <p className="text-anthracite/65 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors">{p.description}</p>
+                  <div
+                    className="text-anthracite/65 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors prose-institutionnel"
+                    dangerouslySetInnerHTML={{ __html: p.description }}
+                  />
                 </div>
               ))}
             </div>
@@ -205,6 +224,14 @@ export default async function LeMinisterPage({ params }: Props) {
         </section>
 
       </main>
+
+      <style>{`
+        .prose-institutionnel p { margin: 0.4em 0; }
+        .prose-institutionnel strong { font-weight: 900; }
+        .prose-institutionnel a { color: #006828; text-decoration: underline; }
+        .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }
+        .prose-institutionnel ol { list-style: decimal; padding-left: 1.2em; }
+      `}</style>
 
       <Footer locale={locale} dict={dict.footer} />
     </>

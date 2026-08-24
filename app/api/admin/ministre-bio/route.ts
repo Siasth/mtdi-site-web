@@ -1,0 +1,54 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getSession, setSetting, logAudit } from "@/lib/auth";
+import { hasPerm } from "@/lib/permissions";
+import { getMinistreBio } from "@/lib/ministre-bio";
+import { sanitizeRichText } from "@/lib/sanitize";
+
+function getIp(req: NextRequest): string | null {
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+}
+
+// getSession() (pas requireSession) : évite tout comportement de redirection
+// de page dans ce contexte d'API, qui peut casser la réponse JSON attendue.
+export async function GET() {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+  if (!hasPerm(session, "contenu.modifier")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+  try {
+    const bio = await getMinistreBio();
+    return NextResponse.json(bio);
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
+  if (!hasPerm(session, "contenu.modifier")) {
+    return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  }
+  const body = await req.json();
+
+  if (Array.isArray(body.bioParagraphsFr)) body.bioParagraphsFr = body.bioParagraphsFr.map(sanitizeRichText);
+  if (Array.isArray(body.bioParagraphsEn)) body.bioParagraphsEn = body.bioParagraphsEn.map(sanitizeRichText);
+  if (Array.isArray(body.parcoursFr)) {
+    body.parcoursFr = body.parcoursFr.map((p: { period: string; title: string; description: string }) => ({ ...p, description: sanitizeRichText(p.description) }));
+  }
+  if (Array.isArray(body.parcoursEn)) {
+    body.parcoursEn = body.parcoursEn.map((p: { period: string; title: string; description: string }) => ({ ...p, description: sanitizeRichText(p.description) }));
+  }
+  if (Array.isArray(body.prioritesFr)) {
+    body.prioritesFr = body.prioritesFr.map((p: { title: string; description: string }) => ({ ...p, description: sanitizeRichText(p.description) }));
+  }
+  if (Array.isArray(body.prioritesEn)) {
+    body.prioritesEn = body.prioritesEn.map((p: { title: string; description: string }) => ({ ...p, description: sanitizeRichText(p.description) }));
+  }
+
+  const current = await getMinistreBio();
+  await setSetting("ministre_bio", { ...current, ...body });
+  await logAudit({ userId: session.id, action: "modifier", module: "ministre-bio", ip: getIp(req) });
+  return NextResponse.json({ ok: true });
+}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { PERMISSIONS, SUPER_ADMIN_ROLE_NAME } from "@/lib/permissions";
+import { MINISTRE_BIO_DEFAULTS } from "@/lib/ministre-bio";
 
 // Convertit "9 juillet 2026" ou "Samedi 2 août 2026 · 09h00" en date ISO.
 const FR_MONTHS: Record<string, string> = {
@@ -921,6 +922,13 @@ export async function POST(req: NextRequest) {
     for (const [titleFr, image] of Object.entries(galerieImages)) {
       await sql`UPDATE galerie_items SET image = ${image} WHERE title_fr = ${titleFr} AND (image IS NULL OR image = '')`;
     }
+
+    // Mot du Ministre (page biographie complète /le-ministere/le-ministre)
+    await sql`
+      INSERT INTO settings (key, value)
+      VALUES ('ministre_bio', ${JSON.stringify(MINISTRE_BIO_DEFAULTS)}::jsonb)
+      ON CONFLICT (key) DO NOTHING
+    `;
 
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
