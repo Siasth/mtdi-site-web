@@ -39,5 +39,13 @@ export const MINISTRE_DEFAULTS: MinistreSettings = {
 export async function getMinistreSettings(): Promise<MinistreSettings> {
   const result = await sql`SELECT value FROM settings WHERE key = 'ministre_message'`;
   const stored = (result.rows[0]?.value as Partial<MinistreSettings>) || {};
-  return { ...MINISTRE_DEFAULTS, ...stored };
+  const merged = { ...MINISTRE_DEFAULTS, ...stored };
+  // Garde-fou : si la valeur stockée n'est pas un vrai tableau (donnée
+  // corrompue ou forme inattendue), on retombe sur un tableau vide plutôt
+  // que de laisser planter le rendu du formulaire côté back-office.
+  return {
+    ...merged,
+    paragraphsFr: Array.isArray(merged.paragraphsFr) ? merged.paragraphsFr : [],
+    paragraphsEn: Array.isArray(merged.paragraphsEn) ? merged.paragraphsEn : [],
+  };
 }

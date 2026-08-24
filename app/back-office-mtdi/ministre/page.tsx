@@ -115,7 +115,9 @@ export default function AdminMinistre() {
     );
   }
 
-  const paragraphs = activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn;
+  const paragraphs = Array.isArray(activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn)
+    ? (activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn)
+    : [];
 
   return (
     <div className="p-8 max-w-3xl">

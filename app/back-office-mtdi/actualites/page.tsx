@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
@@ -237,11 +238,19 @@ export default function AdminActualites() {
           <h1 className="text-2xl font-bold text-gray-900">Actualités</h1>
           <p className="text-sm text-gray-500 mt-1">Gérez les articles affichés sur le site (FR / EN)</p>
         </div>
-        {canCreate && (
-          <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
-            + Nouvel article
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/back-office-mtdi/categories"
+            className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50"
+          >
+            Gérer les catégories
+          </Link>
+          {canCreate && (
+            <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
+              + Nouvel article
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
