@@ -12,8 +12,8 @@ export type MinistreSettings = {
   badgeSubEn: string;
   headingFr: string; // multi-lignes, séparées par \n
   headingEn: string;
-  paragraphsFr: string[];
-  paragraphsEn: string[];
+  contentFr: string; // HTML riche continu (plusieurs paragraphes gérés par l'éditeur lui-même)
+  contentEn: string;
 };
 
 // Valeurs par défaut = exactement le texte codé en dur jusqu'ici, pour
@@ -29,23 +29,24 @@ export const MINISTRE_DEFAULTS: MinistreSettings = {
   badgeSubEn: "Digital Transformation & AI",
   headingFr: "Le Bénin déploie.\nLe Bénin construit.\nLe Bénin innove.",
   headingEn: "Benin deploys.\nBenin builds.\nBenin innovates.",
-  paragraphsFr: [
-    "La technologie ne vaut que par ce qu'elle change concrètement dans la vie des hommes, et d'abord par sa contribution à l'éradication de l'extrême pauvreté.",
-    "Le Ministère de la Transformation Digitale et de l'Innovation a pour mission de conduire la feuille de route technologique au service des politiques publiques, et de bâtir un écosystème d'innovation dynamique, inclusif et compétitif.",
-  ],
-  paragraphsEn: [],
+  contentFr: "<p>La technologie ne vaut que par ce qu'elle change concrètement dans la vie des hommes, et d'abord par sa contribution à l'éradication de l'extrême pauvreté.</p><p>Le Ministère de la Transformation Digitale et de l'Innovation a pour mission de conduire la feuille de route technologique au service des politiques publiques, et de bâtir un écosystème d'innovation dynamique, inclusif et compétitif.</p>",
+  contentEn: "",
 };
 
 export async function getMinistreSettings(): Promise<MinistreSettings> {
   const result = await sql`SELECT value FROM settings WHERE key = 'ministre_message'`;
-  const stored = (result.rows[0]?.value as Partial<MinistreSettings>) || {};
-  const merged = { ...MINISTRE_DEFAULTS, ...stored };
-  // Garde-fou : si la valeur stockée n'est pas un vrai tableau (donnée
-  // corrompue ou forme inattendue), on retombe sur un tableau vide plutôt
-  // que de laisser planter le rendu du formulaire côté back-office.
-  return {
-    ...merged,
-    paragraphsFr: Array.isArray(merged.paragraphsFr) ? merged.paragraphsFr : [],
-    paragraphsEn: Array.isArray(merged.paragraphsEn) ? merged.paragraphsEn : [],
-  };
+  const stored = (result.rows[0]?.value as Record<string, unknown>) || {};
+  const merged = { ...MINISTRE_DEFAULTS, ...stored } as MinistreSettings & { paragraphsFr?: string[]; paragraphsEn?: string[] };
+
+  // Rétrocompatibilité : d'anciennes données stockées en tableau de
+  // paragraphes (avant le passage à un éditeur continu unique) sont
+  // fusionnées automatiquement en un seul bloc HTML.
+  const contentFr = typeof merged.contentFr === "string"
+    ? merged.contentFr
+    : Array.isArray(merged.paragraphsFr) ? merged.paragraphsFr.join("") : MINISTRE_DEFAULTS.contentFr;
+  const contentEn = typeof merged.contentEn === "string"
+    ? merged.contentEn
+    : Array.isArray(merged.paragraphsEn) ? merged.paragraphsEn.join("") : MINISTRE_DEFAULTS.contentEn;
+
+  return { ...merged, contentFr, contentEn };
 }

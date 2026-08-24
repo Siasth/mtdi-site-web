@@ -47,7 +47,7 @@ export default async function LeMinisterPage({ params }: Props) {
   const badgeSousTitre = isEn ? bio.badgeSousTitreEn : bio.badgeSousTitreFr;
   const signatureTitre = isEn ? bio.signatureTitreEn : bio.signatureTitreFr;
   const imageAlt = isEn ? bio.imageAltEn : bio.imageAltFr;
-  const bioParagraphs = (isEn && bio.bioParagraphsEn.length > 0) ? bio.bioParagraphsEn : bio.bioParagraphsFr;
+  const bioContent = (isEn && bio.bioContentEn) || bio.bioContentFr;
   const parcoursItems = (isEn && bio.parcoursEn.length > 0) ? bio.parcoursEn : bio.parcoursFr;
   const prioritesItems = (isEn && bio.prioritesEn.length > 0) ? bio.prioritesEn : bio.prioritesFr;
   const [firstName, ...restName] = bio.name.split(" ");
@@ -108,11 +108,10 @@ export default async function LeMinisterPage({ params }: Props) {
                 {t.biographie}
               </h2>
 
-              <div className="space-y-5 text-base text-anthracite/80 leading-relaxed prose-institutionnel">
-                {bioParagraphs.map((p, i) => (
-                  <div key={i} dangerouslySetInnerHTML={{ __html: p }} />
-                ))}
-              </div>
+              <div
+                className="space-y-5 text-base text-anthracite/80 leading-relaxed prose-institutionnel"
+                dangerouslySetInnerHTML={{ __html: bioContent }}
+              />
 
               <div className="mt-6">
                 <Link

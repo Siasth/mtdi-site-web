@@ -36,7 +36,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
       <main style={{ paddingTop: "80px" }}>
 
         {/* ── Bandeau titre : fond uni, comme le reste du site ── */}
-        <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8" style={{ background: BANNER }}>
+        <section className="px-4 sm:px-6 pt-12 pb-8" style={{ background: BANNER }}>
           <div className="max-w-7xl mx-auto text-center">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase leading-snug text-white max-w-3xl mx-auto mb-5">
               {article.title}
@@ -158,7 +158,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
                         )}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-anthracite leading-snug line-clamp-2 group-hover:text-vert-benin transition-colors">
+                        <p className="text-sm font-bold text-anthracite leading-snug line-clamp-2 group-hover:line-clamp-none group-hover:text-vert-benin transition-colors">
                           {r.title}
                         </p>
                         <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-black uppercase tracking-widest" style={{ color: VERT }}>

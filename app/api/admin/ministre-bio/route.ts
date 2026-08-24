@@ -32,8 +32,8 @@ export async function PUT(req: NextRequest) {
   }
   const body = await req.json();
 
-  if (Array.isArray(body.bioParagraphsFr)) body.bioParagraphsFr = body.bioParagraphsFr.map(sanitizeRichText);
-  if (Array.isArray(body.bioParagraphsEn)) body.bioParagraphsEn = body.bioParagraphsEn.map(sanitizeRichText);
+  if (typeof body.bioContentFr === "string") body.bioContentFr = sanitizeRichText(body.bioContentFr);
+  if (typeof body.bioContentEn === "string") body.bioContentEn = sanitizeRichText(body.bioContentEn);
   if (Array.isArray(body.parcoursFr)) {
     body.parcoursFr = body.parcoursFr.map((p: { period: string; title: string; description: string }) => ({ ...p, description: sanitizeRichText(p.description) }));
   }

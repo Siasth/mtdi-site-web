@@ -18,7 +18,7 @@ type FormState = {
   badgeSousTitreFr: string; badgeSousTitreEn: string;
   signatureTitreFr: string; signatureTitreEn: string;
   imageAltFr: string; imageAltEn: string;
-  bioParagraphsFr: string[]; bioParagraphsEn: string[];
+  bioContentFr: string; bioContentEn: string;
   wikipediaUrl: string;
   parcoursFr: ParcoursItem[]; parcoursEn: ParcoursItem[];
   prioritesFr: PrioriteItem[]; prioritesEn: PrioriteItem[];
@@ -93,26 +93,11 @@ export default function AdminMinistreBio() {
   }
 
   const suffix = activeLang === "fr" ? "Fr" : "En";
-  const bioParagraphs = form[`bioParagraphs${suffix}` as "bioParagraphsFr" | "bioParagraphsEn"] || [];
   const parcours = form[`parcours${suffix}` as "parcoursFr" | "parcoursEn"] || [];
   const priorites = form[`priorites${suffix}` as "prioritesFr" | "prioritesEn"] || [];
 
   function setField<K extends keyof FormState>(key: K, val: FormState[K]) {
     setForm((f) => (f ? { ...f, [key]: val } : f));
-  }
-
-  function updateBioParagraph(i: number, val: string) {
-    const key = `bioParagraphs${suffix}` as "bioParagraphsFr" | "bioParagraphsEn";
-    const list = [...bioParagraphs]; list[i] = val;
-    setField(key, list);
-  }
-  function addBioParagraph() {
-    const key = `bioParagraphs${suffix}` as "bioParagraphsFr" | "bioParagraphsEn";
-    setField(key, [...bioParagraphs, ""]);
-  }
-  function removeBioParagraph(i: number) {
-    const key = `bioParagraphs${suffix}` as "bioParagraphsFr" | "bioParagraphsEn";
-    setField(key, bioParagraphs.filter((_, idx) => idx !== i));
   }
 
   function updateParcours(i: number, field: keyof ParcoursItem, val: string) {
@@ -199,17 +184,14 @@ export default function AdminMinistreBio() {
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-gray-900">Biographie ({activeLang === "fr" ? "Français" : "English"})</h2>
-            <button type="button" onClick={addBioParagraph} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter un paragraphe</button>
-          </div>
-          {bioParagraphs.map((p, i) => (
-            <div key={i} className="relative">
-              <MarkdownEditor value={p} onChange={(v) => updateBioParagraph(i, v)} rows={3} />
-              <button type="button" onClick={() => removeBioParagraph(i)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center hover:bg-red-200">×</button>
-            </div>
-          ))}
-          {bioParagraphs.length === 0 && <p className="text-sm text-gray-400">Aucun paragraphe.</p>}
+          <h2 className="font-bold text-gray-900">Biographie ({activeLang === "fr" ? "Français" : "English"})</h2>
+          <p className="text-xs text-gray-400 -mt-2">Plusieurs paragraphes : appuyez sur Entrée pour passer au suivant, comme dans un traitement de texte.</p>
+          <MarkdownEditor
+            value={activeLang === "fr" ? form.bioContentFr : form.bioContentEn}
+            onChange={(v) => setField(activeLang === "fr" ? "bioContentFr" : "bioContentEn", v)}
+            placeholder={activeLang === "en" ? "Laisser vide si pas encore traduit" : undefined}
+            rows={8}
+          />
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">

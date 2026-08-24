@@ -165,11 +165,8 @@ export async function POST(req: NextRequest) {
         badgeSubEn: "Digital Transformation & AI",
         headingFr: "Le Bénin déploie.\nLe Bénin construit.\nLe Bénin innove.",
         headingEn: "Benin deploys.\nBenin builds.\nBenin innovates.",
-        paragraphsFr: [
-          "La technologie ne vaut que par ce qu'elle change concrètement dans la vie des hommes, et d'abord par sa contribution à l'éradication de l'extrême pauvreté.",
-          "Le Ministère de la Transformation Digitale et de l'Innovation a pour mission de conduire la feuille de route technologique au service des politiques publiques, et de bâtir un écosystème d'innovation dynamique, inclusif et compétitif.",
-        ],
-        paragraphsEn: [],
+        contentFr: "<p>La technologie ne vaut que par ce qu'elle change concrètement dans la vie des hommes, et d'abord par sa contribution à l'éradication de l'extrême pauvreté.</p><p>Le Ministère de la Transformation Digitale et de l'Innovation a pour mission de conduire la feuille de route technologique au service des politiques publiques, et de bâtir un écosystème d'innovation dynamique, inclusif et compétitif.</p>",
+        contentEn: "",
       })}::jsonb)
       ON CONFLICT (key) DO NOTHING
     `;
@@ -662,12 +659,9 @@ export async function POST(req: NextRequest) {
     // que j'avais proposée : on l'utilise à la place.
     await sql`
       UPDATE settings SET value = value || ${JSON.stringify({
-        paragraphsEn: [
-          "Technology is only valuable for what it concretely changes in people's lives, and above all for its contribution to eradicating extreme poverty.",
-          "The Ministry of Digital Transformation and Innovation's mission is to lead the technology roadmap in service of public policies, and to build a dynamic, inclusive and competitive innovation ecosystem.",
-        ],
+        contentEn: "<p>Technology is only valuable for what it concretely changes in people's lives, and above all for its contribution to eradicating extreme poverty.</p><p>The Ministry of Digital Transformation and Innovation's mission is to lead the technology roadmap in service of public policies, and to build a dynamic, inclusive and competitive innovation ecosystem.</p>",
       })}::jsonb
-      WHERE key = 'ministre_message'
+      WHERE key = 'ministre_message' AND (value->>'contentEn' IS NULL OR value->>'contentEn' = '')
     `;
 
     // Grands Chantiers : le dictionnaire (dictionaries/fr.json et en.json,

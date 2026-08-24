@@ -13,7 +13,7 @@ type FormState = {
   badgeFr: string; badgeEn: string;
   badgeSubFr: string; badgeSubEn: string;
   headingFr: string; headingEn: string;
-  paragraphsFr: string[]; paragraphsEn: string[];
+  contentFr: string; contentEn: string;
 };
 
 export default function AdminMinistre() {
@@ -56,24 +56,6 @@ export default function AdminMinistre() {
     }
   }
 
-  function updateParagraph(lang: "Fr" | "En", idx: number, val: string) {
-    if (!form) return;
-    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
-    const list = [...form[key]];
-    list[idx] = val;
-    setForm({ ...form, [key]: list });
-  }
-  function addParagraph(lang: "Fr" | "En") {
-    if (!form) return;
-    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
-    setForm({ ...form, [key]: [...form[key], ""] });
-  }
-  function removeParagraph(lang: "Fr" | "En", idx: number) {
-    if (!form) return;
-    const key = lang === "Fr" ? "paragraphsFr" : "paragraphsEn";
-    setForm({ ...form, [key]: form[key].filter((_, i) => i !== idx) });
-  }
-
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!form) return;
@@ -114,10 +96,6 @@ export default function AdminMinistre() {
       </div>
     );
   }
-
-  const paragraphs = Array.isArray(activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn)
-    ? (activeLang === "fr" ? form.paragraphsFr : form.paragraphsEn)
-    : [];
 
   return (
     <div className="p-8 max-w-3xl">
@@ -181,17 +159,9 @@ export default function AdminMinistre() {
             </section>
 
             <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-gray-900">Paragraphes (Français)</h2>
-                <button type="button" onClick={() => addParagraph("Fr")} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter un paragraphe</button>
-              </div>
-              {paragraphs.map((p, i) => (
-                <div key={i} className="relative">
-                  <MarkdownEditor value={p} onChange={(v) => updateParagraph("Fr", i, v)} rows={3} />
-                  <button type="button" onClick={() => removeParagraph("Fr", i)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center hover:bg-red-200">×</button>
-                </div>
-              ))}
-              {paragraphs.length === 0 && <p className="text-sm text-gray-400">Aucun paragraphe.</p>}
+              <h2 className="font-bold text-gray-900">Contenu détaillé (Français)</h2>
+              <p className="text-xs text-gray-400 -mt-2">Plusieurs paragraphes : appuyez sur Entrée pour passer au suivant, comme dans un traitement de texte.</p>
+              <MarkdownEditor value={form.contentFr} onChange={(v) => setForm({ ...form, contentFr: v })} rows={6} />
             </section>
           </>
         ) : (
@@ -220,17 +190,9 @@ export default function AdminMinistre() {
             </section>
 
             <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-gray-900">Paragraphs (English)</h2>
-                <button type="button" onClick={() => addParagraph("En")} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Add a paragraph</button>
-              </div>
-              {paragraphs.map((p, i) => (
-                <div key={i} className="relative">
-                  <MarkdownEditor value={p} onChange={(v) => updateParagraph("En", i, v)} rows={3} />
-                  <button type="button" onClick={() => removeParagraph("En", i)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-100 text-red-600 text-xs flex items-center justify-center hover:bg-red-200">×</button>
-                </div>
-              ))}
-              {paragraphs.length === 0 && <p className="text-sm text-gray-400">No paragraph yet. Leave empty to keep showing the French version.</p>}
+              <h2 className="font-bold text-gray-900">Detailed content (English)</h2>
+              <p className="text-xs text-gray-400 -mt-2">Leave empty to keep showing the French version.</p>
+              <MarkdownEditor value={form.contentEn} onChange={(v) => setForm({ ...form, contentEn: v })} placeholder="Laisser vide si pas encore traduit" rows={6} />
             </section>
           </>
         )}

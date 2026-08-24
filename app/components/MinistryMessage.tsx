@@ -14,7 +14,7 @@ export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: 
   const badge = (isEn && m.badgeEn) || m.badgeFr;
   const badgeSub = (isEn && m.badgeSubEn) || m.badgeSubFr;
   const headingLines = ((isEn && m.headingEn) || m.headingFr).split("\n").filter(Boolean);
-  const paragraphs = (isEn && m.paragraphsEn.length > 0) ? m.paragraphsEn : m.paragraphsFr;
+  const content = (isEn && m.contentEn) || m.contentFr;
 
   return (
     <section className="py-12 sm:py-20 bg-gris-perle">
@@ -72,13 +72,12 @@ export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: 
               ))}
             </h2>
 
-            <div className="space-y-4 text-base text-anthracite/80 leading-relaxed prose-ministre">
-              {paragraphs.map((p, i) => (
-                // Contenu HTML déjà assaini côté serveur à l'enregistrement
-                // (voir sanitizeRichText dans /api/admin/ministre-settings).
-                <div key={i} dangerouslySetInnerHTML={{ __html: p }} />
-              ))}
-            </div>
+            <div
+              className="space-y-4 text-base text-anthracite/80 leading-relaxed prose-ministre"
+              // Contenu HTML déjà assaini côté serveur à l'enregistrement
+              // (voir sanitizeRichText dans /api/admin/ministre-settings).
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
             <style>{`
               .prose-ministre h1, .prose-ministre h2, .prose-ministre h3 { font-weight: 900; margin: 0.6em 0 0.3em; }
               .prose-ministre ul { list-style: disc; padding-left: 1.4em; margin: 0.5em 0; }

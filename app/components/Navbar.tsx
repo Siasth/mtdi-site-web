@@ -82,10 +82,16 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
 
   const megaMenu = [
     {
-      title: s.actualites ?? "ACTUALITÉS",
+      title: s.actualitesMedias ?? "ACTUALITÉS ET MÉDIAS",
       links: [
         { label: l.toutesActualites ?? "Toutes les actualités", href: `${prefix}/actualites` },
         { label: l.alaUne ?? "À la une", href: `${prefix}/#a-la-une` },
+        { label: l.galeriePhotos ?? "Galerie photos", href: `${prefix}/galerie` },
+        { label: l.videotheque ?? "Vidéothèque", href: `${prefix}/videotheque` },
+        { label: l.mtdiMedias ?? "MTDI dans les médias", href: `${prefix}/medias/mtdi-dans-les-medias` },
+        { label: l.documentheque ?? "Documenthèque", href: `${prefix}/documentheque` },
+        { label: l.kitPresse ?? "Kit presse", href: `${prefix}/kit-presse` },
+        { label: l.enDirect ?? "En direct", href: `${prefix}/direct` },
       ],
     },
     {
@@ -109,21 +115,9 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
       ],
     },
     {
-      title: s.medias ?? "MÉDIAS",
-      links: [
-        { label: l.galeriePhotos ?? "Galerie photos", href: `${prefix}/galerie` },
-        { label: l.videotheque ?? "Vidéothèque", href: `${prefix}/videotheque` },
-        { label: l.mtdiMedias ?? "MTDI dans les médias", href: `${prefix}/medias/mtdi-dans-les-medias` },
-        { label: l.kitPresse ?? "Kit presse", href: `${prefix}/kit-presse` },
-        { label: l.enDirect ?? "En direct", href: `${prefix}/direct` },
-      ],
-    },
-    {
       title: s.ressources ?? "RESSOURCES",
       links: [
-        { label: l.documentheque ?? "Documenthèque", href: `${prefix}/documentheque` },
         { label: l.textesJuridiques ?? "Textes juridiques", href: `${prefix}/textes-juridiques` },
-        { label: l.kitPresse ?? "Kit presse", href: `${prefix}/kit-presse` },
       ],
     },
     {
@@ -143,14 +137,12 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
 
   return (
     <>
-      {/* Skip navigation */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white"
-        style={{ background: VERT }}
-      >
-        {nav.allerAuContenu ?? "Aller au contenu principal"}
-      </a>
+      {/* Note : le lien d'évitement "Aller au contenu principal" a été
+          retiré — sa position fixe top-left chevauchait le logo du
+          Ministère et interceptait les clics qui lui étaient destinés. Le
+          bouton "retour en haut" ci-dessous couvre déjà une partie du
+          besoin ; à revoir plus tard si une vraie alternative accessible
+          est nécessaire. */}
 
       {/* Retour en haut : uniquement visible après un vrai défilement */}
       <button

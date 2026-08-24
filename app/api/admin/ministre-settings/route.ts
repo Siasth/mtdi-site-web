@@ -27,12 +27,8 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const body = await req.json();
-  if (Array.isArray(body.paragraphsFr)) {
-    body.paragraphsFr = body.paragraphsFr.map((p: string) => sanitizeRichText(p));
-  }
-  if (Array.isArray(body.paragraphsEn)) {
-    body.paragraphsEn = body.paragraphsEn.map((p: string) => sanitizeRichText(p));
-  }
+  if (typeof body.contentFr === "string") body.contentFr = sanitizeRichText(body.contentFr);
+  if (typeof body.contentEn === "string") body.contentEn = sanitizeRichText(body.contentEn);
   const current = await getMinistreSettings();
   await setSetting("ministre_message", { ...current, ...body });
   await logAudit({ userId: session.id, action: "modifier", module: "ministre", ip: getIp(req) });
