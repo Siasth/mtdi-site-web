@@ -42,8 +42,8 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
 };
 
 export default function AdminGalerie() {
-  const canView = useHasPermission("galerie.voir");
-  const canManage = useHasPermission("galerie.gerer");
+  const canView = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("contenu.modifier");
 
   const [tab, setTab] = useState<"items" | "collections">("items");
   const [items, setItems] = useState<GalerieItem[]>([]);

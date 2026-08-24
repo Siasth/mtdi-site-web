@@ -12,7 +12,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireSession();
-  if (!hasPerm(session, "galerie.gerer")) {
+  if (!hasPerm(session, "contenu.modifier")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const { id } = await params;
@@ -34,7 +34,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireSession();
-  if (!hasPerm(session, "galerie.gerer")) {
+  if (!hasPerm(session, "contenu.modifier")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const { id } = await params;

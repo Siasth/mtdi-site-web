@@ -49,13 +49,24 @@ export default function GalerieListClient({
 
   const sections =
     activeFilter === "all"
-      ? collections
-          .map((c) => ({
-            key: c.id,
-            name: c.name,
-            items: visibleFiltered.filter((item) => item.collectionId === c.id),
-          }))
-          .filter((s) => s.items.length > 0)
+      ? [
+          ...collections
+            .map((c) => ({
+              key: c.id,
+              name: c.name,
+              items: visibleFiltered.filter((item) => item.collectionId === c.id),
+            }))
+            .filter((s) => s.items.length > 0),
+          // Filet de sécurité : un élément sans collection assignée ne doit
+          // jamais disparaître silencieusement (il compterait dans le total
+          // affiché sans jamais apparaître nulle part, laissant "Charger
+          // plus" actif indéfiniment sans rien de nouveau à montrer).
+          {
+            key: "uncategorized",
+            name: locale === "en" ? "Other" : "Autres",
+            items: visibleFiltered.filter((item) => !collections.some((c) => c.id === item.collectionId)),
+          },
+        ].filter((s) => s.items.length > 0)
       : [{
           key: activeFilter,
           name: collections.find((c) => c.id === activeFilter)?.name ?? "",
