@@ -5,7 +5,6 @@ import StrategieIASubNav from "../../components/StrategieIASubNav";
 import Link from "next/link";
 
 const VERT  = "#006828";
-const BANNER = "#162233"; // bandeau titre, harmonisé avec le reste du site
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
@@ -81,7 +80,7 @@ export default async function StrategieIAPage({ params }: Props) {
       <main>
 
         {/* Hero */}
-        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-12 overflow-hidden" style={{ background: BANNER }}>
+        <section className="relative px-4 sm:px-6 lg:px-8 pt-14 pb-20 overflow-hidden" style={{ background: VERT }}>
           <div className="relative max-w-7xl mx-auto">
             <div className="mb-6 inline-flex items-center gap-2">
               <span className="px-4 py-1.5 text-xs font-black uppercase tracking-widest" style={{ background: "rgba(255,255,255,0.15)", color: "white" }}>

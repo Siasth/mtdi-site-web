@@ -3,7 +3,7 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import StrategieIASubNav from "../../../components/StrategieIASubNav";
 
-const VERT = "#162233"; // bandeau titre, harmonisé avec le reste du site
+const VERT = "#006828";
 const JAUNE = "#FFBE00";
 
 const milestones = [
