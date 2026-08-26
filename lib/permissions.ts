@@ -18,10 +18,6 @@ export const PERMISSIONS = [
   { code: "stats.voir", module: "stats", description: "Voir les chiffres clés" },
   { code: "stats.gerer", module: "stats", description: "Créer, modifier, supprimer des chiffres clés" },
 
-  // Galerie (collections + éléments photo/vidéo)
-  { code: "galerie.voir", module: "galerie", description: "Voir la galerie" },
-  { code: "galerie.gerer", module: "galerie", description: "Créer, modifier, supprimer des éléments et collections de la galerie" },
-
   // Contenu général (hero, chantiers, galerie, direct, ministre, stats)
   { code: "contenu.modifier", module: "contenu", description: "Modifier le contenu des pages (hero, chantiers, galerie, direct, ministre, stats, directions, structures, cabinet, missions, partenaires)" },
 
