@@ -4,6 +4,7 @@ import Footer from "../../../components/Footer";
 import Link from "next/link";
 import { getDirections } from "@/lib/directions";
 import { getStructures } from "@/lib/structures";
+import OrganigrammeDownloadButton from "../../../components/OrganigrammeDownloadButton";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
@@ -16,7 +17,7 @@ const BOX_WHITE = "white";
 
 function Box({ label, sub, bg, text = "white", border, wide }: { label: string; sub?: string; bg: string; text?: string; border?: string; wide?: boolean }) {
   return (
-    <div className={`px-4 py-3 text-center ${wide ? "w-40 sm:w-44" : ""}`} style={{ background: bg, color: text, border: border || "none" }}>
+    <div className={`px-4 py-3 text-center ${wide ? "w-52 sm:w-56" : ""}`} style={{ background: bg, color: text, border: border || "none" }}>
       <p className="text-[11px] font-bold leading-tight">{label}</p>
       {sub && <p className="text-[9px] mt-0.5 opacity-70">{sub}</p>}
     </div>
@@ -80,6 +81,17 @@ export default async function OrganigrammePage({ params }: Props) {
 
         {/* Organigramme */}
         <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle overflow-x-auto">
+          <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-xs text-anthracite/50 font-medium max-w-md">
+              {isEn
+                ? "Boxes are generated automatically from Central Directorates and Supervised Agencies."
+                : "Les blocs sont générés automatiquement à partir des Directions centrales et Organismes sous tutelle."}
+            </p>
+            <OrganigrammeDownloadButton
+              label={isEn ? "Download (PDF, A4)" : "Télécharger (PDF, A4)"}
+              filename="organigramme-mtdi.pdf"
+            />
+          </div>
           {/* Légende */}
           <div className="max-w-5xl mx-auto mb-8 flex flex-wrap gap-4 items-center">
             <span className="text-xs font-black uppercase tracking-widest text-anthracite/70 mr-2">{t.legende}</span>
@@ -97,7 +109,7 @@ export default async function OrganigrammePage({ params }: Props) {
             ))}
           </div>
 
-          <div className="max-w-5xl mx-auto min-w-[700px]">
+          <div id="organigramme-capture" className="max-w-5xl mx-auto min-w-[700px]">
 
             {/* === MINISTRE === */}
             <div className="flex justify-center">
