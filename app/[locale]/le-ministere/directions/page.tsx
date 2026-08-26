@@ -57,7 +57,7 @@ export default async function DirectionsCentralesPage({ params }: Props) {
                     </span>
                     <span className="text-xs font-medium text-anthracite/65">{dir.type}</span>
                   </div>
-                  <h3 className="text-anthracite font-black text-lg uppercase leading-snug mb-2">{dir.name}</h3>
+                  <h3 className="text-anthracite font-black text-lg uppercase leading-snug mb-2 max-w-3xl">{dir.name}</h3>
                   {"director" in dir && dir.director && (
                     <p className="text-xs font-semibold text-anthracite/65 mb-4">
                       {t.directeur} {dir.director}
