@@ -32,29 +32,7 @@ export default function AdminDocuments() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     const isNew = editing === "new";
-    let res: Response;
-    try {
-      res = await fetch(isNew ? "/api/admin/documents" : `/api/admin/documents/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    } catch (networkErr) {
-      // ── Diagnostic temporaire ── la requête n'a même pas atteint le serveur.
-      alert(`DIAGNOSTIC — La requête réseau a échoué avant d'atteindre le serveur :\n\n${networkErr instanceof Error ? networkErr.message : String(networkErr)}`);
-      return;
-    }
-    const rawText = await res.text();
-    // ── Diagnostic temporaire ── à retirer une fois le bug résolu. S'affiche
-    // TOUJOURS, quel que soit le résultat, pour ne rien manquer.
-    if (!isNew) {
-      let parsed: unknown = null;
-      try { parsed = JSON.parse(rawText); } catch { /* pas du JSON valide */ }
-      alert(
-        `DIAGNOSTIC\n\n` +
-        `Statut HTTP : ${res.status} ${res.ok ? "(OK)" : "(ERREUR)"}\n\n` +
-        `Réponse brute du serveur :\n${rawText.slice(0, 500)}\n\n` +
-        (parsed && typeof parsed === "object" && "debugHrefReceived" in parsed
-          ? `Lien envoyé : ${(parsed as any).debugHrefReceived}\nLien relu en base : ${(parsed as any).debugHrefStored}`
-          : "")
-      );
-    }
+    await fetch(isNew ? "/api/admin/documents" : `/api/admin/documents/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
     setEditing(null); load();
   }
   async function handleDelete(d: Doc) { if (confirm(`Supprimer "${d.title_fr}" ?`)) { await fetch(`/api/admin/documents/${d.id}`, { method: "DELETE" }); load(); } }
@@ -109,8 +87,9 @@ export default function AdminDocuments() {
                 <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>English</button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Catégorie</label><select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type de fichier</label><input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value.toUpperCase() })} placeholder="PDF, DOCX..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date (libellé libre)</label><input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="ex: Octobre 2025" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             </div>
             {activeLang === "fr" ? (
