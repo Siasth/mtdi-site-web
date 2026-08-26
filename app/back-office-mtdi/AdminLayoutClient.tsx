@@ -46,6 +46,9 @@ const navItems: NavEntry[] = [
       { type: "link", label: "Actualités", href: "/back-office-mtdi/actualites", icon: "M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z", perm: "actualites.voir" },
       { type: "link", label: "Galerie", href: "/back-office-mtdi/galerie", icon: "M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z M15 13a3 3 0 11-6 0 3 3 0 016 0z", perm: "contenu.modifier" },
       { type: "link", label: "Direct", href: "/back-office-mtdi/direct", icon: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z", perm: "contenu.modifier" },
+      { type: "link", label: "Documenthèque", href: "/back-office-mtdi/documents", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", perm: "contenu.modifier" },
+      { type: "link", label: "Vidéothèque", href: "/back-office-mtdi/videos", icon: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z", perm: "contenu.modifier" },
+      { type: "link", label: "MTDI dans les médias", href: "/back-office-mtdi/media-mentions", icon: "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z", perm: "contenu.modifier" },
     ],
   },
   {
@@ -78,11 +81,8 @@ const navItems: NavEntry[] = [
     label: "Pages secondaires",
     icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
     children: [
-      { type: "link", label: "Documenthèque", href: "/back-office-mtdi/documents", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", perm: "contenu.modifier" },
       { type: "link", label: "Textes juridiques", href: "/back-office-mtdi/textes-juridiques", icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253", perm: "contenu.modifier" },
       { type: "link", label: "Kit presse", href: "/back-office-mtdi/kit-presse", icon: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z", perm: "contenu.modifier" },
-      { type: "link", label: "Vidéothèque", href: "/back-office-mtdi/videos", icon: "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z", perm: "contenu.modifier" },
-      { type: "link", label: "MTDI dans les médias", href: "/back-office-mtdi/media-mentions", icon: "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z", perm: "contenu.modifier" },
       { type: "link", label: "e-Services", href: "/back-office-mtdi/eservices", icon: "M13 10V3L4 14h7v7l9-11h-7z", perm: "contenu.modifier" },
       { type: "link", label: "Opportunités (Participer)", href: "/back-office-mtdi/opportunites", icon: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2v-5a2 2 0 00-2-2H5a2 2 0 00-2 2v5a2 2 0 002 2z", perm: "contenu.modifier" },
       { type: "link", label: "Liens utiles", href: "/back-office-mtdi/liens-utiles", icon: "M13.828 10.172a4 4 0 010 5.656l-4 4a4 4 0 01-5.656-5.656l1.102-1.101m5.44-5.44l1.102-1.1a4 4 0 015.656 5.656l-4 4a4 4 0 01-5.656 0", perm: "contenu.modifier" },
