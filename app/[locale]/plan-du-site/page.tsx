@@ -2,6 +2,8 @@ import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
+import { getSitemapSections } from "@/lib/sitemap";
+import { getLiensUtiles } from "@/lib/liens-utiles";
 
 const VERT = "#162233";
 
@@ -12,65 +14,14 @@ type Props = {
 export default async function PlanDuSitePage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
+  const isEn = locale === "en";
   const t = dict.plandusite;
-  const prefix = locale === "en" ? "/en" : "";
+  const prefix = isEn ? "/en" : "";
 
-  const s = t.sections;
-  const l = t.liens;
-
-  const sitemapSections = [
-    {
-      title: s.accueil,
-      links: [
-        { label: l.pageAccueil, href: `${prefix}/` },
-      ],
-    },
-    {
-      title: s.actualitesMedias,
-      links: [
-        { label: l.actualites, href: `${prefix}/actualites` },
-        { label: l.galeriePhotos, href: `${prefix}/galerie` },
-        { label: l.videotheque, href: `${prefix}/videotheque` },
-        { label: "MTDI dans les médias", href: `${prefix}/medias/mtdi-dans-les-medias` },
-      ],
-    },
-    {
-      title: s.leMinistere,
-      links: [
-        { label: l.leMinistre, href: `${prefix}/le-ministere/le-ministre` },
-        { label: l.organigramme, href: `${prefix}/le-ministere/organigramme` },
-        { label: l.directionsCentrales, href: `${prefix}/le-ministere/directions` },
-        { label: l.cabinet, href: `${prefix}/le-ministere/cabinet` },
-        { label: l.missionsAttributions, href: `${prefix}/le-ministere/missions` },
-        { label: l.structuresSousTutelle, href: `${prefix}/le-ministere/structures` },
-        { label: l.partenaires, href: `${prefix}/le-ministere/partenaires` },
-        { label: l.ecrireAuMinistre, href: `${prefix}/ecrire-au-ministre` },
-      ],
-    },
-    {
-      title: s.ressources,
-      links: [
-        { label: l.documentheque, href: `${prefix}/documentheque` },
-        { label: l.textesJuridiques, href: `${prefix}/textes-juridiques` },
-        { label: l.eServices, href: `${prefix}/e-services` },
-      ],
-    },
-    {
-      title: s.contact,
-      links: [
-        { label: l.nousContacter, href: `${prefix}/contact` },
-      ],
-    },
-    {
-      title: s.informationsLegales,
-      links: [
-        { label: l.mentionsLegales, href: `${prefix}/mentions-legales` },
-        { label: l.politiqueConfidentialite, href: `${prefix}/confidentialite` },
-        { label: l.accessibilite, href: `${prefix}/accessibilite` },
-        { label: l.planDuSite, href: `${prefix}/plan-du-site` },
-      ],
-    },
-  ];
+  const [sitemapSections, liensUtiles] = await Promise.all([
+    getSitemapSections(isEn ? "en" : "fr"),
+    getLiensUtiles(),
+  ]);
 
   return (
     <>
@@ -95,15 +46,15 @@ export default async function PlanDuSitePage({ params }: Props) {
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {sitemapSections.map((section) => (
-                <div key={section.title} className="p-8 bg-gris-perle" style={{ border: "1px solid rgba(0,0,0,0.06)" }}>
+                <div key={section.id} className="p-8 bg-gris-perle" style={{ border: "1px solid rgba(0,0,0,0.06)" }}>
                   <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: VERT }}>
                     {section.title}
                   </h2>
                   <ul className="flex flex-col gap-3">
                     {section.links.map((link) => (
-                      <li key={link.href}>
+                      <li key={link.id}>
                         <Link
-                          href={link.href}
+                          href={`${prefix}${link.href}`}
                           className="group flex items-center gap-2 text-sm font-medium text-anthracite/60 hover:text-anthracite transition-colors"
                         >
                           <svg
@@ -124,40 +75,32 @@ export default async function PlanDuSitePage({ params }: Props) {
         </section>
 
         {/* External links */}
-        <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-8" style={{ color: VERT }}>
-              {t.liensExternes}
-            </h2>
-            <div className="flex flex-wrap gap-4">
-              {[
-                { label: "Sèmè City", href: "https://semecity.bj/" },
-                { label: "ANIP", href: "https://eservices.anip.bj/" },
-                { label: "e-pme", href: "https://epme.adpme.bj/" },
-                { label: "e-services", href: "https://service-public.bj/" },
-                { label: "e-visa", href: "https://evisa.bj/" },
-                { label: "Centre de services", href: "https://cds.asin.bj/" },
-                { label: "ASIN", href: "https://asin.bj/" },
-                { label: "APDP", href: "https://service.apdp.bj/" },
-                { label: "Présidence de la République", href: "https://presidence.bj/" },
-              ].map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-white text-sm font-semibold text-anthracite/60 hover:text-anthracite transition-colors"
-                  style={{ border: "1px solid rgba(0,0,0,0.08)" }}
-                >
-                  {link.label}
-                  <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
-                  </svg>
-                </a>
-              ))}
+        {liensUtiles.length > 0 && (
+          <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
+            <div className="max-w-7xl mx-auto">
+              <h2 className="text-xs font-black uppercase tracking-widest mb-8" style={{ color: VERT }}>
+                {t.liensExternes}
+              </h2>
+              <div className="flex flex-wrap gap-4">
+                {liensUtiles.map((link) => (
+                  <a
+                    key={link.id}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-white text-sm font-semibold text-anthracite/60 hover:text-anthracite transition-colors"
+                    style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+                  >
+                    {link.label}
+                    <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
+                    </svg>
+                  </a>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
       </main>
 

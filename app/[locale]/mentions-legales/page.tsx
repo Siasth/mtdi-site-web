@@ -1,57 +1,9 @@
 import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import { getStaticPage } from "@/lib/static-pages";
 
 const VERT = "#162233";
-
-const sections = [
-  {
-    title: "1. Éditeur du site",
-    content: [
-      "Le présent site, accessible à l'adresse gouv.bj, est édité par :",
-      "Ministère de la Transformation Digitale et de l'Innovation (MTDI)\nRépublique du Bénin",
-      "Directeur de la publication : le Ministre de la Transformation Digitale et de l'Innovation.",
-    ],
-  },
-  {
-    title: "2. Hébergement",
-    content: [
-      "Le site est hébergé par :",
-      "Vercel Inc.\n340 S Lemon Ave #4133\nWalnut, CA 91789, États-Unis\nSite web : https://vercel.com — Contact : privacy@vercel.com",
-    ],
-  },
-  {
-    title: "3. Propriété intellectuelle",
-    content: [
-      "L'ensemble des contenus présents sur le site (textes, images, vidéos, logos, identité visuelle, arborescence) est la propriété du Ministère de la Transformation Digitale et de l'Innovation, sauf mention contraire. Toute reproduction, représentation, modification ou diffusion, totale ou partielle, sans autorisation préalable est interdite, à l'exception des contenus explicitement identifiés comme libres de réutilisation (open data, communiqués de presse destinés à la republication).",
-      "Les photographies et vidéos peuvent être soumises à des droits détenus par des tiers (photographes, agences) ; leur réutilisation est soumise à autorisation.",
-    ],
-  },
-  {
-    title: "4. Liens hypertextes",
-    content: [
-      "Le site peut contenir des liens vers d'autres sites publics (gouv.bj, ASIN, ANIP, Présidence, Sèmè City, service-public.bj) ou vers les réseaux sociaux du Ministère. Le Ministère n'exerce aucun contrôle sur le contenu de ces sites tiers et décline toute responsabilité quant à leur contenu.",
-    ],
-  },
-  {
-    title: "5. Disponibilité du site",
-    content: [
-      "Le Ministère s'efforce d'assurer l'accessibilité du site 24h/24 et 7j/7, sauf interruption pour maintenance, mise à jour ou cas de force majeure. Le Ministère ne saurait être tenu responsable des interruptions de service qui en résulteraient.",
-    ],
-  },
-  {
-    title: "6. Protection des données personnelles",
-    content: [
-      "Le traitement des données à caractère personnel collectées sur ce site (formulaire « Écrire au Ministre », inscription à la newsletter) est décrit dans la Politique de confidentialité, conformément à la Loi n° 2017-20 du 20 avril 2018 portant Code du numérique (Livre 5, relatif à la protection des données à caractère personnel et de la vie privée) et sous le contrôle de l'Autorité de Protection des Données Personnelles (APDP) — apdp.bj.",
-    ],
-  },
-  {
-    title: "7. Droit applicable",
-    content: [
-      "Les présentes mentions légales sont soumises au droit béninois. Tout litige relatif à l'utilisation du site relève de la compétence des juridictions béninoises.",
-    ],
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -60,7 +12,9 @@ type Props = {
 export default async function MentionsLegalesPage({ params }: Props) {
   const { locale } = await params;
   const dict = await getDictionary(locale as Locale);
+  const isEn = locale === "en";
   const t = dict.mentions;
+  const page = await getStaticPage("mentions-legales", isEn ? "en" : "fr");
 
   return (
     <>
@@ -77,31 +31,30 @@ export default async function MentionsLegalesPage({ params }: Props) {
           </div>
         </section>
 
-        {/* Sections */}
-        <ol className="list-none" role="list">
-          {sections.map((section, i) => (
-            <li key={section.title}>
-              <section
-                className={`px-4 sm:px-6 lg:px-8 py-16 ${i % 2 === 0 ? "bg-white" : "bg-gris-perle"}`}
-              >
-                <div className="max-w-4xl mx-auto">
-                  <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: VERT }}>
-                    {section.title}
-                  </h2>
-                  <div className="flex flex-col gap-4">
-                    {section.content.map((paragraph, j) => (
-                      <p key={j} className="text-anthracite/70 text-sm font-medium leading-relaxed whitespace-pre-line">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            </li>
-          ))}
-        </ol>
+        {/* Contenu */}
+        <section className="px-4 sm:px-6 lg:px-8 py-16 bg-white">
+          <div className="max-w-4xl mx-auto">
+            {page && page.published ? (
+              <div className="prose-legal text-anthracite/70 text-sm font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: page.content }} />
+            ) : (
+              <p className="text-anthracite/60 text-sm font-medium">
+                {isEn ? "This page is not currently available." : "Cette page n'est pas disponible pour le moment."}
+              </p>
+            )}
+          </div>
+        </section>
 
       </main>
+
+      <style>{`
+        .prose-legal h2 { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: ${VERT}; margin: 2em 0 0.9em; }
+        .prose-legal h2:first-child { margin-top: 0; }
+        .prose-legal p { margin: 0 0 0.9em; }
+        .prose-legal p:last-child { margin-bottom: 0; }
+        .prose-legal ul { list-style: disc; padding-left: 1.4em; margin: 0.7em 0; }
+        .prose-legal a { color: ${VERT}; text-decoration: underline; }
+        .prose-legal strong { font-weight: 900; }
+      `}</style>
 
       <Footer locale={locale} dict={dict.footer} />
     </>
