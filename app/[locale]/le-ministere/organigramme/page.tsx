@@ -12,7 +12,7 @@ const JAUNE = "#FFBE00";
 const BOX_MINISTER = "#006828";
 const BOX_BLUE = "#0369a1";
 const BOX_ORANGE = "#ea8c00";
-const BOX_GREEN = "#4d7a09";
+const BOX_GREEN = "#0D9488"; // teal distinct du vert officiel gouvernemental (#006828, réservé au Ministre)
 const BOX_WHITE = "white";
 
 function Box({ label, sub, bg, text = "white", border, wide }: { label: string; sub?: string; bg: string; text?: string; border?: string; wide?: boolean }) {
@@ -83,7 +83,7 @@ export default async function OrganigrammePage({ params }: Props) {
         <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle overflow-x-auto">
           <div className="max-w-5xl mx-auto mb-6 flex justify-end">
             <OrganigrammeDownloadButton
-              label={isEn ? "Download (PDF, A4)" : "Télécharger (PDF, A4)"}
+              label={isEn ? "Download" : "Télécharger"}
               filename="organigramme-mtdi.pdf"
             />
           </div>
@@ -94,7 +94,7 @@ export default async function OrganigrammePage({ params }: Props) {
               { color: "#006828", label: "Ministre" },
               { color: "#0369a1", label: "Secrétariat Général & directions" },
               { color: "#ea8c00", label: "Cabinet & rattachements directs" },
-              { color: "#4d7a09", label: "Organismes sous tutelle" },
+              { color: BOX_GREEN, label: "Organismes sous tutelle" },
               { color: "white", label: "Services administratifs", border: "1px solid rgba(0,0,0,0.15)" },
             ].map((item) => (
               <span key={item.label} className="flex items-center gap-1.5">
@@ -145,8 +145,8 @@ export default async function OrganigrammePage({ params }: Props) {
                     <Box label="Assistant DC" bg={BOX_ORANGE} text="#1a1a1a" />
                     <Box label="Secrétariat du Cabinet" bg={BOX_ORANGE} text="#1a1a1a" />
                     <Box label="Point Focal Communication" bg={BOX_ORANGE} text="#1a1a1a" />
+                    <Box label="Conseillers Techniques" bg={BOX_ORANGE} text="#1a1a1a" />
                   </div>
-                  <Box label="Conseillers Techniques" bg={BOX_ORANGE} text="#1a1a1a" />
                 </div>
               </div>
 
