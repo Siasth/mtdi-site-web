@@ -18,7 +18,7 @@ export default function OrganigrammeDownloadButton({ label, filename }: { label:
     setError("");
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
+        import("html2canvas-pro"),
         import("jspdf"),
       ]);
 

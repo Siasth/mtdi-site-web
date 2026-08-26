@@ -81,12 +81,7 @@ export default async function OrganigrammePage({ params }: Props) {
 
         {/* Organigramme */}
         <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gris-perle overflow-x-auto">
-          <div className="max-w-5xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <p className="text-xs text-anthracite/50 font-medium max-w-md">
-              {isEn
-                ? "Boxes are generated automatically from Central Directorates and Supervised Agencies."
-                : "Les blocs sont générés automatiquement à partir des Directions centrales et Organismes sous tutelle."}
-            </p>
+          <div className="max-w-5xl mx-auto mb-6 flex justify-end">
             <OrganigrammeDownloadButton
               label={isEn ? "Download (PDF, A4)" : "Télécharger (PDF, A4)"}
               filename="organigramme-mtdi.pdf"
@@ -97,7 +92,7 @@ export default async function OrganigrammePage({ params }: Props) {
             <span className="text-xs font-black uppercase tracking-widest text-anthracite/70 mr-2">{t.legende}</span>
             {[
               { color: "#006828", label: "Ministre" },
-              { color: "#0369a1", label: "Secrétariat Général & services" },
+              { color: "#0369a1", label: "Secrétariat Général & directions" },
               { color: "#ea8c00", label: "Cabinet & rattachements directs" },
               { color: "#4d7a09", label: "Organismes sous tutelle" },
               { color: "white", label: "Services administratifs", border: "1px solid rgba(0,0,0,0.15)" },
