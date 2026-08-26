@@ -32,7 +32,12 @@ export default function AdminDocuments() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     const isNew = editing === "new";
-    await fetch(isNew ? "/api/admin/documents" : `/api/admin/documents/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    const res = await fetch(isNew ? "/api/admin/documents" : `/api/admin/documents/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    const data = await res.json().catch(() => null);
+    // ── Diagnostic temporaire ── à retirer une fois le bug résolu.
+    if (!isNew && data) {
+      alert(`DIAGNOSTIC\n\nLien envoyé au serveur :\n${data.debugHrefReceived}\n\nLien relu en base juste après :\n${data.debugHrefStored}\n\n${data.debugHrefReceived === data.debugHrefStored ? "✓ Identiques — la base a bien été mise à jour." : "✗ DIFFÉRENTS — la base n'a PAS été mise à jour avec le nouveau lien."}`);
+    }
     setEditing(null); load();
   }
   async function handleDelete(d: Doc) { if (confirm(`Supprimer "${d.title_fr}" ?`)) { await fetch(`/api/admin/documents/${d.id}`, { method: "DELETE" }); load(); } }
