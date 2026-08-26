@@ -26,7 +26,15 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         return {
           allowedContentTypes: [
-            "image/*",
+            // Formats matriciels explicites (pas de wildcard "image/*") :
+            // exclut volontairement image/svg+xml, qui peut contenir du
+            // JavaScript exécutable si le fichier est ouvert directement
+            // dans un navigateur — un vecteur XSS classique via upload.
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/avif",
             "video/*",
             "application/pdf",
             "application/msword",

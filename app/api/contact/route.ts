@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
+import { escapeHtml, sanitizeHeaderValue } from "@/lib/html-escape";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -47,9 +48,9 @@ export async function POST(req: NextRequest) {
       from:    process.env.SMTP_FROM ?? process.env.SMTP_USER,
       to:      "mtdi.contact@gouv.bj",
       replyTo: email,
-      subject: `[Contact MTDI] ${subject}`,
+      subject: `[Contact MTDI] ${sanitizeHeaderValue(subject)}`,
       text:    `De : ${name} <${email}>\n\n${message}`,
-      html:    `<p><strong>De :</strong> ${name} &lt;${email}&gt;</p><hr/><p>${message.replace(/\n/g, "<br>")}</p>`,
+      html:    `<p><strong>De :</strong> ${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;</p><hr/><p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
     });
   } catch (err) {
     console.error("[contact] Envoi email échoué :", err);

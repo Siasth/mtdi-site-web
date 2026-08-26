@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { getGeneralSettings } from "@/lib/general-settings";
 import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
+import { escapeHtml, sanitizeHeaderValue } from "@/lib/html-escape";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -58,9 +59,9 @@ export async function POST(req: NextRequest) {
       from:        process.env.SMTP_FROM ?? process.env.SMTP_USER,
       to:          general.ministreEmail,
       replyTo:     email,
-      subject:     `[Écrire au Ministre] ${subject}`,
+      subject:     `[Écrire au Ministre] ${sanitizeHeaderValue(subject)}`,
       text:        `De : ${name} <${email}>\n\n${message}`,
-      html:        `<p><strong>De :</strong> ${name} &lt;${email}&gt;</p><hr/><p>${message.replace(/\n/g, "<br>")}</p>`,
+      html:        `<p><strong>De :</strong> ${escapeHtml(name)} &lt;${escapeHtml(email)}&gt;</p><hr/><p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
       attachments,
     });
   } catch (err) {
