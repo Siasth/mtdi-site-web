@@ -43,7 +43,7 @@ export default function AdminDocuments() {
     setUploadError("");
     setUploadedFileName("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form.href);
       const ext = file.name.split(".").pop()?.toUpperCase() || "PDF";
       setForm((f) => ({ ...f, href: url, type: ext }));
       setUploadedFileName(file.name);

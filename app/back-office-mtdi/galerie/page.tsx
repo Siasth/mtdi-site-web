@@ -98,7 +98,7 @@ export default function AdminGalerie() {
     setUploading(true);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, itemForm[field] as string);
       setItemForm((f) => ({ ...f, [field]: url }));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");

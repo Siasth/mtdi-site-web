@@ -50,7 +50,7 @@ export default function AdminStructures() {
     setUploading(true);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form.logoSrc);
       setForm({ ...form, logoSrc: url });
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");

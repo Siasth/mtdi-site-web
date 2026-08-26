@@ -5,16 +5,35 @@ import { upload } from "@vercel/blob/client";
 // Upload direct navigateur → Vercel Blob (contourne la limite de 4,5 Mo des
 // fonctions serverless Vercel). À utiliser partout dans le back-office où un
 // fichier est envoyé (images, vidéos, PDF...).
-export async function uploadFile(file: File): Promise<{ url: string; name: string }> {
+//
+// previousUrl (optionnel) : URL du fichier remplacé par ce nouvel upload —
+// si fournie, son nettoyage est déclenché en tâche de fond après le succès
+// de l'upload, pour éviter d'accumuler des fichiers orphelins dans le
+// stockage. Ce nettoyage est best-effort : un échec ne fait jamais échouer
+// l'upload principal ni la sauvegarde du formulaire.
+export async function uploadFile(file: File, previousUrl?: string): Promise<{ url: string; name: string }> {
   try {
     const blob = await upload(file.name, file, {
       access: "public",
       handleUploadUrl: "/api/admin/upload",
     });
+    if (previousUrl && previousUrl !== blob.url) {
+      cleanupOldFile(previousUrl);
+    }
     return { url: blob.url, name: file.name };
   } catch (err) {
     throw new Error(friendlyUploadError(err));
   }
+}
+
+export function cleanupOldFile(url: string) {
+  fetch("/api/admin/upload/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  }).catch(() => {
+    // Silencieux : un fichier orphelin de plus n'est pas critique.
+  });
 }
 
 // Traduit les messages techniques de Vercel Blob / réseau en phrases

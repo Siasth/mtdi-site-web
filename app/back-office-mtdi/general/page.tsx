@@ -53,7 +53,7 @@ export default function AdminGeneral() {
     setUploadingField(field);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form[field] as string);
       setForm({ ...form, [field]: url });
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { cleanupOldFile } from "@/lib/client-upload";
 import { uploadFile } from "@/lib/client-upload";
 
 const VERT = "#006828";
@@ -136,7 +137,7 @@ export default function AdminActualites() {
     setUploading(true);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form.image ?? undefined);
       setForm((f) => ({ ...f, image: url }));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
@@ -173,7 +174,11 @@ export default function AdminActualites() {
     setLinkUrl("");
   }
   function removeAttachment(i: number) {
-    setForm((f) => ({ ...f, attachments: f.attachments.filter((_, idx) => idx !== i) }));
+    setForm((f) => {
+      const removed = f.attachments[i];
+      if (removed?.kind === "file" && removed.url) cleanupOldFile(removed.url);
+      return { ...f, attachments: f.attachments.filter((_, idx) => idx !== i) };
+    });
   }
 
   const [saveError, setSaveError] = useState("");

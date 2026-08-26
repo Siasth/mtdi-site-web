@@ -99,7 +99,7 @@ export default function AdminChantiers() {
     setUploading(field);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form[field] as string);
       setForm((f) => ({ ...f, [field]: url }));
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");

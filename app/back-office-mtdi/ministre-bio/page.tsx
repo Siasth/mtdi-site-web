@@ -54,7 +54,7 @@ export default function AdminMinistreBio() {
     setUploading(true);
     setUploadError("");
     try {
-      const { url } = await uploadFile(file);
+      const { url } = await uploadFile(file, form.photo);
       setForm({ ...form, photo: url });
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
