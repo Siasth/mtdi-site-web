@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -9,6 +10,17 @@ export async function POST(req: NextRequest) {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
+  }
+
+  // Pot de miel : un champ invisible pour un humain, souvent rempli par un
+  // bot. On répond succès sans rien envoyer, pour ne pas l'éduquer.
+  if (isHoneypotTriggered(body.website)) {
+    return NextResponse.json({ success: true });
+  }
+
+  const { allowed } = await checkRateLimit("contact", req);
+  if (!allowed) {
+    return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
   }
 
   const name    = body.name?.trim()    ?? "";

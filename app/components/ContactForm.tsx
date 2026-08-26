@@ -86,6 +86,7 @@ export default function ContactForm({ dict }: { dict: Dict }) {
       email:   (form.elements.namedItem("email")   as HTMLInputElement).value.trim(),
       subject: (form.elements.namedItem("subject") as HTMLInputElement).value.trim(),
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value.trim(),
+      website: (form.elements.namedItem("website") as HTMLInputElement | null)?.value ?? "",
     };
 
     if (!data.name || !data.email || !data.subject || !data.message) {
@@ -153,6 +154,12 @@ export default function ContactForm({ dict }: { dict: Dict }) {
         {t.nousEcrire}
       </h2>
       <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+        {/* Pot de miel anti-spam : invisible pour un humain, souvent
+            rempli par un bot. Ne jamais retirer aria-hidden/tabIndex=-1. */}
+        <div style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
+          <label htmlFor="contact-website">Site web</label>
+          <input type="text" id="contact-website" name="website" tabIndex={-1} autoComplete="off" />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
             <label htmlFor="contact-name" className="text-[10px] font-black uppercase tracking-widest text-anthracite">

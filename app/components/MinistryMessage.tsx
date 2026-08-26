@@ -28,7 +28,7 @@ export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: 
             >
               <Image
                 src={m.photo}
-                alt=""
+                alt={m.name}
                 fill
                 className="object-cover object-top"
                 sizes="(max-width: 1024px) 100vw, 50vw"

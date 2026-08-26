@@ -1715,6 +1715,23 @@ export async function POST(req: NextRequest) {
       ON CONFLICT (key) DO NOTHING
     `;
 
+    // ══════════════════════════════════════════════════════════════════
+    // Anti-spam : limitation de fréquence par formulaire public + IP
+    // (hachée, jamais stockée en clair).
+    // ══════════════════════════════════════════════════════════════════
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS form_submissions (
+        id SERIAL PRIMARY KEY,
+        form_type TEXT NOT NULL,
+        ip_hash TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `);
+    await sql.query(`
+      CREATE INDEX IF NOT EXISTS idx_form_submissions_lookup
+      ON form_submissions(form_type, ip_hash, created_at)
+    `);
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

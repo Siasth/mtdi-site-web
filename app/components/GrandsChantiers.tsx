@@ -73,7 +73,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                 ) : (
                   <Image
                     src={c.image}
-                    alt=""
+                    alt={c.title}
                     fill
                     className="object-cover"
                     style={{ objectPosition: c.objectPosition }}

@@ -54,7 +54,7 @@ export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict
               style={{ aspectRatio: i === 0 ? "1/1" : "1/1" }}
             >
               {item.image ? (
-                <Image src={item.image} alt="" fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 25vw" />
+                <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 25vw" />
               ) : (
                 <div className="absolute inset-0" style={{ background: "#162233" }} />
               )}

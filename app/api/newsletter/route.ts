@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readData, writeData, nextId } from "../../../lib/data";
+import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -12,6 +13,15 @@ export async function POST(req: NextRequest) {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
+  }
+
+  if (isHoneypotTriggered(body.website)) {
+    return NextResponse.json({ success: true });
+  }
+
+  const { allowed } = await checkRateLimit("newsletter", req);
+  if (!allowed) {
+    return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
   }
 
   const name      = String(body.name      ?? "").trim();

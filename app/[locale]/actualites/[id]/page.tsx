@@ -64,7 +64,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
             <div>
               {article.image && (
                 <div className="relative h-64 sm:h-96 overflow-hidden rounded-sm mb-8">
-                  <Image src={article.image} alt="" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 900px" priority />
+                  <Image src={article.image} alt={article.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 900px" priority />
                 </div>
               )}
 
@@ -148,7 +148,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
                     >
                       <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded">
                         {r.image ? (
-                          <Image src={r.image} alt="" fill className="object-cover" sizes="80px" />
+                          <Image src={r.image} alt={r.title} fill className="object-cover" sizes="80px" />
                         ) : (
                           <div className="absolute inset-0" style={{ background: BANNER }} />
                         )}

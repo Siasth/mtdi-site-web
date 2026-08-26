@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { getGeneralSettings } from "@/lib/general-settings";
+import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
@@ -10,6 +11,15 @@ export async function POST(req: NextRequest) {
     formData = await req.formData();
   } catch {
     return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
+  }
+
+  if (isHoneypotTriggered(formData.get("website"))) {
+    return NextResponse.json({ success: true });
+  }
+
+  const { allowed } = await checkRateLimit("ecrire-au-ministre", req);
+  if (!allowed) {
+    return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
   }
 
   const name    = (formData.get("name")    as string | null)?.trim() ?? "";

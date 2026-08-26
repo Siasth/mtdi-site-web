@@ -46,6 +46,7 @@ export default function NewsletterForm({ dict }: { dict: Dict }) {
     const form = e.currentTarget;
     const name  = (form.elements.namedItem("name")  as HTMLInputElement).value.trim();
     const email = (form.elements.namedItem("email") as HTMLInputElement).value.trim();
+    const website = (form.elements.namedItem("website") as HTMLInputElement | null)?.value ?? "";
 
     if (!name || !email) {
       setErrMsg(t.erreurInscription);
@@ -63,7 +64,7 @@ export default function NewsletterForm({ dict }: { dict: Dict }) {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, interests: checkedInterests }),
+        body: JSON.stringify({ name, email, interests: checkedInterests, website }),
       });
       if (res.ok) {
         setStatus("success");
@@ -114,6 +115,10 @@ export default function NewsletterForm({ dict }: { dict: Dict }) {
         {t.sinscrire}
       </h2>
       <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+        <div style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
+          <label htmlFor="newsletter-website">Site web</label>
+          <input type="text" id="newsletter-website" name="website" tabIndex={-1} autoComplete="off" />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
             <label htmlFor="nl-name" className="text-[10px] font-black uppercase tracking-widest text-anthracite/70">

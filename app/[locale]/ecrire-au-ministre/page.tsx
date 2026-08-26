@@ -111,6 +111,10 @@ export default function EcrireAuMinistrePage() {
                 </div>
               ) : (
                 <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+                  <div style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }} aria-hidden="true">
+                    <label htmlFor="minister-website">Site web</label>
+                    <input type="text" id="minister-website" name="website" tabIndex={-1} autoComplete="off" />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label htmlFor="minister-name" className="block text-xs font-black uppercase tracking-widest text-anthracite mb-2">

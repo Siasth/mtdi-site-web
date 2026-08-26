@@ -178,7 +178,7 @@ export default function GalerieListClient({
                     >
                       <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16 / 10" }}>
                         {item.image ? (
-                          <Image src={item.image} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+                          <Image src={item.image} alt={item.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                         ) : (
                           <div className="absolute inset-0" style={{ background: "#162233" }} />
                         )}
