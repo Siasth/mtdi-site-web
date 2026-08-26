@@ -7,8 +7,8 @@ import { uploadFile } from "@/lib/client-upload";
 const VERT = "#006828";
 const CATEGORIES = ["rapport", "guide", "juridique", "stratégie"];
 
-type Doc = { id: number; title_fr: string; title_en: string | null; category: string; date_label: string | null; description_fr: string | null; description_en: string | null; href: string; featured: boolean; display_order: number; active: boolean; deleted_at: string | null };
-const emptyForm = { titleFr: "", titleEn: "", category: "rapport", date: "", descriptionFr: "", descriptionEn: "", href: "", featured: false, displayOrder: 0, active: true };
+type Doc = { id: number; title_fr: string; title_en: string | null; category: string; type: string; date_label: string | null; description_fr: string | null; description_en: string | null; href: string; featured: boolean; display_order: number; active: boolean; deleted_at: string | null };
+const emptyForm = { titleFr: "", titleEn: "", category: "rapport", type: "PDF", date: "", descriptionFr: "", descriptionEn: "", href: "", featured: false, displayOrder: 0, active: true };
 
 export default function AdminDocuments() {
   const canManage = useHasPermission("contenu.modifier");
@@ -18,13 +18,14 @@ export default function AdminDocuments() {
   const [form, setForm] = useState(emptyForm);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   function load() { setLoading(true); fetch("/api/admin/documents").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setEditing("new"); }
   function openEdit(d: Doc) {
-    setForm({ titleFr: d.title_fr, titleEn: d.title_en || "", category: d.category, date: d.date_label || "", descriptionFr: d.description_fr || "", descriptionEn: d.description_en || "", href: d.href, featured: d.featured, displayOrder: d.display_order, active: d.active });
+    setForm({ titleFr: d.title_fr, titleEn: d.title_en || "", category: d.category, type: d.type || "PDF", date: d.date_label || "", descriptionFr: d.description_fr || "", descriptionEn: d.description_en || "", href: d.href, featured: d.featured, displayOrder: d.display_order, active: d.active });
     setActiveLang("fr"); setEditing(d.id);
   }
   async function handleSave(e: React.FormEvent) {
@@ -38,7 +39,17 @@ export default function AdminDocuments() {
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true);
-    try { const { url } = await uploadFile(file); setForm((f) => ({ ...f, href: url })); } finally { setUploading(false); e.target.value = ""; }
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      const ext = file.name.split(".").pop()?.toUpperCase() || "PDF";
+      setForm((f) => ({ ...f, href: url, type: ext }));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   }
 
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
@@ -92,6 +103,7 @@ export default function AdminDocuments() {
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier / lien *</label>
               <input required value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
+              {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Mis en avant</label>

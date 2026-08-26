@@ -17,11 +17,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ ok: true });
   }
   if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
-  const { titleFr, titleEn, category, date, descriptionFr, descriptionEn, href, featured, displayOrder, active } = body;
+  const { titleFr, titleEn, category, type, date, descriptionFr, descriptionEn, href, featured, displayOrder, active } = body;
   await sql`
     UPDATE documents SET
       title_fr = COALESCE(${titleFr}, title_fr), title_en = ${titleEn ?? null},
-      category = COALESCE(${category}, category), date_label = ${date ?? null},
+      category = COALESCE(${category}, category), type = COALESCE(${type}, type), date_label = ${date ?? null},
       description_fr = ${descriptionFr ?? null}, description_en = ${descriptionEn ?? null},
       href = COALESCE(${href}, href), featured = COALESCE(${featured}, featured),
       display_order = COALESCE(${displayOrder}, display_order), active = COALESCE(${active}, active)

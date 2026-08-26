@@ -936,6 +936,7 @@ export async function POST(req: NextRequest) {
         id SERIAL PRIMARY KEY,
         title_fr TEXT NOT NULL, title_en TEXT,
         category TEXT NOT NULL DEFAULT 'rapport',
+        type TEXT NOT NULL DEFAULT 'PDF', -- dérivé de l'extension du fichier à l'upload
         date_label TEXT,
         description_fr TEXT, description_en TEXT,
         href TEXT NOT NULL,
@@ -946,6 +947,15 @@ export async function POST(req: NextRequest) {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         deleted_at TIMESTAMPTZ
       )
+    `);
+    // Colonne "type" ajoutée après coup : idempotent pour les bases déjà migrées.
+    await sql.query(`ALTER TABLE documents ADD COLUMN IF NOT EXISTS type TEXT NOT NULL DEFAULT 'PDF'`);
+    // Rétro-remplit le type réel depuis l'extension de l'URL pour les
+    // documents déjà en base (tous étaient jusqu'ici affichés "PDF" en dur,
+    // qu'ils le soient réellement ou non).
+    await sql.query(`
+      UPDATE documents SET type = UPPER(SUBSTRING(href FROM '\\.([a-zA-Z0-9]+)(\\?.*)?$'))
+      WHERE href ~ '\\.[a-zA-Z0-9]+(\\?.*)?$'
     `);
     const documentsCount = await sql`SELECT COUNT(*) AS count FROM documents`;
     if (Number(documentsCount.rows[0].count) === 0) {

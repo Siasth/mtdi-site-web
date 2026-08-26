@@ -54,7 +54,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
               {featured.map((doc) => (
                 <div key={doc.id} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors flex flex-col">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: ROUGE }}>PDF</span>
+                    <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: ROUGE }}>{doc.type}</span>
                     <span className="text-xs font-bold text-anthracite/65">{doc.date}</span>
                   </div>
                   <h3 className="text-anthracite font-black text-lg uppercase leading-snug mb-4">{doc.title}</h3>
@@ -79,7 +79,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
               {visibleOthers.map((doc, i) => (
                 <div key={doc.id} className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 py-7" style={{ borderBottom: i < visibleOthers.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}>
                   <div className="flex-shrink-0 flex items-center gap-3 sm:w-40">
-                    <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: ROUGE }}>PDF</span>
+                    <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: ROUGE }}>{doc.type}</span>
                     <span className="text-xs font-bold text-anthracite/65 tabular-nums">{doc.date}</span>
                   </div>
                   <div className="flex-1 min-w-0">

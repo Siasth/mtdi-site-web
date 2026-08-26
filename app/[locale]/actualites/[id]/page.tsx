@@ -144,7 +144,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
                       href={r.hrefExternal || `${prefix}/actualites/${r.id}`}
                       target={r.hrefExternal ? "_blank" : undefined}
                       className="flex gap-3 group py-4 first:pt-0 last:pb-0"
-                      style={{ borderBottom: i < related.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
+                      style={{ borderTop: i > 0 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
                     >
                       <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded">
                         {r.image ? (

@@ -30,6 +30,7 @@ export default function AdminPartenaires() {
   const [form, setForm] = useState(emptyForm);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   function load() { setLoading(true); fetch("/api/admin/partners").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
@@ -50,7 +51,16 @@ export default function AdminPartenaires() {
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true);
-    try { const { url } = await uploadFile(file); setForm({ ...form, logoSrc: url }); } finally { setUploading(false); e.target.value = ""; }
+    setUploadError("");
+    try {
+      const { url } = await uploadFile(file);
+      setForm({ ...form, logoSrc: url });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   }
 
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
@@ -96,6 +106,7 @@ export default function AdminPartenaires() {
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Logo (optionnel)</label>
               {form.logoSrc && <img src={form.logoSrc} alt="" className="h-8 mb-2 object-contain" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Choisir un logo"}<input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleLogoUpload} /></label>
+              {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             {activeLang === "fr" ? (
               <>

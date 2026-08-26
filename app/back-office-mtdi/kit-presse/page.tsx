@@ -15,6 +15,7 @@ export default function AdminKitPresse() {
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   function load() { setLoading(true); fetch("/api/admin/kit-presse").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
@@ -32,11 +33,17 @@ export default function AdminKitPresse() {
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true);
+    setUploadError("");
     try {
       const { url } = await uploadFile(file);
       const ext = file.name.split(".").pop()?.toUpperCase() || "PDF";
       setForm((f) => ({ ...f, href: url, type: ext }));
-    } finally { setUploading(false); e.target.value = ""; }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   }
 
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
@@ -69,6 +76,7 @@ export default function AdminKitPresse() {
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier *</label>
               {form.href && <p className="text-xs text-gray-500 mb-2 truncate">{form.href}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
+              {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
