@@ -2,6 +2,8 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
+import { getDirections } from "@/lib/directions";
+import { getStructures } from "@/lib/structures";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
@@ -12,9 +14,9 @@ const BOX_ORANGE = "#ea8c00";
 const BOX_GREEN = "#4d7a09";
 const BOX_WHITE = "white";
 
-function Box({ label, sub, bg, text = "white", border }: { label: string; sub?: string; bg: string; text?: string; border?: string }) {
+function Box({ label, sub, bg, text = "white", border, wide }: { label: string; sub?: string; bg: string; text?: string; border?: string; wide?: boolean }) {
   return (
-    <div className="px-4 py-3 text-center" style={{ background: bg, color: text, border: border || "none" }}>
+    <div className={`px-4 py-3 text-center ${wide ? "w-40 sm:w-44" : ""}`} style={{ background: bg, color: text, border: border || "none" }}>
       <p className="text-[11px] font-bold leading-tight">{label}</p>
       {sub && <p className="text-[9px] mt-0.5 opacity-70">{sub}</p>}
     </div>
@@ -46,6 +48,17 @@ export default async function OrganigrammePage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.ministere.organigramme;
   const prefix = locale === "en" ? "/en" : "";
+  const isEn = locale === "en";
+
+  const [directions, structures] = await Promise.all([
+    getDirections(isEn ? "en" : "fr"),
+    getStructures(isEn ? "en" : "fr"),
+  ]);
+  // Regroupement automatique : tout ce qui n'est pas explicitement "Direction
+  // centrale" tombe dans "Directions techniques" — garde-fou pour ne jamais
+  // faire disparaître silencieusement une direction du schéma.
+  const directionsCentrales = directions.filter((d) => d.type === "Direction centrale" || d.type === "Central Directorate");
+  const directionsTechniques = directions.filter((d) => !(d.type === "Direction centrale" || d.type === "Central Directorate"));
 
   return (
     <>
@@ -125,7 +138,6 @@ export default async function OrganigrammePage({ params }: Props) {
                     <Box label="Assistant DC" bg={BOX_ORANGE} text="#1a1a1a" />
                     <Box label="Secrétariat du Cabinet" bg={BOX_ORANGE} text="#1a1a1a" />
                     <Box label="Point Focal Communication" bg={BOX_ORANGE} text="#1a1a1a" />
-                    <Box label="Directeur Adjoint du Cabinet" bg={BOX_ORANGE} text="#1a1a1a" />
                   </div>
                   <Box label="Conseillers Techniques" bg={BOX_ORANGE} text="#1a1a1a" />
                 </div>
@@ -142,7 +154,6 @@ export default async function OrganigrammePage({ params }: Props) {
                     <Box label="CMMR" bg={BOX_BLUE} />
                     <Box label="CTPR" bg={BOX_BLUE} />
                   </div>
-                  <Box label="Secrétaire Général Adjoint" bg={BOX_BLUE} />
                   <div className="grid grid-cols-1 gap-2 w-full">
                     <Box label="Secrétariat Administratif" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
                     <Box label="Cellule Juridique" bg={BOX_WHITE} text="#1a1a1a" border="1px solid rgba(0,0,0,0.12)" />
@@ -154,29 +165,43 @@ export default async function OrganigrammePage({ params }: Props) {
             </div>
 
             {/* === DIRECTIONS CENTRALES === */}
-            <Connector height={32} />
-            <SectionLabel>Directions centrales</SectionLabel>
-            <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
-              <Box label="Direction de la Programmation, de l'Administration et des Finances" sub="DPAF" bg={BOX_BLUE} />
-              <Box label="Direction des Systèmes d'Information" sub="DSI" bg={BOX_BLUE} />
-            </div>
+            {directionsCentrales.length > 0 && (
+              <>
+                <Connector height={32} />
+                <SectionLabel>Directions centrales</SectionLabel>
+                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                  {directionsCentrales.map((d) => (
+                    <Box key={d.id} label={d.name} sub={d.acronym} bg={BOX_BLUE} wide />
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* === DIRECTIONS TECHNIQUES === */}
-            <Connector height={32} />
-            <SectionLabel>Directions techniques</SectionLabel>
-            <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
-              <Box label="Direction du Numérique" sub="DN" bg={BOX_BLUE} />
-              <Box label="Direction de la Digitalisation" sub="DD" bg={BOX_BLUE} />
-              <Box label="Direction des Médias" sub="DM" bg={BOX_BLUE} />
-            </div>
+            {directionsTechniques.length > 0 && (
+              <>
+                <Connector height={32} />
+                <SectionLabel>Directions techniques</SectionLabel>
+                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                  {directionsTechniques.map((d) => (
+                    <Box key={d.id} label={d.name} sub={d.acronym} bg={BOX_BLUE} wide />
+                  ))}
+                </div>
+              </>
+            )}
 
             {/* === ORGANISMES SOUS TUTELLE === */}
-            <Connector height={32} />
-            <SectionLabel>Organismes sous tutelle</SectionLabel>
-            <div className="grid grid-cols-2 gap-3 max-w-xl mx-auto">
-              <Box label="Société Béninoise d'Infrastructures Numériques" sub="SBIN" bg={BOX_GREEN} />
-              <Box label="Agence des Systèmes d'Information et du Numérique" sub="ASIN" bg={BOX_GREEN} />
-            </div>
+            {structures.length > 0 && (
+              <>
+                <Connector height={32} />
+                <SectionLabel>Organismes sous tutelle</SectionLabel>
+                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                  {structures.map((s) => (
+                    <Box key={s.id} label={s.name} sub={s.acronym} bg={BOX_GREEN} wide />
+                  ))}
+                </div>
+              </>
+            )}
 
           </div>
         </section>

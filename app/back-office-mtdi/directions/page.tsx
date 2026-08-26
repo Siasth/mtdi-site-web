@@ -79,14 +79,14 @@ export default function AdminDirections() {
             </div>
             {activeLang === "fr" ? (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type</label><input value={form.typeFr} onChange={(e) => setForm({ ...form, typeFr: e.target.value })} placeholder="Direction centrale / technique" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type</label><select value={form.typeFr} onChange={(e) => setForm({ ...form, typeFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"><option value="Direction centrale">Direction centrale</option><option value="Direction technique">Direction technique</option></select></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Nom (FR) *</label><input required value={form.nameFr} onChange={(e) => setForm({ ...form, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Directeur (optionnel)</label><input value={form.director} onChange={(e) => setForm({ ...form, director: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
               </>
             ) : (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type (EN)</label><input value={form.typeEn} onChange={(e) => setForm({ ...form, typeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type (EN)</label><select value={form.typeEn} onChange={(e) => setForm({ ...form, typeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"><option value="Central Directorate">Central Directorate</option><option value="Technical Directorate">Technical Directorate</option></select></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Name (EN)</label><input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
               </>
