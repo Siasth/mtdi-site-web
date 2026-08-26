@@ -181,7 +181,7 @@ export default async function OrganigrammePage({ params }: Props) {
               <>
                 <Connector height={32} />
                 <SectionLabel>Directions centrales</SectionLabel>
-                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                <div className={`flex justify-center gap-3 mx-auto ${directionsCentrales.length > 4 ? "flex-wrap max-w-3xl" : "flex-nowrap"}`}>
                   {directionsCentrales.map((d) => (
                     <Box key={d.id} label={d.name} sub={d.acronym} bg={BOX_BLUE} wide />
                   ))}
@@ -194,7 +194,7 @@ export default async function OrganigrammePage({ params }: Props) {
               <>
                 <Connector height={32} />
                 <SectionLabel>Directions techniques</SectionLabel>
-                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                <div className={`flex justify-center gap-3 mx-auto ${directionsTechniques.length > 4 ? "flex-wrap max-w-3xl" : "flex-nowrap"}`}>
                   {directionsTechniques.map((d) => (
                     <Box key={d.id} label={d.name} sub={d.acronym} bg={BOX_BLUE} wide />
                   ))}
@@ -207,7 +207,7 @@ export default async function OrganigrammePage({ params }: Props) {
               <>
                 <Connector height={32} />
                 <SectionLabel>Organismes sous tutelle</SectionLabel>
-                <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                <div className={`flex justify-center gap-3 mx-auto ${structures.length > 4 ? "flex-wrap max-w-3xl" : "flex-nowrap"}`}>
                   {structures.map((s) => (
                     <Box key={s.id} label={s.name} sub={s.acronym} bg={BOX_GREEN} wide />
                   ))}
