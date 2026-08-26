@@ -1702,6 +1702,19 @@ export async function POST(req: NextRequest) {
     }
 
 
+    // Texte affiché sous les Chiffres clés (accueil) — reprend exactement
+    // le texte déjà en ligne, désormais éditable depuis le back-office.
+    await sql`
+      INSERT INTO settings (key, value)
+      VALUES ('stats_meta', ${JSON.stringify({
+        dateLabelFr: "Données au 1ᵉʳ juillet 2026",
+        dateLabelEn: "Data as of July 1, 2026",
+        frequencyFr: "Mise à jour trimestrielle",
+        frequencyEn: "Quarterly update",
+      })}::jsonb)
+      ON CONFLICT (key) DO NOTHING
+    `;
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

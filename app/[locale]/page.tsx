@@ -5,7 +5,7 @@ import AlaUne from "../components/AlaUne";
 import MinistryMessage from "../components/MinistryMessage";
 import GrandsChantiers from "../components/GrandsChantiers";
 import StatsSection from "../components/StatsSection";
-import { getPublicStats } from "@/lib/stats";
+import { getPublicStats, getStatsMeta } from "@/lib/stats";
 import { getHeroSlides } from "@/lib/hero";
 import { getChantiers } from "@/lib/chantiers";
 import Galerie from "../components/Galerie";
@@ -29,7 +29,7 @@ export default async function HomePage({ params }: Props) {
         <AlaUne locale={locale} />
         <MinistryMessage dict={home} locale={locale} />
         <GrandsChantiers dict={home} chantiers={await getChantiers(locale === "en" ? "en" : "fr")} />
-        <StatsSection stats={await getPublicStats(locale === "en" ? "en" : "fr")} dict={home} />
+        <StatsSection stats={await getPublicStats(locale === "en" ? "en" : "fr")} meta={await getStatsMeta(locale === "en" ? "en" : "fr")} dict={home} />
         <Galerie dict={home} locale={locale} />
         <Newsletter dict={home} />
       </main>

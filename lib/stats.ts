@@ -1,5 +1,24 @@
 import { sql } from "@/lib/db";
 
+export type StatsMeta = { dateLabel: string; frequencyLabel: string };
+
+const STATS_META_DEFAULTS = {
+  dateLabelFr: "Données au 1ᵉʳ juillet 2026",
+  dateLabelEn: "Data as of July 1, 2026",
+  frequencyFr: "Mise à jour trimestrielle",
+  frequencyEn: "Quarterly update",
+};
+
+export async function getStatsMeta(locale: "fr" | "en"): Promise<StatsMeta> {
+  const result = await sql`SELECT value FROM settings WHERE key = 'stats_meta'`;
+  const stored = (result.rows[0]?.value as Record<string, string>) || {};
+  const merged = { ...STATS_META_DEFAULTS, ...stored };
+  return {
+    dateLabel: locale === "en" && merged.dateLabelEn ? merged.dateLabelEn : merged.dateLabelFr,
+    frequencyLabel: locale === "en" && merged.frequencyEn ? merged.frequencyEn : merged.frequencyFr,
+  };
+}
+
 export type StatItem = {
   id: number;
   label: string;

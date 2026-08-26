@@ -48,6 +48,22 @@ export default function AdminStats() {
   const [saveError, setSaveError] = useState("");
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
+  const [meta, setMeta] = useState({ dateLabelFr: "", dateLabelEn: "", frequencyFr: "", frequencyEn: "" });
+  const [metaSaving, setMetaSaving] = useState(false);
+  const [metaMsg, setMetaMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  function loadMeta() {
+    fetch("/api/admin/stats-meta", { cache: "no-store" }).then((r) => r.json()).then(setMeta);
+  }
+  async function handleSaveMeta(e: React.FormEvent) {
+    e.preventDefault();
+    setMetaSaving(true);
+    setMetaMsg(null);
+    const res = await fetch("/api/admin/stats-meta", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(meta) });
+    setMetaMsg(res.ok ? { type: "success", text: "Enregistré." } : { type: "error", text: "Erreur lors de l'enregistrement." });
+    setMetaSaving(false);
+  }
+
   function load() {
     setLoading(true);
     setLoadError("");
@@ -59,7 +75,7 @@ export default function AdminStats() {
       .then((d) => { setStats(d); setLoading(false); })
       .catch((err) => { setLoadError(err.message); setLoading(false); });
   }
-  useEffect(() => { if (canView) load(); }, [canView]);
+  useEffect(() => { if (canView) { load(); loadMeta(); } }, [canView]);
 
   if (!canView) {
     return (
@@ -157,6 +173,38 @@ export default function AdminStats() {
           </button>
         )}
       </div>
+
+      {canManage && (
+        <form onSubmit={handleSaveMeta} className="bg-white rounded-xl border border-gray-200 p-5 mb-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-gray-900 text-sm">Texte affiché sous les chiffres</h2>
+              <p className="text-xs text-gray-500 mt-0.5">"Données au..." et "Mise à jour trimestrielle" sur la page d'accueil</p>
+            </div>
+            <div className="flex text-xs font-bold uppercase rounded-lg overflow-hidden border border-gray-200">
+              <button type="button" onClick={() => setActiveLang("fr")} className="px-3 py-1.5" style={activeLang === "fr" ? { background: VERT, color: "white" } : { color: "#666" }}>FR</button>
+              <button type="button" onClick={() => setActiveLang("en")} className="px-3 py-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>EN</button>
+            </div>
+          </div>
+          {activeLang === "fr" ? (
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date des données (FR)</label><input value={meta.dateLabelFr} onChange={(e) => setMeta({ ...meta, dateLabelFr: e.target.value })} placeholder="ex: Données au 1ᵉʳ juillet 2026" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fréquence de mise à jour (FR)</label><input value={meta.frequencyFr} onChange={(e) => setMeta({ ...meta, frequencyFr: e.target.value })} placeholder="ex: Mise à jour trimestrielle" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date des données (EN)</label><input value={meta.dateLabelEn} onChange={(e) => setMeta({ ...meta, dateLabelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fréquence de mise à jour (EN)</label><input value={meta.frequencyEn} onChange={(e) => setMeta({ ...meta, frequencyEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            </div>
+          )}
+          <div className="flex items-center gap-3">
+            <button type="submit" disabled={metaSaving} className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+              {metaSaving ? "Enregistrement..." : "Enregistrer"}
+            </button>
+            {metaMsg && <p className={`text-xs ${metaMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{metaMsg.text}</p>}
+          </div>
+        </form>
+      )}
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">

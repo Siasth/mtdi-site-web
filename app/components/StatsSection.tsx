@@ -21,7 +21,7 @@ function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
 }
 
-export default function StatsSection({ stats: externalStats, dict }: { stats?: StatItem[]; dict?: Dict }) {
+export default function StatsSection({ stats: externalStats, meta, dict }: { stats?: StatItem[]; meta?: { dateLabel: string; frequencyLabel: string }; dict?: Dict }) {
   const d = dict ?? {};
   const barData = externalStats
     ? externalStats.map((s, i) => ({ ...s, color: s.color || (i % 2 === 0 ? VERT : JAUNE) }))
@@ -78,9 +78,9 @@ export default function StatsSection({ stats: externalStats, dict }: { stats?: S
             <span style={{ color: VERT }}>{d.pasDIntentions ?? "Pas des intentions."}</span>
           </h2>
           <p className="text-anthracite/65 text-xs font-semibold uppercase tracking-widest sm:text-right leading-relaxed">
-            {d.donneesMaj ?? "Données au 1ᵉʳ juillet 2026"}
+            {meta?.dateLabel ?? d.donneesMaj ?? "Données au 1ᵉʳ juillet 2026"}
             <br />
-            {d.miseMajTrimestrielle ?? "Mise à jour trimestrielle"}
+            {meta?.frequencyLabel ?? d.miseMajTrimestrielle ?? "Mise à jour trimestrielle"}
           </p>
         </div>
 
