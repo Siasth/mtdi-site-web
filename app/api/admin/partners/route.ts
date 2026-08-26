@@ -4,6 +4,11 @@ import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
 import { sanitizeRichText } from "@/lib/sanitize";
 
+// Jamais mis en cache : ces routes back-office doivent toujours refléter
+// l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
+// faire tant que le cache n'expire pas).
+export const dynamic = "force-dynamic";
+
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
 }

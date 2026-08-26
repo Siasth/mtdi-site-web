@@ -3,6 +3,11 @@ import { sql } from "@/lib/db";
 import { requireSession } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
 
+// Jamais mis en cache : ces routes back-office doivent toujours refléter
+// l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
+// faire tant que le cache n'expire pas).
+export const dynamic = "force-dynamic";
+
 // Journal d'audit paginé (les plus récents d'abord)
 export async function GET(req: NextRequest) {
   const session = await requireSession();

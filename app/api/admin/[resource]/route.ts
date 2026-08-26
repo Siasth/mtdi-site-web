@@ -3,6 +3,11 @@ import { readData, writeData, nextId } from "@/lib/data";
 import { requireSession } from "@/lib/auth";
 import { hasPerm, type PermissionCode } from "@/lib/permissions";
 
+// Jamais mis en cache : ces routes back-office doivent toujours refléter
+// l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
+// faire tant que le cache n'expire pas).
+export const dynamic = "force-dynamic";
+
 type Params = { params: Promise<{ resource: string }> };
 
 // Tous les modules de contenu ont migré vers des routes dédiées + la base de
