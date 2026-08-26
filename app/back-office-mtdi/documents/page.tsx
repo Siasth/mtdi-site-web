@@ -19,14 +19,15 @@ export default function AdminDocuments() {
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [uploadedFileName, setUploadedFileName] = useState("");
 
   function load() { setLoading(true); fetch("/api/admin/documents").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
-  function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setEditing("new"); }
+  function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setUploadedFileName(""); setUploadError(""); setEditing("new"); }
   function openEdit(d: Doc) {
     setForm({ titleFr: d.title_fr, titleEn: d.title_en || "", category: d.category, type: d.type || "PDF", date: d.date_label || "", descriptionFr: d.description_fr || "", descriptionEn: d.description_en || "", href: d.href, featured: d.featured, displayOrder: d.display_order, active: d.active });
-    setActiveLang("fr"); setEditing(d.id);
+    setActiveLang("fr"); setUploadedFileName(""); setUploadError(""); setEditing(d.id);
   }
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -40,10 +41,12 @@ export default function AdminDocuments() {
     const file = e.target.files?.[0]; if (!file) return;
     setUploading(true);
     setUploadError("");
+    setUploadedFileName("");
     try {
       const { url } = await uploadFile(file);
       const ext = file.name.split(".").pop()?.toUpperCase() || "PDF";
       setForm((f) => ({ ...f, href: url, type: ext }));
+      setUploadedFileName(file.name);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Erreur d'envoi");
     } finally {
@@ -103,7 +106,18 @@ export default function AdminDocuments() {
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier / lien *</label>
               <input required value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
-              {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
+              {uploadedFileName && !uploadError && (
+                <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
+                  <span>✓</span>
+                  <span>« {uploadedFileName} » envoyé avec succès. Le lien ci-dessus a été mis à jour — pensez à cliquer sur Enregistrer.</span>
+                </div>
+              )}
+              {uploadError && (
+                <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                  <span>✕</span>
+                  <span>{uploadError}</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} /> Mis en avant</label>
