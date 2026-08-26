@@ -34,7 +34,12 @@ export async function POST(request: Request): Promise<NextResponse> {
             "application/vnd.ms-excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           ],
-          addRandomSuffix: false,
+          // true (et non false) : chaque upload obtient une URL unique,
+          // même en réutilisant un nom de fichier déjà uploadé. Sans ça,
+          // deux fichiers de même nom entrent en conflit (erreur bloquante),
+          // et remplacer un fichier existant peut laisser l'ancien contenu
+          // visible un moment via le cache CDN de l'URL réutilisée.
+          addRandomSuffix: true,
         };
       },
       onUploadCompleted: async () => {
