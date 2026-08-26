@@ -12,208 +12,13 @@ const VERT = "#162233";
 const JAUNE = "#FFBE00";
 const VERT_BENIN = "#006828";
 
-interface SearchEntry {
+type SearchEntry = {
   title: string;
   description: string;
   category: "Actualités" | "Pages" | "Rubriques";
   href: string;
-  keywords?: string;
-}
-
-const searchIndex: SearchEntry[] = [
-  {
-    category: "Actualités",
-    title: "Olympiades Nationales d'Intelligence Artificielle : les lauréats distingués",
-    description: "Les meilleurs jeunes talents béninois en IA ont été sélectionnés lors de la cérémonie du 4 juillet à Sèmè One. Communiqué — 6 juillet 2026.",
-    href: "https://www.gouv.bj/article/3579/",
-    keywords: "olympiades IA intelligence artificielle talents béninois sèmè",
-  },
-  {
-    category: "Actualités",
-    title: "Le Bénin lance les Olympiades Nationales d'IA pour sélectionner les talents qui représenteront le pays au Kazakhstan",
-    description: "Première édition des NOAI — sélection pour les Olympiades Internationales d'IA au Kazakhstan du 2 au 8 août 2026. Communiqué — 28 juin 2026.",
-    href: "https://www.gouv.bj/article/3565/",
-    keywords: "olympiades NOAI intelligence artificielle Kazakhstan IOAI 2026",
-  },
-  {
-    category: "Actualités",
-    title: "2ème Conférence des RSSI : le Ministre Akplogan pose la sécurité numérique au cœur de l'ambition de l'État augmenté",
-    description: "Sous le thème « IA pour la cybersécurité et cybersécurité pour l'IA ». Dossier — 26 juin 2026.",
-    href: "https://www.gouv.bj/article/3560/",
-    keywords: "RSSI cybersécurité sécurité numérique Akplogan état augmenté conférence",
-  },
-  {
-    category: "Actualités",
-    title: "Mahuna Akplogan nommé Ministre de la Transformation Digitale et de l'Innovation, en charge de la Stratégie Nationale d'IA",
-    description: "Nomination — 25 mai 2026.",
-    href: "/actualites",
-    keywords: "Akplogan ministre nomination transformation digitale innovation stratégie IA",
-  },
-  {
-    category: "Actualités",
-    title: "GPT.bj, le chatbot gouvernemental béninois, remporte le prix Innovation au Gitex Africa",
-    description: "Innovation — 2025.",
-    href: "/actualites",
-    keywords: "GPT.bj chatbot gouvernemental béninois Gitex Africa innovation prix",
-  },
-  {
-    category: "Actualités",
-    title: "« J'aime ma langue » : une initiative citoyenne pour intégrer le Fon, le Yoruba et le Bariba dans les modèles d'IA",
-    description: "IA & Culture — 2025.",
-    href: "/actualites",
-    keywords: "langue fon yoruba bariba modèles IA initiative citoyenne culture",
-  },
-  {
-    category: "Pages",
-    title: "Le Ministre — Mahuna Akplogan",
-    description: "Ministre de la Transformation Digitale et de l'Innovation, en charge de la Stratégie Nationale d'IA.",
-    href: "/le-ministere/le-ministre",
-    keywords: "ministre Akplogan biographie profil transformation digitale",
-  },
-  {
-    category: "Pages",
-    title: "Missions & Attributions",
-    description: "Missions et attributions du Ministère de la Transformation Digitale et de l'Innovation.",
-    href: "/le-ministere/missions",
-    keywords: "missions attributions ministère rôle objectifs",
-  },
-  {
-    category: "Pages",
-    title: "Organigramme du Ministère",
-    description: "Organisation interne et hiérarchie du ministère.",
-    href: "/le-ministere/organigramme",
-    keywords: "organigramme organisation hiérarchie structure interne",
-  },
-  {
-    category: "Pages",
-    title: "Directions centrales — DPAF, DSI, DN, DD, DM",
-    description: "Présentation des directions centrales : DPAF, DSI, DN, DD, DM.",
-    href: "/le-ministere/directions",
-    keywords: "directions DPAF DSI DN DD DM centrales administration",
-  },
-  {
-    category: "Pages",
-    title: "Cabinet ministériel",
-    description: "Composition et rôle du cabinet du Ministre.",
-    href: "/le-ministere/cabinet",
-    keywords: "cabinet ministériel conseillers directeur cabinet",
-  },
-  {
-    category: "Pages",
-    title: "Structures sous tutelle — ASIN, SBIN",
-    description: "Agences et structures placées sous la tutelle du ministère : ASIN et SBIN.",
-    href: "/le-ministere/structures",
-    keywords: "structures tutelle ASIN SBIN agences",
-  },
-  {
-    category: "Pages",
-    title: "Partenaires",
-    description: "Partenaires institutionnels et techniques du Ministère.",
-    href: "/le-ministere/partenaires",
-    keywords: "partenaires coopération internationale institutionnel",
-  },
-  {
-    category: "Pages",
-    title: "Contact — Coordonnées, Formulaire",
-    description: "Nous contacter : coordonnées postales, email, téléphone, et formulaire de contact.",
-    href: "/contact",
-    keywords: "contact adresse email téléphone formulaire coordonnées",
-  },
-  {
-    category: "Pages",
-    title: "Écrire au Ministre",
-    description: "Envoyer un message directement au Ministre Mahuna Akplogan.",
-    href: "/ecrire-au-ministre",
-    keywords: "écrire ministre message courrier lettre",
-  },
-  {
-    category: "Pages",
-    title: "Kit Presse",
-    description: "Ressources pour les journalistes : logos, photos officielles, fiches biographiques.",
-    href: "/kit-presse",
-    keywords: "kit presse journaliste logo photo biographie ressources médias",
-  },
-  {
-    category: "Rubriques",
-    title: "Actualités — Communiqués, Dossiers",
-    description: "Toutes les actualités, communiqués et dossiers du Ministère.",
-    href: "/actualites",
-    keywords: "actualités communiqué dossier nomination innovation",
-  },
-  {
-    category: "Rubriques",
-    title: "Galerie photos",
-    description: "Photothèque officielle du Ministère — événements, cérémonies, missions.",
-    href: "/galerie",
-    keywords: "galerie photos images événements cérémonies",
-  },
-  {
-    category: "Rubriques",
-    title: "Vidéothèque",
-    description: "Vidéos officielles du Ministère — discours, reportages, événements.",
-    href: "/videotheque",
-    keywords: "vidéothèque vidéos discours reportages",
-  },
-  {
-    category: "Rubriques",
-    title: "Documenthèque",
-    description: "Bibliothèque de documents officiels, rapports et publications.",
-    href: "/documentheque",
-    keywords: "documenthèque documents rapports publications téléchargement",
-  },
-  {
-    category: "Rubriques",
-    title: "Stratégie Nationale d'Intelligence Artificielle",
-    description: "La vision et la feuille de route du Bénin en matière d'Intelligence Artificielle.",
-    href: "/strategie-ia",
-    keywords: "stratégie IA intelligence artificielle feuille de route vision Bénin",
-  },
-  {
-    category: "Rubriques",
-    title: "En Direct — Événements, Replays",
-    description: "Suivez en direct les événements du Ministère et accédez aux replays.",
-    href: "/direct",
-    keywords: "direct live événements replays diffusion streaming",
-  },
-  {
-    category: "Rubriques",
-    title: "Participer — Emplois, Stages, Appels d'offres",
-    description: "Offres d'emploi, stages et appels d'offres publiés par le Ministère.",
-    href: "/participer",
-    keywords: "emplois stages appels offres recrutement opportunités",
-  },
-];
-
-function normalize(str: string): string {
-  return str.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
-}
-
-interface ScoredEntry extends SearchEntry { score: number; }
-
-function search(query: string): ScoredEntry[] {
-  const q = normalize(query.trim());
-  if (!q) return [];
-  const terms = q.split(/\s+/).filter(Boolean);
-  const results: ScoredEntry[] = [];
-  for (const entry of searchIndex) {
-    const titleN = normalize(entry.title);
-    const descN = normalize(entry.description);
-    const kwN = normalize(entry.keywords ?? "");
-    const fullText = `${titleN} ${descN} ${kwN}`;
-    let score = 0;
-    for (const term of terms) {
-      if (titleN === q) score += 100;
-      if (titleN.startsWith(q)) score += 50;
-      if (titleN.includes(q)) score += 30;
-      if (titleN.includes(term)) score += 10;
-      if (descN.includes(term)) score += 5;
-      if (kwN.includes(term)) score += 4;
-      if (fullText.includes(term)) score += 2;
-    }
-    if (score > 0) results.push({ ...entry, score });
-  }
-  return results.sort((a, b) => b.score - a.score);
-}
+};
+type ScoredEntry = SearchEntry;
 
 const CATEGORIES = ["Actualités", "Pages", "Rubriques"] as const;
 type Category = (typeof CATEGORIES)[number];
@@ -234,6 +39,8 @@ function SearchContent() {
   const initialQ = searchParams.get("q") ?? "";
   const [inputValue, setInputValue] = useState(initialQ);
   const [query, setQuery] = useState(initialQ);
+  const [results, setResults] = useState<ScoredEntry[]>([]);
+  const [searching, setSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -241,6 +48,18 @@ function SearchContent() {
     setInputValue(q);
     setQuery(q);
   }, [searchParams]);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) { setResults([]); return; }
+    setSearching(true);
+    const controller = new AbortController();
+    fetch(`/api/search?q=${encodeURIComponent(trimmed)}&locale=${locale}`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((d) => { if (Array.isArray(d)) setResults(d); setSearching(false); })
+      .catch(() => setSearching(false));
+    return () => controller.abort();
+  }, [query, locale]);
 
   function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -257,7 +76,6 @@ function SearchContent() {
     if (e.key === "Enter") handleSubmit();
   }
 
-  const results = search(query);
   const grouped = CATEGORIES.reduce<Record<Category, ScoredEntry[]>>(
     (acc, cat) => { acc[cat] = results.filter((r) => r.category === cat); return acc; },
     { "Actualités": [], "Pages": [], "Rubriques": [] }
@@ -315,7 +133,7 @@ function SearchContent() {
         <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 min-h-64">
           <div className="max-w-7xl mx-auto">
 
-            {hasQuery && (
+            {hasQuery && !searching && (
               <p className="text-sm text-gray-500 mb-8">
                 {hasResults
                   ? `${results.length} ${results.length > 1 ? t.resultatsPluriel : t.resultats} ${t.pour} ${query} »`
@@ -323,7 +141,11 @@ function SearchContent() {
               </p>
             )}
 
-            {hasQuery && !hasResults && (
+            {hasQuery && searching && (
+              <p className="text-sm text-gray-400 mb-8">{locale === "en" ? "Searching…" : "Recherche en cours…"}</p>
+            )}
+
+            {hasQuery && !searching && !hasResults && (
               <div className="text-center py-20">
                 <svg className="mx-auto mb-6 text-gray-300" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                   <circle cx="11" cy="11" r="8" />
