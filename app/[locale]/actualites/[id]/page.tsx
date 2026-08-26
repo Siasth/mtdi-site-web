@@ -143,13 +143,19 @@ export default async function ActualiteDetailPage({ params }: Props) {
 
             {/* Colonne droite : Articles similaires (plus courte que la colonne gauche) */}
             {related.length > 0 && (
-              <aside>
-                <h2 className="text-xs font-black uppercase tracking-widest mb-5" style={{ color: VERT }}>
+              <aside className="bg-gris-perle rounded-lg p-6 sm:p-7 self-start">
+                <h2 className="font-black text-xl text-anthracite mb-5">
                   {isEn ? "Related articles" : "Articles similaires"}
                 </h2>
-                <div className="space-y-5">
-                  {related.map((r) => (
-                    <Link key={r.id} href={r.hrefExternal || `${prefix}/actualites/${r.id}`} target={r.hrefExternal ? "_blank" : undefined} className="flex gap-3 group">
+                <div className="flex flex-col">
+                  {related.map((r, i) => (
+                    <Link
+                      key={r.id}
+                      href={r.hrefExternal || `${prefix}/actualites/${r.id}`}
+                      target={r.hrefExternal ? "_blank" : undefined}
+                      className="flex gap-3 group py-4 first:pt-0 last:pb-0"
+                      style={{ borderBottom: i < related.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
+                    >
                       <div className="relative w-20 h-16 flex-shrink-0 overflow-hidden rounded">
                         {r.image ? (
                           <Image src={r.image} alt="" fill className="object-cover" sizes="80px" />
@@ -161,7 +167,8 @@ export default async function ActualiteDetailPage({ params }: Props) {
                         <p className="text-sm font-bold text-anthracite leading-snug line-clamp-2 group-hover:line-clamp-none group-hover:text-vert-benin transition-colors">
                           {r.title}
                         </p>
-                        <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-black uppercase tracking-widest" style={{ color: VERT }}>
+                        <span className="inline-flex items-center gap-1.5 mt-2 text-xs font-bold" style={{ color: VERT }}>
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: VERT }} />
                           {t.lire}
                         </span>
                       </div>
