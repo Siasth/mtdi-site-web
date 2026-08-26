@@ -185,8 +185,8 @@ export default async function LeMinisterPage({ params }: Props) {
               {prioritesItems.map((p, i) => (
                 <div key={i} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors">
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i], opacity: 0.3 }}>{String(i + 1).padStart(2, "0")}</span>
-                    <div className="mt-1 flex-shrink-0" style={{ color: priorityAccents[i] }}>{priorityIcons[i]}</div>
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i % priorityAccents.length], opacity: 0.3 }}>{String(i + 1).padStart(2, "0")}</span>
+                    <div className="mt-1 flex-shrink-0" style={{ color: priorityAccents[i % priorityAccents.length] }}>{priorityIcons[i % priorityIcons.length]}</div>
                   </div>
                   <h3 className="text-anthracite font-black text-xl uppercase leading-snug mb-4">{p.title}</h3>
                   <div
@@ -225,7 +225,8 @@ export default async function LeMinisterPage({ params }: Props) {
       </main>
 
       <style>{`
-        .prose-institutionnel p { margin: 0.4em 0; }
+        .prose-institutionnel p { margin: 0 0 0.9em; }
+        .prose-institutionnel p:last-child { margin-bottom: 0; }
         .prose-institutionnel strong { font-weight: 900; }
         .prose-institutionnel a { color: #006828; text-decoration: underline; }
         .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }

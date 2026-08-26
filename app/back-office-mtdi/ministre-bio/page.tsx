@@ -120,7 +120,6 @@ export default function AdminMinistreBio() {
     setField(key, list);
   }
   function addPriorite() {
-    if (priorites.length >= 4) return; // grille 2x2, garde 4 max
     const key = `priorites${suffix}` as "prioritesFr" | "prioritesEn";
     setField(key, [...priorites, { title: "", description: "" }]);
   }
@@ -185,7 +184,6 @@ export default function AdminMinistreBio() {
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Biographie ({activeLang === "fr" ? "Français" : "English"})</h2>
-          <p className="text-xs text-gray-400 -mt-2">Plusieurs paragraphes : appuyez sur Entrée pour passer au suivant, comme dans un traitement de texte.</p>
           <MarkdownEditor
             value={activeLang === "fr" ? form.bioContentFr : form.bioContentEn}
             onChange={(v) => setField(activeLang === "fr" ? "bioContentFr" : "bioContentEn", v)}
@@ -214,9 +212,7 @@ export default function AdminMinistreBio() {
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-gray-900">Priorités ministérielles ({activeLang === "fr" ? "Français" : "English"})</h2>
-            {priorites.length < 4 && (
-              <button type="button" onClick={addPriorite} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter (max 4)</button>
-            )}
+            <button type="button" onClick={addPriorite} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter une priorité</button>
           </div>
           {priorites.map((item, i) => (
             <div key={i} className="border border-gray-100 rounded-lg p-4 space-y-2 relative">

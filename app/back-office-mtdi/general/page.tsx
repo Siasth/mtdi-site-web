@@ -194,7 +194,6 @@ export default function AdminGeneral() {
               Email destinataire — formulaire "Écrire au Ministre"
             </label>
             <input value={form.ministreEmail} onChange={(e) => setForm({ ...form, ministreEmail: e.target.value })} placeholder="mtdi.contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-            <p className="text-xs text-gray-400 mt-1">Boîte mail qui reçoit les messages envoyés depuis /ecrire-au-ministre</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Téléphone</label>

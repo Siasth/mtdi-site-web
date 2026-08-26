@@ -79,6 +79,8 @@ export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: 
               dangerouslySetInnerHTML={{ __html: content }}
             />
             <style>{`
+              .prose-ministre p { margin: 0 0 1em; }
+              .prose-ministre p:last-child { margin-bottom: 0; }
               .prose-ministre h1, .prose-ministre h2, .prose-ministre h3 { font-weight: 900; margin: 0.6em 0 0.3em; }
               .prose-ministre ul { list-style: disc; padding-left: 1.4em; margin: 0.5em 0; }
               .prose-ministre ol { list-style: decimal; padding-left: 1.4em; margin: 0.5em 0; }

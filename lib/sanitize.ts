@@ -40,7 +40,7 @@ export function sanitizeRichText(html: string): string {
         color: [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/],
         "font-family": [/^[a-zA-Z0-9\s,'"-]+$/],
       },
-      p: { "text-align": [/^(left|center|right|justify)$/] },
+      p: { "text-align": [/^(left|center|right|justify)$/], "line-height": [/^[0-9](\.[0-9]{1,2})?$/], "margin-bottom": [/^[0-9](\.[0-9]{1,2})?em$/] },
       h1: { "text-align": [/^(left|center|right|justify)$/] },
       h2: { "text-align": [/^(left|center|right|justify)$/] },
       h3: { "text-align": [/^(left|center|right|justify)$/] },

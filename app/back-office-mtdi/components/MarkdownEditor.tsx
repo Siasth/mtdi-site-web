@@ -13,6 +13,52 @@ import { TableRow } from "@tiptap/extension-table-row";
 import { TableHeader as BaseTableHeader } from "@tiptap/extension-table-header";
 import { TableCell as BaseTableCell } from "@tiptap/extension-table-cell";
 import { TextAlign } from "@tiptap/extension-text-align";
+import Paragraph from "@tiptap/extension-paragraph";
+
+// Étend les paragraphes pour supporter interligne et espacement entre
+// paragraphes (attributs appliqués comme style CSS inline, conservés par
+// l'assainissement côté serveur — voir lib/sanitize.ts).
+export const LINE_HEIGHTS = [
+  { label: "Normal", value: "" },
+  { label: "Compact", value: "1.3" },
+  { label: "Confortable", value: "1.6" },
+  { label: "Large", value: "1.9" },
+  { label: "Très large", value: "2.2" },
+];
+export const PARAGRAPH_SPACINGS = [
+  { label: "Normal", value: "" },
+  { label: "Resserré", value: "0.3em" },
+  { label: "Confortable", value: "1em" },
+  { label: "Large", value: "1.75em" },
+];
+
+const ParagraphWithSpacing = Paragraph.extend({
+  addAttributes() {
+    return {
+      lineHeight: {
+        default: null,
+        parseHTML: (el) => el.style.lineHeight || null,
+        // Le style combiné est construit dans renderHTML() ci-dessous, pas
+        // ici, pour éviter que deux attributs "style" distincts s'écrasent
+        // l'un l'autre au lieu de se combiner.
+        renderHTML: () => ({}),
+      },
+      spacing: {
+        default: null,
+        parseHTML: (el) => el.style.marginBottom || null,
+        renderHTML: () => ({}),
+      },
+    };
+  },
+  renderHTML({ node, HTMLAttributes }) {
+    const styleParts: string[] = [];
+    if (node.attrs.lineHeight) styleParts.push(`line-height: ${node.attrs.lineHeight}`);
+    if (node.attrs.spacing) styleParts.push(`margin-bottom: ${node.attrs.spacing}`);
+    const attrs = { ...HTMLAttributes };
+    if (styleParts.length > 0) attrs.style = styleParts.join("; ");
+    return ["p", attrs, 0];
+  },
+});
 
 // Étend les cellules pour supporter une couleur de fond personnalisée
 // (setCellAttribute("backgroundColor", ...) n'a aucun effet sans ça).
@@ -250,6 +296,26 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
+      <select
+        title="Interligne"
+        value={(editor.getAttributes("paragraph").lineHeight as string) || ""}
+        onChange={(e) => editor.chain().focus().updateAttributes("paragraph", { lineHeight: e.target.value || null }).run()}
+        className="text-xs border border-gray-200 rounded px-1.5 py-1 bg-white text-gray-600 cursor-pointer"
+      >
+        {LINE_HEIGHTS.map((o) => <option key={o.label} value={o.value}>Interligne : {o.label}</option>)}
+      </select>
+
+      <select
+        title="Espacement après le paragraphe"
+        value={(editor.getAttributes("paragraph").spacing as string) || ""}
+        onChange={(e) => editor.chain().focus().updateAttributes("paragraph", { spacing: e.target.value || null }).run()}
+        className="text-xs border border-gray-200 rounded px-1.5 py-1 bg-white text-gray-600 cursor-pointer"
+      >
+        {PARAGRAPH_SPACINGS.map((o) => <option key={o.label} value={o.value}>Espacement : {o.label}</option>)}
+      </select>
+
+      <div className="w-px h-5 bg-gray-200 mx-1" />
+
       <ToolbarButton
         title="Insérer un tableau"
         onClick={() => {
@@ -340,7 +406,8 @@ export default function MarkdownEditor({
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit.configure({ link: false }),
+      StarterKit.configure({ link: false, paragraph: false }),
+      ParagraphWithSpacing,
       Link.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder: placeholder || "Écrivez ici…" }),
       TextStyle,
