@@ -1450,6 +1450,258 @@ export async function POST(req: NextRequest) {
     }
 
 
+
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises officielles — contenu institutionnel
+    // (Directions, Structures, Cabinet, Missions, Partenaires). Idempotent :
+    // ne touche jamais une traduction déjà saisie manuellement (par
+    // exemple un admin qui aurait ajouté sa propre entrée entre-temps).
+    // ══════════════════════════════════════════════════════════════════
+
+    const directionsTranslations: Record<string, { type: string; description: string }> = {
+      "Direction de la Programmation, de l'Administration et des Finances": { type: "Central Directorate", description: "Ensures the programming, administrative and financial management of the ministry. Oversees the budget, human resources, public procurement and logistics." },
+      "Direction des Systèmes d'Information": { type: "Central Directorate", description: "The Information Systems Department ensures the alignment of the ministry's information system with national policy. It is responsible for defining and supervising the information system policy and its implementation, setting the Ministry's strategic IT direction, and guaranteeing IT security, reliability, confidentiality and integrity of information systems." },
+      "Direction du Numérique": { type: "Technical Directorate", description: "The Digital Directorate is responsible for developing the policy for digital infrastructure, uses and content. It contributes to steering the national strategy for broadband and ultra-broadband infrastructure development, oversees the deployment of digital television and radio infrastructure, promotes electronic communications, and encourages the development of the digital economy industry." },
+      "Direction de la Digitalisation": { type: "Technical Directorate", description: "The Digitalization Directorate is responsible for overseeing the implementation of the State's e-governance programme through the use of ICT in public administration and the digitization of public services. It promotes the digital transformation of businesses, contributes to the development of digital skills and the promotion of digital entrepreneurship, and contributes to the development of digital security policy and the implementation of the national cybersecurity strategy." },
+      "Direction des Médias": { type: "Technical Directorate", description: "The Media Directorate is responsible for audiovisual policy and the digital transition of public and private media." },
+    };
+    for (const [nameFr, tr] of Object.entries(directionsTranslations)) {
+      await sql`
+        UPDATE directions SET type_en = ${tr.type}, description_en = ${tr.description}
+        WHERE name_fr = ${nameFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    const structuresTranslations: Record<string, { description: string; missions: string[]; label: string }> = {
+      "Société Béninoise d'Infrastructures Numériques": { description: "SBIN (Celtiis) is the national digital infrastructure operator, responsible for deploying and managing telecommunications networks and connectivity across Beninese territory.", missions: ["Deployment of fibre optic and telecommunications networks", "Management of national digital infrastructure", "Provision of broadband connectivity across the territory", "Development of digital access for citizens and businesses", "Support for the State's digital transformation"], label: "Digital infrastructure & connectivity" },
+      "Agence des Systèmes d'Information et du Numérique": { description: "ASIN is the government agency responsible for the operational implementation of the State's cross-cutting and shared digital projects, as well as sector-specific projects delegated to it for execution.", missions: ["Operation and security of the State's shared information systems", "Public digital infrastructure: connectivity of public sites, data centres, sovereign hosting", "Cybersecurity: bjCSIRT (national incident response centre), security audits and qualification, threat monitoring", "Interoperability and digital trust: national data exchange platform (X-Road BJ), national PKI, electronic signature", "E-services and the national public services portal", "Support for administrations in their digital transformation", "Integration of artificial intelligence into public services, in support of the National AI Strategy"], label: "Information systems & cybersecurity" },
+    };
+    for (const [nameFr, tr] of Object.entries(structuresTranslations)) {
+      await sql`
+        UPDATE structures SET description_en = ${tr.description}, missions_en = ${JSON.stringify(tr.missions)}::jsonb, label_en = ${tr.label}
+        WHERE name_fr = ${nameFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    const cabinetTranslations: Record<string, { direction: string; description: string }> = {
+      "Ministre": { direction: "Ministry of Digital Transformation and Innovation", description: "Political authority in charge of defining and implementing government policy on digital transformation, innovation and artificial intelligence." },
+      "Directeur de Cabinet": { direction: "Minister's Cabinet", description: "Coordinates all activities of the ministerial cabinet, liaises with other government institutions, and oversees the implementation of the Minister's decisions." },
+      "Secrétaire Général du Ministère": { direction: "General Secretariat", description: "Ensures the administrative coordination of all the ministry's directorates and services. Guarantees the continuity and consistency of ministerial action." },
+      "Conseillers Techniques (CT)": { direction: "Minister's Cabinet", description: "The Technical Advisors assist the Minister and the Cabinet Director with sector expertise, case analysis and the preparation of strategic decisions. They work in the fields of artificial intelligence, digital transformation, cybersecurity, digital public policy and international cooperation." },
+    };
+    for (const [roleFr, tr] of Object.entries(cabinetTranslations)) {
+      await sql`
+        UPDATE cabinet_members SET direction_en = ${tr.direction}, description_en = ${tr.description}
+        WHERE role_fr = ${roleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+
+
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises officielles — Missions & Partenaires.
+    // ══════════════════════════════════════════════════════════════════
+    const missionsTranslations: [string, string][] = [
+      ["Élaborer les politiques sectorielles et exécuter les stratégies liées à l'agenda numérique de l'État", "Develop sectoral policies and implement strategies related to the State's digital agenda"],
+      ["Favoriser le développement des infrastructures, des usages et des contenus numériques par les technologies innovantes", "Foster the development of digital infrastructure, uses and content through innovative technologies"],
+      ["Intégrer les technologies numériques dans les structures de l'État pour améliorer la performance, l'accessibilité, la transparence et l'efficacité des services publics", "Integrate digital technologies into State structures to improve the performance, accessibility, transparency and efficiency of public services"],
+      ["Promouvoir la transformation digitale des entreprises", "Promote the digital transformation of businesses"],
+      ["Mettre en place l'infrastructure numérique de collecte, de transport et de distribution de la télévision et de la radiodiffusion", "Establish the digital infrastructure for the collection, transport and distribution of television and radio broadcasting"],
+      ["Conduire des études prospectives et formuler des recommandations sur les projets numériques de l'État", "Conduct forward-looking studies and formulate recommendations on the State's digital projects"],
+      ["Promouvoir les communications électroniques et les services numériques innovants en partenariat avec les autorités de régulation", "Promote electronic communications and innovative digital services in partnership with regulatory authorities"],
+      ["Assurer la gestion optimale des licences et des ressources de l'État", "Ensure the optimal management of the State's licences and resources"],
+      ["Établir un cadre législatif et réglementaire favorable au développement du numérique", "Establish a legislative and regulatory framework conducive to digital development"],
+      ["Réduire la fracture numérique entre les régions et les populations", "Reduce the digital divide between regions and populations"],
+      ["Promouvoir les compétences numériques et l'entrepreneuriat digital", "Promote digital skills and digital entrepreneurship"],
+      ["Lutter contre les déchets électroniques en coordination avec les agences environnementales", "Combat electronic waste in coordination with environmental agencies"],
+      ["Instaurer des mécanismes durables de confiance numérique", "Establish sustainable digital trust mechanisms"],
+      ["Développer les partenariats avec le secteur privé et les institutions internationales", "Develop partnerships with the private sector and international institutions"],
+      ["Représenter le Bénin dans les instances internationales de gouvernance du numérique", "Represent Benin in international digital governance bodies"],
+      ["Accompagner les médias publics et privés dans leur transition numérique", "Support public and private media in their digital transition"],
+      ["Renforcer la qualité du paysage audiovisuel", "Strengthen the quality of the audiovisual landscape"],
+    ];
+    for (const [textFr, textEn] of missionsTranslations) {
+      await sql`UPDATE missions SET text_en = ${textEn} WHERE text_fr = ${textFr} AND (text_en IS NULL OR text_en = '')`;
+    }
+
+    const partnersTranslations: Record<string, { full: string; description: string }> = {
+      "APDP": { full: "Personal Data Protection Authority", description: "National authority overseeing the processing of personal data, guaranteeing respect for digital privacy in Benin." },
+      "ANIP": { full: "National Agency for Personal Identification", description: "Manages civil identity and issues official identity documents for Beninese citizens, including the MonIdentité.bj programme." },
+      "Présidence": { full: "Presidency of the Republic of Benin", description: "Government oversight authority, whose digital priorities guide the ministry's roadmap." },
+      "Sèmè City": { full: "City of Innovation and Knowledge", description: "Benin's innovation and entrepreneurship hub, a laboratory for African digital transformation located in Cotonou." },
+      "Banque Mondiale": { full: "World Bank Group", description: "Financial and technical partner for major digital infrastructure and capacity-building projects." },
+      "Smart Africa": { full: "Smart Africa Alliance", description: "Continental alliance promoting inclusive digital transformation in Africa; Benin is an active member." },
+      "ITU": { full: "International Telecommunication Union", description: "Specialized United Nations agency for ICT; supports Benin on connectivity governance and policy." },
+      "UAC": { full: "University of Abomey-Calavi", description: "Benin's leading university, a partner for digital skills training programmes and artificial intelligence research." },
+      "INFOTI": { full: "National Institute for Information Technology Training", description: "Public vocational training institute in ICT, digital technology and telecommunications." },
+    };
+    for (const [name, tr] of Object.entries(partnersTranslations)) {
+      await sql`
+        UPDATE partners SET full_en = ${tr.full}, description_en = ${tr.description}
+        WHERE name = ${name} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+
+
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises officielles — Documenthèque.
+    // ══════════════════════════════════════════════════════════════════
+    const documentsTranslations: Record<string, { title: string; description: string }> = {
+      "Plan d'Engagement Environnemental et Social (PEES) : WARDIP": { title: "Environmental and Social Commitment Plan (ESCP): WARDIP", description: "Environmental and Social Commitment Plan under the WARDIP project (West Africa Regional Digital Integration Program)." },
+      "Plan de Gestion de la Main-d'œuvre (PGMO) : WARDIP": { title: "Labour Management Plan (LMP): WARDIP", description: "Labour Management Plan under the WARDIP project." },
+      "Plan de Mobilisation des Parties Prenantes (PMPP) incluant le MGP : WARDIP": { title: "Stakeholder Engagement Plan (SEP) including the GRM: WARDIP", description: "Stakeholder Engagement Plan including the Grievance Redress Mechanism under the WARDIP project." },
+      "Résultats de la sélection dans le cadre de la participation du Bénin aux OIIA 2025": { title: "Selection results for Benin's participation in the IOAI 2025", description: "Results of the selection of Beninese candidates for participation in the 2025 International Olympiad in Artificial Intelligence." },
+      "Magazine Bénin Numérique N°3": { title: "Digital Benin Magazine No. 3", description: "Third edition of the Digital Benin magazine." },
+      "Liste des Fournisseurs de Services de Sécurité Numérique qualifiés en République du Bénin": { title: "List of qualified digital security service providers in the Republic of Benin", description: "Official list of qualified digital security service providers in the Republic of Benin." },
+      "Rapport de vulnérabilités et d'incidents du cyberespace béninois": { title: "Report on vulnerabilities and incidents in the Beninese cyberspace", description: "Report on security vulnerabilities and incidents identified in the Beninese cyberspace." },
+      "Magazine Bénin Numérique N°2": { title: "Digital Benin Magazine No. 2", description: "Second edition of the Digital Benin magazine: news, innovations and developments in the digital sector." },
+      "Référentiel des exigences relatives à la qualification des fournisseurs de services de sécurité numérique en République du Bénin": { title: "Reference framework for the qualification of digital security service providers in the Republic of Benin", description: "Reference framework defining the requirements for the qualification of digital security service providers in Benin." },
+      "Magazine Bénin Numérique N°1": { title: "Digital Benin Magazine No. 1", description: "First edition of the Digital Benin magazine: overview, projects and outlook for digital development in Benin." },
+      "Règles de politique de protection des infrastructures d'information critiques en République du Bénin": { title: "Policy rules for the protection of critical information infrastructure in the Republic of Benin", description: "Document setting out the rules for protecting critical information infrastructure in the Republic of Benin." },
+      "État des lieux de l'écosystème digital et de l'entrepreneuriat numérique au Bénin": { title: "Overview of the digital ecosystem and digital entrepreneurship in Benin", description: "Report on the state of the digital ecosystem and digital entrepreneurship in the Republic of Benin." },
+      "Guide de l'Entrepreneur Digital : Bénin": { title: "Digital Entrepreneur's Guide: Benin", description: "Practical guide for digital entrepreneurs in Benin." },
+    };
+    for (const [titleFr, tr] of Object.entries(documentsTranslations)) {
+      await sql`
+        UPDATE documents SET title_en = ${tr.title}, description_en = ${tr.description}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+
+
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises officielles — Textes juridiques, Kit presse,
+    // Vidéothèque, Médias, e-Services.
+    // ══════════════════════════════════════════════════════════════════
+
+    const textesTranslations: Record<string, { type: string; status: string; description: string; articles: string }> = {
+      "Code du numérique en République du Bénin": { type: "Law", status: "In force", description: "Founding legal framework governing the digital economy in Benin. Covers the protection of personal data, cybersecurity, electronic transactions, e-commerce, electronic communications and offences related to information and communication technologies.", articles: "478 articles across 8 books" },
+      "Loi portant modification du code du numérique en République du Bénin": { type: "Law", status: "In force", description: "Law amending Law No. 2017-20 of 20 April 2018 on the Digital Code of the Republic of Benin. Updates and supplements the founding digital legal framework.", articles: "Amending text" },
+    };
+    for (const [titleFr, tr] of Object.entries(textesTranslations)) {
+      await sql`
+        UPDATE textes_juridiques SET type_en = ${tr.type}, status_en = ${tr.status}, description_en = ${tr.description}, articles_en = ${tr.articles}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    const kitTranslations: Record<string, { title: string; description: string }> = {
+      "Logo MTDI — Usage officiel": { title: "MTDI Logo — Official use", description: "Official vector logo of the Ministry of Digital Transformation and Innovation." },
+      "Bannière officielle MTDI": { title: "Official MTDI banner", description: "Horizontal banner with the Ministry's complete visual identity." },
+    };
+    for (const [titleFr, tr] of Object.entries(kitTranslations)) {
+      await sql`
+        UPDATE kit_presse_items SET title_en = ${tr.title}, description_en = ${tr.description}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    const videosTranslations: Record<string, string> = {
+      "2ème Conférence des RSSI : la sécurité numérique au cœur de l'État augmenté": "2nd CISO Conference: digital security at the heart of the augmented State",
+      "Cyberdrill RSSI : Exercice de cybersécurité national": "CISO Cyberdrill: national cybersecurity exercise",
+      "« J'aime ma langue » : Intégration des langues nationales dans l'IA": "\"I Love My Language\": integrating national languages into AI",
+    };
+    for (const [titleFr, titleEn] of Object.entries(videosTranslations)) {
+      await sql`UPDATE videos SET title_en = ${titleEn} WHERE title_fr = ${titleFr} AND (title_en IS NULL OR title_en = '')`;
+    }
+
+    const mediasTranslations: Record<string, { type: string; title: string; excerpt: string }> = {
+      "MTDI sur Instagram : Reel 1": { type: "Media", title: "MTDI on Instagram: Reel 1", excerpt: "Discover the activities of the Ministry of Digital Transformation and Innovation on video on Instagram." },
+      "MTDI sur Instagram : Reel 2": { type: "Media", title: "MTDI on Instagram: Reel 2", excerpt: "Follow the latest MTDI news on social media." },
+      "MTDI sur YouTube : Interview et reportage": { type: "Media", title: "MTDI on YouTube: Interview and report", excerpt: "Watch interviews and reports from the Ministry of Digital Transformation and Innovation." },
+    };
+    for (const [titleFr, tr] of Object.entries(mediasTranslations)) {
+      await sql`
+        UPDATE media_mentions SET type_en = ${tr.type}, title_en = ${tr.title}, excerpt_en = ${tr.excerpt}
+        WHERE title_fr = ${titleFr} AND (title_en IS NULL OR title_en = '')
+      `;
+    }
+
+    const eservicesTranslations: Record<string, { title: string; description: string }> = {
+      "État civil": { title: "Civil status", description: "Request your birth, marriage and death certificates online. Collect your documents at the civil status centre of your choice." },
+      "Fiscalité": { title: "Taxation", description: "File and pay your taxes online via the e-Taxes platform. Access your taxpayer account and track your tax obligations." },
+      "Identité": { title: "Identity", description: "Obtain your biometric national ID card or passport via MonIdentite.bj. Track the progress of your application in real time." },
+      "Permis & autorisations": { title: "Permits & authorizations", description: "Apply for building permits, business licences and administrative authorizations. All your procedures gathered in a single portal." },
+      "Éducation": { title: "Education", description: "School and university enrolment, scholarship applications, diploma equivalence and career guidance online." },
+      "Santé": { title: "Health", description: "Manage your universal health insurance (ARCH), check your digital vaccination record, and access health services online." },
+      "Emploi": { title: "Employment", description: "Browse public job offers, submit your application and track your dealings with administrations in one place." },
+      "Foncier": { title: "Land & property", description: "Secure your land titles, carry out your land registry procedures and track your property files online." },
+    };
+    for (const [titleFr, tr] of Object.entries(eservicesTranslations)) {
+      await sql`
+        UPDATE eservices SET title_en = ${tr.title}, description_en = ${tr.description}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+
+
+    // ══════════════════════════════════════════════════════════════════
+    // Traductions anglaises officielles — Stratégie IA (piliers, jalons,
+    // olympiades, critères) et Contacts spécifiques.
+    // ══════════════════════════════════════════════════════════════════
+
+    const piliersTranslations: Record<string, { title: string; description: string }> = {
+      "Gouvernance & Éthique": { title: "Governance & Ethics", description: "A leading African regulatory framework guaranteeing transparent, fair AI that respects fundamental rights. National ethics committee, algorithmic audits and personal data protection." },
+      "Infrastructures IA": { title: "AI Infrastructure", description: "Digital sovereignty through Benin's public cloud, high-availability data centres and a structured national open data network for training AI models." },
+      "Talents & Compétences": { title: "Talent & Skills", description: "Training 10,000 AI professionals by 2030 through the Digital Academy, university partnerships, excellence scholarships and internationally recognized certification programmes." },
+      "Projets & Innovation": { title: "Projects & Innovation", description: "Deploying AI in agriculture, health, education and public services. Benin AI Challenge, national incubator, and support fund for Beninese deeptech startups." },
+    };
+    for (const [titleFr, tr] of Object.entries(piliersTranslations)) {
+      await sql`
+        UPDATE ia_piliers SET title_en = ${tr.title}, description_en = ${tr.description}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    const jalonsTranslations: Record<string, { title: string; description: string }> = {
+      "Diagnostic national": { title: "National assessment", description: "National assessment of Benin's AI capabilities, stakeholder mapping, identification of priority use cases." },
+      "Adoption de la stratégie": { title: "Strategy adoption", description: "Inter-ministerial validation and official launch of the National Artificial Intelligence Strategy." },
+      "Création de l'ANAI": { title: "Establishment of ANAI", description: "Establishment of the National Artificial Intelligence Agency. First calls for projects." },
+      "Montée en charge": { title: "Scaling up", description: "10 sectoral AI projects deployed. Opening of Benin's first sovereign Data Centre." },
+      "Maturité et consolidation": { title: "Maturity and consolidation", description: "5,000 certified professionals. AI legal framework adopted by the National Assembly." },
+      "Bénin, nation de l'IA": { title: "Benin, an AI nation", description: "Benin ranked in the African top 5 for AI adoption. Continental AI platform deployed." },
+    };
+    for (const [titleFr, tr] of Object.entries(jalonsTranslations)) {
+      await sql`
+        UPDATE ia_jalons SET title_en = ${tr.title}, description_en = ${tr.description}
+        WHERE title_fr = ${titleFr} AND (description_en IS NULL OR description_en = '')
+      `;
+    }
+
+    await sql`
+      UPDATE ia_olympiades_editions SET
+        title_en = ${"1st edition — National AI Olympiad (NOAI)"},
+        description_en = ${"Inaugural competition to select young Beninese talents who will represent the country at the International Olympiad in Artificial Intelligence (IOAI) 2026 in Kazakhstan, from 2 to 8 August."},
+        highlight_en = ${"8 winners selected on 4 July at Sèmè One"}
+      WHERE title_fr = ${"1ère édition — Olympiades Nationales d'IA (NOAI)"} AND (description_en IS NULL OR description_en = '')
+    `;
+
+    const criteresTranslations: Record<string, string> = {
+      "Être scolarisé au Bénin, niveau lycée ou premier cycle universitaire": "Be enrolled in school in Benin, at secondary or undergraduate level",
+      "Maîtriser les fondamentaux de la programmation et des mathématiques": "Have a solid grasp of the fundamentals of programming and mathematics",
+      "S'inscrire via la plateforme dédiée avant la date limite officielle": "Register via the dedicated platform before the official deadline",
+      "Réussir les épreuves de présélection (algorithmique, machine learning, éthique de l'IA)": "Pass the preselection tests (algorithms, machine learning, AI ethics)",
+    };
+    for (const [textFr, textEn] of Object.entries(criteresTranslations)) {
+      await sql`UPDATE ia_criteres SET text_en = ${textEn} WHERE text_fr = ${textFr} AND (text_en IS NULL OR text_en = '')`;
+    }
+
+    const contactsTranslations: Record<string, { role: string; name: string; note: string }> = {
+      "Presse & Accréditations": { role: "Press & Accreditation", name: "Communication Department", note: "For interview requests, accreditation and press kits." },
+      "Partenariats & Coopération": { role: "Partnerships & Cooperation", name: "Partnerships Directorate", note: "International organizations, funding bodies, technical partners." },
+      "Réclamations & Signalements": { role: "Complaints & Reports", name: "Citizen Response Unit", note: "Handling of reports and complaints relating to public digital services." },
+    };
+    for (const [roleFr, tr] of Object.entries(contactsTranslations)) {
+      await sql`
+        UPDATE contacts_specifiques SET role_en = ${tr.role}, name_en = ${tr.name}, note_en = ${tr.note}
+        WHERE role_fr = ${roleFr} AND (note_en IS NULL OR note_en = '')
+      `;
+    }
+
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
