@@ -21,29 +21,56 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
 
   const [activeCategory, setActiveCategory] = useState("all");
   const [showAllDocs, setShowAllDocs] = useState(false);
+  const [query, setQuery] = useState("");
 
-  const filtered = activeCategory === "all" ? documents : documents.filter((d) => d.category === activeCategory);
+  const byCategory = activeCategory === "all" ? documents : documents.filter((d) => d.category === activeCategory);
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = normalizedQuery ? byCategory.filter((d) => d.title.toLowerCase().includes(normalizedQuery)) : byCategory;
   const featured = filtered.filter((d) => d.featured);
   const others = filtered.filter((d) => !d.featured);
   const visibleOthers = showAllDocs ? others : others.slice(0, DOCS_PAGE_SIZE);
 
   return (
     <>
-      {/* Filter */}
+      {/* Filter + recherche */}
       <section className="px-4 sm:px-6 lg:px-8 py-6 bg-white" style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-        <div className="max-w-7xl mx-auto flex flex-wrap gap-3">
-          {categories.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => { setActiveCategory(cat.value); setShowAllDocs(false); }}
-              className="px-4 py-2 text-xs font-black uppercase tracking-widest cursor-pointer transition-colors"
-              style={{ background: activeCategory === cat.value ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat.value ? "white" : "rgba(26,26,26,0.50)" }}
-            >
-              {cat.label}
-            </button>
-          ))}
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+          <div className="flex flex-wrap gap-3">
+            {categories.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => { setActiveCategory(cat.value); setShowAllDocs(false); }}
+                className="px-4 py-2 text-xs font-black uppercase tracking-widest cursor-pointer transition-colors"
+                style={{ background: activeCategory === cat.value ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat.value ? "white" : "rgba(26,26,26,0.50)" }}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative flex-shrink-0 w-full sm:w-64">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" fill="none" stroke="rgba(26,26,26,0.4)" strokeWidth="2.2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" />
+            </svg>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setShowAllDocs(false); }}
+              placeholder={locale === "en" ? "Search a document..." : "Rechercher un document..."}
+              className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
+              style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+            />
+          </div>
         </div>
       </section>
+
+      {filtered.length === 0 && (
+        <section className="px-4 sm:px-6 lg:px-8 py-16 bg-white">
+          <p className="max-w-7xl mx-auto text-center text-anthracite/50 text-sm font-medium">
+            {locale === "en" ? "No documents match your search." : "Aucun document ne correspond à votre recherche."}
+          </p>
+        </section>
+      )}
 
       {/* Featured documents */}
       {featured.length > 0 && (

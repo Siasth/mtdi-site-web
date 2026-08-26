@@ -28,17 +28,22 @@ export default function ActualitesListClient({
 }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [query, setQuery] = useState("");
   const prefix = locale === "en" ? "/en" : "";
 
   const categories = Array.from(new Set(articles.map((a) => a.category)));
-  const filtered = activeCategory ? articles.filter((a) => a.category === activeCategory) : articles;
+  const byCategory = activeCategory ? articles.filter((a) => a.category === activeCategory) : articles;
+  const normalizedQuery = query.trim().toLowerCase();
+  const filtered = normalizedQuery
+    ? byCategory.filter((a) => a.title.toLowerCase().includes(normalizedQuery))
+    : byCategory;
   const visible = showAll ? filtered : filtered.slice(0, 6);
 
   return (
     <>
-      {/* Filter tabs */}
+      {/* Filter tabs + recherche */}
       <section className="px-4 sm:px-6 lg:px-8 py-6 bg-white" style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
           <div className="flex gap-px overflow-x-auto" role="list" aria-label="Filtrer par catégorie" style={{ scrollbarWidth: "none" }}>
             <button
               role="listitem"
@@ -62,12 +67,32 @@ export default function ActualitesListClient({
               </button>
             ))}
           </div>
+
+          <div className="relative flex-shrink-0 w-full sm:w-64">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" fill="none" stroke="rgba(26,26,26,0.4)" strokeWidth="2.2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" />
+            </svg>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setShowAll(false); }}
+              placeholder={locale === "en" ? "Search an article..." : "Rechercher un article..."}
+              className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
+              style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+            />
+          </div>
         </div>
       </section>
 
       {/* Articles grid */}
       <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gris-perle">
         <div className="max-w-7xl mx-auto">
+          {filtered.length === 0 ? (
+            <p className="text-center text-anthracite/50 text-sm font-medium py-12">
+              {locale === "en" ? "No articles match your search." : "Aucun article ne correspond à votre recherche."}
+            </p>
+          ) : (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
             {visible.map((article) => {
               const href = article.hrefExternal || `${prefix}/actualites/${article.id}`;
@@ -116,6 +141,8 @@ export default function ActualitesListClient({
                 </svg>
               </button>
             </div>
+          )}
+          </>
           )}
         </div>
       </section>
