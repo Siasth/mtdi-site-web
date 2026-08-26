@@ -19,8 +19,8 @@ export default function AdminDirect() {
   function load() {
     setLoading(true);
     Promise.all([
-      fetch("/api/admin/direct-upcoming").then((r) => r.json()),
-      fetch("/api/admin/direct-replays").then((r) => r.json()),
+      fetch("/api/admin/direct-upcoming", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/admin/direct-replays", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([u, r]) => { setUpcoming(u); setReplays(r); setLoading(false); });
   }
   useEffect(() => { if (canManage) load(); }, [canManage]);

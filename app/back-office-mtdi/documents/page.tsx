@@ -21,7 +21,7 @@ export default function AdminDocuments() {
   const [uploadError, setUploadError] = useState("");
   const [uploadedFileName, setUploadedFileName] = useState("");
 
-  function load() { setLoading(true); fetch("/api/admin/documents").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/documents", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setUploadedFileName(""); setUploadError(""); setEditing("new"); }

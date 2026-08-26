@@ -29,7 +29,7 @@ export default function AdminMinistre() {
   function load() {
     setLoading(true);
     setLoadError("");
-    fetch("/api/admin/ministre-settings")
+    fetch("/api/admin/ministre-settings", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
         return r.json();

@@ -23,7 +23,7 @@ export default function AdminCabinet() {
   const [form, setForm] = useState(emptyForm);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
-  function load() { setLoading(true); fetch("/api/admin/cabinet").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/cabinet", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setEditing("new"); }

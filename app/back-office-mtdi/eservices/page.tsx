@@ -15,7 +15,7 @@ export default function AdminEServices() {
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
 
-  function load() { setLoading(true); fetch("/api/admin/eservices").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/eservices", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setEditing("new"); }

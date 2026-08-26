@@ -19,7 +19,7 @@ export default function AdminSecurite() {
   const [pwdLoading, setPwdLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/profile")
+    fetch("/api/admin/profile", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         setName(d.name);

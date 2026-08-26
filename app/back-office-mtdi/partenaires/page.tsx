@@ -32,7 +32,7 @@ export default function AdminPartenaires() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
 
-  function load() { setLoading(true); fetch("/api/admin/partners").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/partners", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setActiveLang("fr"); setEditing("new"); }

@@ -18,7 +18,7 @@ export async function GET() {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const settings = await getGeneralSettings();
-  return NextResponse.json(settings);
+  return NextResponse.json(settings, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function PUT(req: NextRequest) {

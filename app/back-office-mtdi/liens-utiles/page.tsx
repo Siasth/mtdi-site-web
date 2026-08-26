@@ -14,7 +14,7 @@ export default function AdminLiensUtiles() {
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
 
-  function load() { setLoading(true); fetch("/api/admin/liens-utiles").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/liens-utiles", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setEditing("new"); }

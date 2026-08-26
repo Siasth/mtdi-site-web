@@ -38,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   if (denied) return denied;
 
   const data = await readData(resource);
-  return NextResponse.json(data);
+  return NextResponse.json(data, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {

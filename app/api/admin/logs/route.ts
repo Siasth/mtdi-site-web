@@ -36,5 +36,5 @@ export async function GET(req: NextRequest) {
     total: Number(countResult.rows[0].total),
     page,
     perPage,
-  });
+  }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }

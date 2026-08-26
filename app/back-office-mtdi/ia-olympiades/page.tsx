@@ -17,8 +17,8 @@ export default function AdminIAOlympiades() {
   function load() {
     setLoading(true);
     Promise.all([
-      fetch("/api/admin/ia-olympiades-editions").then((r) => r.json()),
-      fetch("/api/admin/ia-criteres").then((r) => r.json()),
+      fetch("/api/admin/ia-olympiades-editions", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/admin/ia-criteres", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([e, c]) => { setEditions(e); setCriteres(c); setLoading(false); });
   }
   useEffect(() => { if (canManage) load(); }, [canManage]);

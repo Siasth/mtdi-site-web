@@ -23,7 +23,7 @@ export async function GET() {
   }
   try {
     const bio = await getMinistreBio();
-    return NextResponse.json(bio);
+    return NextResponse.json(bio, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

@@ -28,7 +28,7 @@ export async function GET() {
   return NextResponse.json({
     forceTwoFactorAll,
     smtp: smtp ? { ...smtp, pass: smtp.pass ? "••••••••" : "" } : null, // le mot de passe n'est jamais renvoyé en clair
-  });
+  }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function PUT(req: NextRequest) {

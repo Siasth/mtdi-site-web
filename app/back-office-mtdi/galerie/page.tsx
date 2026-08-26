@@ -55,8 +55,8 @@ export default function AdminGalerie() {
     setLoading(true);
     setLoadError("");
     Promise.all([
-      fetch("/api/admin/galerie-items").then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
-      fetch("/api/admin/galerie-collections").then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
+      fetch("/api/admin/galerie-items", { cache: "no-store" }).then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
+      fetch("/api/admin/galerie-collections", { cache: "no-store" }).then(async (r) => { if (!r.ok) throw new Error(await r.text()); return r.json(); }),
     ])
       .then(([i, c]) => { setItems(i); setCollections(c); setLoading(false); })
       .catch((err) => { setLoadError(err.message); setLoading(false); });

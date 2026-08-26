@@ -75,11 +75,11 @@ export default function AdminActualites() {
     setLoading(true);
     setLoadError("");
     Promise.all([
-      fetch("/api/admin/actualites").then(async (r) => {
+      fetch("/api/admin/actualites", { cache: "no-store" }).then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} sur /api/admin/actualites : ${await r.text()}`);
         return r.json();
       }),
-      fetch("/api/admin/categories").then(async (r) => {
+      fetch("/api/admin/categories", { cache: "no-store" }).then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} sur /api/admin/categories : ${await r.text()}`);
         return r.json();
       }),

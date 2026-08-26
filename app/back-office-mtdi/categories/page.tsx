@@ -31,7 +31,7 @@ export default function AdminCategories() {
 
   function load() {
     setLoading(true);
-    fetch("/api/admin/categories").then((r) => r.json()).then((d) => { setCategories(d); setLoading(false); });
+    fetch("/api/admin/categories", { cache: "no-store" }).then((r) => r.json()).then((d) => { setCategories(d); setLoading(false); });
   }
   useEffect(() => { if (canView) load(); }, [canView]);
 

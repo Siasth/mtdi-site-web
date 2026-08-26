@@ -15,7 +15,7 @@ export default function AdminMissions() {
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState({ textFr: "", textEn: "", displayOrder: 0, active: true });
 
-  function load() { setLoading(true); fetch("/api/admin/missions").then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
+  function load() { setLoading(true); fetch("/api/admin/missions", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
   function openNew() { setForm({ textFr: "", textEn: "", displayOrder: items.length, active: true }); setEditing("new"); }

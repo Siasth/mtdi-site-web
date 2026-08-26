@@ -26,7 +26,7 @@ export async function GET() {
     LEFT JOIN categories c ON c.id = a.category_id
     ORDER BY a.deleted_at NULLS FIRST, a.published_at DESC, a.display_order ASC
   `;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {

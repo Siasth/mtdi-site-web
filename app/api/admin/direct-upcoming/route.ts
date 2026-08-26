@@ -16,7 +16,7 @@ export async function GET() {
   const session = await requireSession();
   if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const result = await sql`SELECT * FROM direct_upcoming ORDER BY deleted_at NULLS FIRST, event_date ASC`;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {

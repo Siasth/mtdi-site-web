@@ -39,7 +39,7 @@ export async function GET() {
     permissions: rolePerms.rows.filter((rp) => rp.role_id === role.id).map((rp) => rp.code),
   }));
 
-  return NextResponse.json({ roles: rolesWithPerms, allPermissions: allPermissions.rows });
+  return NextResponse.json({ roles: rolesWithPerms, allPermissions: allPermissions.rows }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 // Création d'un rôle (dynamique)

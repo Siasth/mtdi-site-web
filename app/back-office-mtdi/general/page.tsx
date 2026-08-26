@@ -28,7 +28,7 @@ export default function AdminGeneral() {
 
   useEffect(() => {
     if (!canManage) return;
-    fetch("/api/admin/general-settings")
+    fetch("/api/admin/general-settings", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         setForm({

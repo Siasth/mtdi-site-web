@@ -18,7 +18,7 @@ export async function GET() {
   const session = await requireSession();
   const result = await sql`SELECT name, email FROM users WHERE id = ${session.id}`;
   const row = result.rows[0];
-  return NextResponse.json({ name: row.name, email: row.email });
+  return NextResponse.json({ name: row.name, email: row.email }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function PATCH(req: NextRequest) {

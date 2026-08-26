@@ -23,7 +23,7 @@ export async function GET() {
     WHERE c.deleted_at IS NULL
     ORDER BY c.display_order ASC
   `;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {

@@ -23,7 +23,7 @@ export default function AdminRoles() {
 
   async function load() {
     setLoading(true);
-    const data = await fetch("/api/admin/roles").then((r) => r.json());
+    const data = await fetch("/api/admin/roles", { cache: "no-store" }).then((r) => r.json());
     setRoles(data.roles || []);
     setAllPermissions(data.allPermissions || []);
     setLoading(false);

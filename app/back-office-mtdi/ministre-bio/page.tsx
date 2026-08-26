@@ -38,7 +38,7 @@ export default function AdminMinistreBio() {
   function load() {
     setLoading(true);
     setLoadError("");
-    fetch("/api/admin/ministre-bio")
+    fetch("/api/admin/ministre-bio", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
         return r.json();

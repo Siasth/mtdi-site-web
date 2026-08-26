@@ -20,7 +20,7 @@ export async function GET() {
   }
   try {
     const settings = await getMinistreSettings();
-    return NextResponse.json(settings);
+    return NextResponse.json(settings, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

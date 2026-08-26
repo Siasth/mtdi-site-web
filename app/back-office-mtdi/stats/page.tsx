@@ -51,7 +51,7 @@ export default function AdminStats() {
   function load() {
     setLoading(true);
     setLoadError("");
-    fetch("/api/admin/stats")
+    fetch("/api/admin/stats", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
         return r.json();

@@ -21,7 +21,7 @@ export async function GET() {
     SELECT * FROM stats
     ORDER BY deleted_at NULLS FIRST, display_order ASC
   `;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {

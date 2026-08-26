@@ -51,7 +51,7 @@ export default function AdminChantiers() {
   function load() {
     setLoading(true);
     setLoadError("");
-    fetch("/api/admin/chantiers")
+    fetch("/api/admin/chantiers", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
         return r.json();

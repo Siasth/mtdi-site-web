@@ -33,8 +33,8 @@ export default function AdminUtilisateurs() {
   async function load() {
     setLoading(true);
     const [usersRes, rolesRes] = await Promise.all([
-      fetch("/api/admin/users").then((r) => r.json()),
-      fetch("/api/admin/roles").then((r) => r.json()),
+      fetch("/api/admin/users", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/admin/roles", { cache: "no-store" }).then((r) => r.json()),
     ]);
     setUsers(usersRes);
     setRoles((rolesRes.roles || []).map((r: { id: number; name: string }) => ({ id: r.id, name: r.name })));

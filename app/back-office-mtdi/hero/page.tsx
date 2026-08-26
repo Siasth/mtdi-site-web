@@ -36,7 +36,7 @@ export default function AdminHero() {
   function load() {
     setLoading(true);
     setLoadError("");
-    fetch("/api/admin/hero-slides")
+    fetch("/api/admin/hero-slides", { cache: "no-store" })
       .then(async (r) => {
         if (!r.ok) throw new Error(`Erreur ${r.status} : ${await r.text()}`);
         return r.json();

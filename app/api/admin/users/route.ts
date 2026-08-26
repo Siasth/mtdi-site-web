@@ -27,7 +27,7 @@ export async function GET() {
     JOIN roles r ON r.id = u.role_id
     ORDER BY u.deleted_at NULLS FIRST, u.created_at DESC
   `;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 // Création d'un utilisateur

@@ -19,8 +19,8 @@ export default function AdminIAStrategie() {
   function load() {
     setLoading(true);
     Promise.all([
-      fetch("/api/admin/ia-piliers").then((r) => r.json()),
-      fetch("/api/admin/ia-jalons").then((r) => r.json()),
+      fetch("/api/admin/ia-piliers", { cache: "no-store" }).then((r) => r.json()),
+      fetch("/api/admin/ia-jalons", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([p, j]) => { setPiliers(p); setJalons(j); setLoading(false); });
   }
   useEffect(() => { if (canManage) load(); }, [canManage]);

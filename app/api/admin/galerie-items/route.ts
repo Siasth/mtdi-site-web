@@ -24,7 +24,7 @@ export async function GET() {
     LEFT JOIN galerie_collections c ON c.id = g.collection_id
     ORDER BY g.deleted_at NULLS FIRST, g.event_date DESC NULLS LAST, g.display_order ASC
   `;
-  return NextResponse.json(result.rows);
+  return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {

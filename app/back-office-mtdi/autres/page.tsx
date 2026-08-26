@@ -23,7 +23,7 @@ export default function AdminAdministration() {
 
   useEffect(() => {
     if (!canManage) return;
-    fetch("/api/admin/security")
+    fetch("/api/admin/security", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
         setForceTwoFactorAll(!!d.forceTwoFactorAll);
