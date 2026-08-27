@@ -1771,10 +1771,10 @@ export async function POST(req: NextRequest) {
       ON form_submissions(form_type, ip_hash, created_at)
     `);
 
-    // Nettoyage de 2 permissions devenues mortes (remplacées depuis
-    // longtemps par contenu.modifier, plus aucun code ne les vérifie) —
-    // sans ça, elles continueraient à apparaître comme cases à cocher dans
-    // l'écran Rôles alors qu'elles n'ont plus aucun effet.
+    // Nettoyage de 2 permissions mortes depuis longtemps (remplacées à
+    // l'époque par contenu.modifier, lui-même depuis remplacé par les
+    // groupes actuels) — sans ça, elles continueraient à apparaître comme
+    // cases à cocher dans l'écran Rôles alors qu'elles n'ont plus aucun effet.
     await sql`
       DELETE FROM role_permissions
       WHERE permission_id IN (SELECT id FROM permissions WHERE code IN ('galerie.voir', 'galerie.gerer'))
