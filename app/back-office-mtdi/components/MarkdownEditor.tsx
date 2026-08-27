@@ -403,11 +403,15 @@ export default function MarkdownEditor({
   placeholder?: string;
   rows?: number;
 }) {
-  // Ne sert qu'à forcer un re-rendu quand le curseur bouge sans modifier de
-  // contenu (voir onSelectionUpdate plus bas) — jamais lu ailleurs.
-  const [, setSelectionTick] = useState(0);
   const editor = useEditor({
     immediatelyRender: false,
+    // Sans ça (option officielle TipTap, désactivée par défaut), le
+    // composant ne se re-rend pas lors d'un simple déplacement du curseur
+    // (ex: cliquer dans un tableau déjà existant) — seul un changement de
+    // CONTENU déclenchait un re-rendu, donc les boutons de la barre
+    // d'outils (isActive("table"), isActive("bold")...) restaient figés
+    // sur leur dernier état jusqu'à la prochaine frappe.
+    shouldRerenderOnTransaction: true,
     extensions: [
       StarterKit.configure({ link: false, paragraph: false }),
       ParagraphWithSpacing,
@@ -425,14 +429,6 @@ export default function MarkdownEditor({
     content: value || "",
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
-    },
-    // Sans ça, la barre d'outils (isActive("table"), isActive("bold")...)
-    // ne se met à jour que lors d'un changement de CONTENU — cliquer dans
-    // un tableau déjà présent (juste un déplacement du curseur, aucun
-    // contenu modifié) ne rafraîchissait donc jamais les boutons tant
-    // qu'aucune modification n'avait eu lieu ailleurs entre-temps.
-    onSelectionUpdate: () => {
-      setSelectionTick((t) => t + 1);
     },
     editorProps: {
       attributes: {

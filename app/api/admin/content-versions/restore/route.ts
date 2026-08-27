@@ -38,6 +38,8 @@ export async function POST(req: NextRequest) {
   const snapshot = version.snapshot as Record<string, any>;
 
   try {
+    let verif: Record<string, unknown> | null = null;
+
     if (table_name === "actualites") {
       // Sauvegarde l'état actuel avant de le remplacer, pour pouvoir
       // annuler la restauration elle-même comme n'importe quelle modif.
@@ -56,6 +58,9 @@ export async function POST(req: NextRequest) {
           updated_at = now()
         WHERE id = ${record_id}
       `;
+      // Diagnostic temporaire : relit ce qui est vraiment en base juste après.
+      const verifResult = await sql`SELECT title_fr, excerpt_fr FROM actualites WHERE id = ${record_id}`;
+      verif = verifResult.rows[0] || null;
     } else if (table_name === "static_pages") {
       const current = await sql`SELECT * FROM static_pages WHERE slug = ${record_id}`;
       if (current.rows[0]) await saveVersion("static_pages", record_id, current.rows[0], session.id);
@@ -66,17 +71,23 @@ export async function POST(req: NextRequest) {
           published = ${snapshot.published}, updated_by = ${session.id}, updated_at = now()
         WHERE slug = ${record_id}
       `;
+      const verifResult = await sql`SELECT content_fr, published FROM static_pages WHERE slug = ${record_id}`;
+      verif = verifResult.rows[0] || null;
     } else if (table_name === "settings" && record_id === "ministre_bio") {
       const currentResult = await sql`SELECT value FROM settings WHERE key = 'ministre_bio'`;
       if (currentResult.rows[0]) await saveVersion("settings", "ministre_bio", currentResult.rows[0].value, session.id);
 
       await setSetting("ministre_bio", snapshot);
+      const verifResult = await sql`SELECT value FROM settings WHERE key = 'ministre_bio'`;
+      verif = verifResult.rows[0]?.value || null;
     } else {
       return NextResponse.json({ error: "Module non pris en charge pour la restauration" }, { status: 400 });
     }
 
     await logAudit({ userId: session.id, action: "modifier", module: table_name, resourceId: record_id, details: { action: "restauration_version", versionId }, ip: getIp(req) });
-    return NextResponse.json({ ok: true });
+    // Diagnostic temporaire : renvoie ce qui a été demandé ET ce qui est
+    // vraiment en base après écriture, pour comparer sans ambiguïté.
+    return NextResponse.json({ ok: true, debugSnapshotRequested: snapshot, debugVerifAfterWrite: verif });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }

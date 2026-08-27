@@ -69,25 +69,37 @@ export default function VersionHistory({
   async function handleRestore(versionId: number) {
     if (!confirm("Restaurer cette version ? L'état actuel sera lui-même conservé dans l'historique, donc rien n'est perdu.")) return;
     setRestoringId(versionId);
-    const res = await fetch("/api/admin/content-versions/restore", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ versionId }),
-    });
+    let res: Response;
+    try {
+      res = await fetch("/api/admin/content-versions/restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ versionId }),
+      });
+    } catch (networkErr) {
+      setRestoringId(null);
+      alert(`DIAGNOSTIC — requête réseau échouée : ${networkErr instanceof Error ? networkErr.message : String(networkErr)}`);
+      return;
+    }
+    const rawText = await res.text();
     setRestoringId(null);
+
+    // ── Diagnostic temporaire ── à retirer une fois le bug résolu.
+    let parsed: any = null;
+    try { parsed = JSON.parse(rawText); } catch { /* pas du JSON valide */ }
+    alert(
+      `DIAGNOSTIC\n\n` +
+      `Statut HTTP : ${res.status} ${res.ok ? "(OK)" : "(ERREUR)"}\n\n` +
+      `Réponse brute :\n${rawText.slice(0, 800)}`
+    );
+
     if (res.ok) {
-      // On a déjà les données restaurées en mémoire (c'est le contenu de
-      // cette version) : on les transmet directement au parent pour que le
-      // formulaire ouvert se resynchronise sans attendre un rechargement.
       const restoredVersion = versions.find((v) => v.id === versionId);
       if (restoredVersion && onDataRestored) {
         onDataRestored(restoredVersion.snapshot);
       }
       onRestored();
       onClose();
-    } else {
-      const data = await res.json().catch(() => ({}));
-      alert(data.error || "Erreur lors de la restauration.");
     }
   }
 
