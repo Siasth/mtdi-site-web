@@ -3,6 +3,7 @@ import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { sanitizeRichText } from "@/lib/sanitize";
 import { hasPerm } from "@/lib/permissions";
+import { saveVersion } from "@/lib/content-versions";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -45,6 +46,12 @@ export async function PATCH(
         { status: 400 }
       );
     }
+  }
+
+  // Historique : instantané de l'état AVANT modification.
+  const before = await sql`SELECT * FROM actualites WHERE id = ${id}`;
+  if (before.rows[0]) {
+    await saveVersion("actualites", id, before.rows[0], session.id);
   }
 
   await sql`

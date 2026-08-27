@@ -1781,6 +1781,27 @@ export async function POST(req: NextRequest) {
     `;
     await sql`DELETE FROM permissions WHERE code IN ('galerie.voir', 'galerie.gerer')`;
 
+    // ══════════════════════════════════════════════════════════════════
+    // Historique des modifications : un instantané du contenu AVANT
+    // chaque modification, pour pouvoir comparer et revenir en arrière.
+    // record_id en TEXT (pas INTEGER) car certains modules s'identifient
+    // par un slug (ex: static_pages) plutôt qu'un id numérique.
+    // ══════════════════════════════════════════════════════════════════
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS content_versions (
+        id SERIAL PRIMARY KEY,
+        table_name TEXT NOT NULL,
+        record_id TEXT NOT NULL,
+        snapshot JSONB NOT NULL,
+        changed_by INTEGER REFERENCES users(id),
+        changed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `);
+    await sql.query(`
+      CREATE INDEX IF NOT EXISTS idx_content_versions_lookup
+      ON content_versions(table_name, record_id, changed_at DESC)
+    `);
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

@@ -6,6 +6,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { cleanupOldFile } from "@/lib/client-upload";
+import VersionHistory from "../components/VersionHistory";
 import { uploadFile } from "@/lib/client-upload";
 
 const VERT = "#006828";
@@ -65,6 +66,7 @@ export default function AdminActualites() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -315,7 +317,14 @@ export default function AdminActualites() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
           <form onSubmit={handleSave} className="bg-white rounded-xl p-6 w-[90%] max-w-6xl shadow-2xl space-y-5 my-auto">
             <div className="flex items-center justify-between">
-              <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvel article" : "Modifier l'article"}</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvel article" : "Modifier l'article"}</h2>
+                {editingId !== "new" && (
+                  <button type="button" onClick={() => setShowHistory(true)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>
+                    Historique
+                  </button>
+                )}
+              </div>
               {/* Onglets de langue : on édite le FR puis l'EN l'un après l'autre, jamais côte à côte */}
               <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
                 <button
@@ -498,6 +507,22 @@ export default function AdminActualites() {
           </form>
         </div>
       )}
+
+      {showHistory && editingId !== null && editingId !== "new" && (() => {
+        const article = articles.find((a) => a.id === editingId);
+        if (!article) return null;
+        return (
+          <VersionHistory
+            table="actualites"
+            recordId={article.id}
+            current={article}
+            fieldLabels={{ title_fr: "Titre (FR)", title_en: "Titre (EN)", excerpt_fr: "Extrait (FR)", excerpt_en: "Extrait (EN)", image: "Image", status: "Statut", featured: "À la une", published_at: "Date de publication" }}
+            canRestore={canEdit}
+            onRestored={load}
+            onClose={() => setShowHistory(false)}
+          />
+        );
+      })()}
     </div>
   );
 }

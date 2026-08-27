@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
+import VersionHistory from "../components/VersionHistory";
 
 const VERT = "#006828";
 const PAGES = [
@@ -19,6 +20,7 @@ export default function AdminPagesStatiques() {
   const [activeSlug, setActiveSlug] = useState(PAGES[0].slug);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [saving, setSaving] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   function load() {
@@ -70,6 +72,9 @@ export default function AdminPagesStatiques() {
             <div>
               <p className="font-bold text-gray-900">{PAGES.find((p) => p.slug === activeSlug)?.label}</p>
               <p className="text-xs text-gray-500 mt-0.5">/{activeSlug}</p>
+              <button type="button" onClick={() => setShowHistory(true)} className="text-xs font-bold hover:underline mt-1" style={{ color: VERT }}>
+                Historique
+              </button>
             </div>
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <span className="text-sm font-semibold text-gray-700">{current.published ? "Publiée" : "Dépubliée"}</span>
@@ -109,6 +114,18 @@ export default function AdminPagesStatiques() {
             {saving ? "Enregistrement..." : "Enregistrer"}
           </button>
         </div>
+      )}
+
+      {showHistory && current && (
+        <VersionHistory
+          table="static_pages"
+          recordId={current.slug}
+          current={current}
+          fieldLabels={{ content_fr: "Contenu (FR)", content_en: "Contenu (EN)", published: "Publiée" }}
+          canRestore={canManage}
+          onRestored={load}
+          onClose={() => setShowHistory(false)}
+        />
       )}
     </div>
   );

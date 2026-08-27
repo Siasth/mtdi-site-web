@@ -3,6 +3,7 @@ import { getSession, setSetting, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
 import { getMinistreBio } from "@/lib/ministre-bio";
 import { sanitizeRichText } from "@/lib/sanitize";
+import { saveVersion } from "@/lib/content-versions";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -53,6 +54,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const current = await getMinistreBio();
+  await saveVersion("settings", "ministre_bio", current as unknown as Record<string, unknown>, session.id);
   await setSetting("ministre_bio", { ...current, ...body });
   await logAudit({ userId: session.id, action: "modifier", module: "ministre-bio", ip: getIp(req) });
   return NextResponse.json({ ok: true });

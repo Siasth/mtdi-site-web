@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { uploadFile } from "@/lib/client-upload";
+import VersionHistory from "../components/VersionHistory";
 
 const VERT = "#006828";
 
@@ -34,6 +35,7 @@ export default function AdminMinistreBio() {
   const [msg, setMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
   const [form, setForm] = useState<FormState | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   function load() {
     setLoading(true);
@@ -134,6 +136,9 @@ export default function AdminMinistreBio() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Le Ministre — Page biographie</h1>
           <p className="text-sm text-gray-500 mt-1">Page complète /le-ministere/le-ministre (distincte du widget accueil)</p>
+          <button type="button" onClick={() => setShowHistory(true)} className="text-xs font-bold hover:underline mt-1" style={{ color: VERT }}>
+            Historique
+          </button>
         </div>
         <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
           <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>Français</button>
@@ -230,6 +235,18 @@ export default function AdminMinistreBio() {
           {saving ? "Enregistrement..." : "Enregistrer"}
         </button>
       </form>
+
+      {showHistory && form && (
+        <VersionHistory
+          table="settings"
+          recordId="ministre_bio"
+          current={form as unknown as Record<string, unknown>}
+          fieldLabels={{ name: "Nom", photo: "Photo", bioContentFr: "Biographie (FR)", bioContentEn: "Biographie (EN)", prioritesFr: "Priorités (FR)", prioritesEn: "Priorités (EN)", parcoursFr: "Parcours (FR)", parcoursEn: "Parcours (EN)" }}
+          canRestore={canManage}
+          onRestored={load}
+          onClose={() => setShowHistory(false)}
+        />
+      )}
     </div>
   );
 }

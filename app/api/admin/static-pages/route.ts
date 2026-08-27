@@ -3,6 +3,7 @@ import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
 import { sanitizeRichText } from "@/lib/sanitize";
+import { saveVersion } from "@/lib/content-versions";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base.
@@ -25,6 +26,13 @@ export async function PATCH(req: NextRequest) {
   try {
     const { slug, contentFr, contentEn, published } = await req.json();
     if (!slug) return NextResponse.json({ error: "slug requis" }, { status: 400 });
+
+    // Historique : instantané de l'état AVANT modification.
+    const before = await sql`SELECT * FROM static_pages WHERE slug = ${slug}`;
+    if (before.rows[0]) {
+      await saveVersion("static_pages", slug, before.rows[0], session.id);
+    }
+
     await sql`
       UPDATE static_pages SET
         content_fr = COALESCE(${contentFr ? sanitizeRichText(contentFr) : null}, content_fr),
