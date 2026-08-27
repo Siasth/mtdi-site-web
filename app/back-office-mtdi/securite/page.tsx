@@ -103,11 +103,12 @@ export default function AdminSecurite() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nouveau mot de passe</label>
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input type="password" minLength={12} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <p className="text-xs text-gray-400 mt-1">12 caractères minimum. Une phrase facile à retenir mais longue est préférable à un mot court avec des symboles.</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Confirmer le nouveau mot de passe</label>
-            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input type="password" minLength={12} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           {pwdMsg && <p className={`text-sm ${pwdMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{pwdMsg.text}</p>}
           <button type="submit" disabled={pwdLoading} className="px-4 py-2 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>

@@ -190,9 +190,9 @@ export default function AdminUtilisateurs() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mot de passe initial</label>
-              <input required type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
+              <input required type="text" minLength={12} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              <p className="text-xs text-gray-400 mt-1">L'utilisateur devra le changer à sa première connexion.</p>
+              <p className="text-xs text-gray-400 mt-1">12 caractères minimum. L'utilisateur devra le changer à sa première connexion.</p>
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}

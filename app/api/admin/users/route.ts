@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { checkPasswordStrength } from "@/lib/password-policy";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -45,6 +46,11 @@ export async function POST(req: NextRequest) {
   const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
   if (existing.rows.length > 0) {
     return NextResponse.json({ error: "Cet email est déjà utilisé" }, { status: 409 });
+  }
+
+  const check = checkPasswordStrength(password, { email, name });
+  if (!check.valid) {
+    return NextResponse.json({ error: check.error }, { status: 400 });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { checkPasswordStrength } from "@/lib/password-policy";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -29,6 +30,11 @@ export async function PATCH(
   }
 
   if (newPassword) {
+    const target = await sql`SELECT email, name FROM users WHERE id = ${id}`;
+    const check = checkPasswordStrength(newPassword, { email: target.rows[0]?.email, name: target.rows[0]?.name });
+    if (!check.valid) {
+      return NextResponse.json({ error: check.error }, { status: 400 });
+    }
     const passwordHash = await bcrypt.hash(newPassword, 12);
     await sql`
       UPDATE users

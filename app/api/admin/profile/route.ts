@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
+import { checkPasswordStrength } from "@/lib/password-policy";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -31,13 +32,14 @@ export async function PATCH(req: NextRequest) {
     if (!currentPassword) {
       return NextResponse.json({ error: "Mot de passe actuel requis" }, { status: 400 });
     }
-    const userResult = await sql`SELECT password_hash FROM users WHERE id = ${session.id}`;
+    const userResult = await sql`SELECT password_hash, email, name FROM users WHERE id = ${session.id}`;
     const valid = await bcrypt.compare(currentPassword, userResult.rows[0].password_hash);
     if (!valid) {
       return NextResponse.json({ error: "Mot de passe actuel incorrect" }, { status: 401 });
     }
-    if (newPassword.length < 8) {
-      return NextResponse.json({ error: "Le nouveau mot de passe doit contenir au moins 8 caractères" }, { status: 400 });
+    const check = checkPasswordStrength(newPassword, { email: userResult.rows[0].email, name: userResult.rows[0].name });
+    if (!check.valid) {
+      return NextResponse.json({ error: check.error }, { status: 400 });
     }
     const passwordHash = await bcrypt.hash(newPassword, 12);
     await sql`
