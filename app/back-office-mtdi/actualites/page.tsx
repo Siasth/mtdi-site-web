@@ -289,7 +289,6 @@ export default function AdminActualites() {
               <th className="px-5 py-3">Traduction EN</th>
               <th className="px-5 py-3">Catégorie</th>
               <th className="px-5 py-3">Statut</th>
-              <th className="px-5 py-3">Date</th>
               <th className="px-5 py-3">À la une</th>
               <th className="px-5 py-3 text-right">Actions</th>
             </tr>
@@ -316,7 +315,6 @@ export default function AdminActualites() {
                     </span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-gray-400 text-xs">{new Date(a.published_at).toLocaleDateString("fr-FR")}</td>
                 <td className="px-5 py-3">{a.featured ? "✓" : ""}</td>
                 <td className="px-5 py-3">
                   <div className="flex items-center justify-end gap-1">
@@ -383,6 +381,10 @@ export default function AdminActualites() {
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
                   <MarkdownEditor value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={6} />
                 </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
+                  <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
+                </div>
               </div>
             ) : (
               <div className="space-y-4">
@@ -400,36 +402,67 @@ export default function AdminActualites() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Catégorie</label>
-                <select
-                  required
-                  value={form.categoryId}
-                  onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
-                >
-                  <option value="" disabled>Sélectionner...</option>
-                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name_fr}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Statut</label>
-                <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
-                  <option value="brouillon">Brouillon</option>
-                  <option value="publie">Publié</option>
-                  <option value="depublie">Dépublié</option>
-                  <option value="archive">Archivé</option>
-                </select>
-              </div>
-              {form.status === "publie" && (
+            {/* ── Classement ── comment l'article est catégorisé et trouvé */}
+            <div className="pt-3 border-t border-gray-100">
+              <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Classement</p>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Publier plus tard (optionnel)</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catégorie *</label>
+                  <select
+                    required
+                    value={form.categoryId}
+                    onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+                  >
+                    <option value="" disabled>Sélectionner...</option>
+                    {categories.map((c) => <option key={c.id} value={c.id}>{c.name_fr}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
+                  <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <p className="text-xs text-gray-400 mt-1">Si renseigné, l'article renvoie vers ce lien au lieu d'une page de détail interne.</p>
+                </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
+                {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
+                <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
+                  {uploading ? "Envoi..." : "Choisir une image"}
+                  <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
+                </label>
+                {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
+              </div>
+            </div>
+
+            {/* ── Publication ── si/quand l'article devient visible, et comment il est mis en avant */}
+            <div className="pt-3 border-t border-gray-100">
+              <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Publication</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
+                  <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                    <option value="brouillon">Brouillon</option>
+                    <option value="publie">Publié</option>
+                    <option value="depublie">Dépublié</option>
+                    <option value="archive">Archivé</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Date de publication *</label>
+                  <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <p className="text-xs text-gray-400 mt-1">Date affichée et utilisée pour le tri — pas la visibilité (voir ci-dessous).</p>
+                </div>
+              </div>
+
+              {form.status === "publie" && (
+                <div className="mt-4">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Publier plus tard (optionnel)</label>
                   <input
                     type="datetime-local"
                     value={form.scheduledAt}
                     onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    className="w-full max-w-xs px-3 py-2 border border-gray-200 rounded-lg text-sm"
                   />
                   <p className="text-xs text-gray-400 mt-1">
                     {form.scheduledAt
@@ -443,44 +476,19 @@ export default function AdminActualites() {
                   )}
                 </div>
               )}
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Date de publication</label>
-                <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
-                <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
-                <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
-              {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading ? "Envoi..." : "Choisir une image"}
-                <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
-              </label>
-              {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
-            </div>
-
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
-                Afficher dans "À la une"
-                <span className="text-xs text-gray-400">
-                  ({articles.filter((a) => a.featured && a.status === "publie" && !a.deleted_at && a.id !== editingId).length}/8)
-                </span>
-              </label>
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              <div className="flex items-center gap-4 mt-4">
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} />
+                  Afficher dans "À la une"
+                  <span className="text-xs text-gray-400">
+                    ({articles.filter((a) => a.featured && a.status === "publie" && !a.deleted_at && a.id !== editingId).length}/8)
+                  </span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-700">Ordre d'affichage</label>
+                  <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                </div>
               </div>
             </div>
 
