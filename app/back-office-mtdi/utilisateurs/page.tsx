@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
-import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon } from "../components/ActionIcons";
+import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon, ResetPasswordIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
 
@@ -29,6 +29,12 @@ export default function AdminUtilisateurs() {
   const [error, setError] = useState("");
 
   const [form, setForm] = useState({ email: "", name: "", roleId: "", password: "" });
+
+  const [resetTarget, setResetTarget] = useState<UserRow | null>(null);
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -99,6 +105,32 @@ export default function AdminUtilisateurs() {
     await load();
   }
 
+  function openResetPassword(u: UserRow) {
+    setResetTarget(u);
+    setResetPassword("");
+    setResetError("");
+    setResetSuccess(false);
+  }
+
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!resetTarget) return;
+    setResetting(true);
+    setResetError("");
+    const res = await fetch(`/api/admin/users/${resetTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newPassword: resetPassword }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setResetSuccess(true);
+    } else {
+      setResetError(data.error || "Erreur lors de la réinitialisation");
+    }
+    setResetting(false);
+  }
+
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
   return (
@@ -154,6 +186,7 @@ export default function AdminUtilisateurs() {
                         ) : (
                           <ToggleOffIcon label="Activer" onClick={() => toggleStatus(u)} />
                         )}
+                        <ResetPasswordIcon label="Réinitialiser le mot de passe" onClick={() => openResetPassword(u)} />
                         <DeleteIcon label="Supprimer" onClick={() => removeUser(u)} />
                       </>
                     )}
@@ -206,6 +239,49 @@ export default function AdminUtilisateurs() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+      {resetTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          {resetSuccess ? (
+            <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+              <h2 className="font-bold text-gray-900 text-lg">Mot de passe réinitialisé</h2>
+              <p className="text-sm text-gray-600">
+                Communiquez ce nouveau mot de passe à <strong>{resetTarget.name}</strong> par un canal sûr (pas par email en clair dans l'idéal). Il devra le changer dès sa prochaine connexion.
+              </p>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 font-mono text-sm break-all select-all">
+                {resetPassword}
+              </div>
+              <button
+                type="button"
+                onClick={() => setResetTarget(null)}
+                className="w-full py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg"
+                style={{ background: VERT }}
+              >
+                Fermer
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleResetPassword} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
+              <h2 className="font-bold text-gray-900 text-lg">Réinitialiser le mot de passe</h2>
+              <p className="text-sm text-gray-500">Pour <strong>{resetTarget.name}</strong> ({resetTarget.email})</p>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nouveau mot de passe</label>
+                <input required type="text" minLength={12} value={resetPassword} onChange={(e) => setResetPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" autoFocus />
+                <p className="text-xs text-gray-400 mt-1">12 caractères minimum. La personne devra le changer à sa prochaine connexion.</p>
+              </div>
+              {resetError && <p className="text-sm text-red-600">{resetError}</p>}
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={() => setResetTarget(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
+                  Annuler
+                </button>
+                <button type="submit" disabled={resetting} className="flex-1 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+                  {resetting ? "Réinitialisation..." : "Réinitialiser"}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       )}
     </div>

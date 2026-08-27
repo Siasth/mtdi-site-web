@@ -80,3 +80,14 @@ export function ToggleOffIcon(props: Omit<IconButtonProps, "variant">) {
     </IconButton>
   );
 }
+
+export function ResetPasswordIcon(props: Omit<IconButtonProps, "variant">) {
+  return (
+    <IconButton {...props}>
+      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <circle cx="8" cy="15" r="4" />
+        <path d="M11 12l7-7m0 0v4m0-4h-4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </IconButton>
+  );
+}
