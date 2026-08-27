@@ -244,6 +244,7 @@ export default function AdminMinistreBio() {
           fieldLabels={{ name: "Nom", photo: "Photo", bioContentFr: "Biographie (FR)", bioContentEn: "Biographie (EN)", prioritesFr: "Priorités (FR)", prioritesEn: "Priorités (EN)", parcoursFr: "Parcours (FR)", parcoursEn: "Parcours (EN)" }}
           canRestore={canManage}
           onRestored={load}
+          onDataRestored={(snapshot) => setForm(snapshot as unknown as FormState)}
           onClose={() => setShowHistory(false)}
         />
       )}

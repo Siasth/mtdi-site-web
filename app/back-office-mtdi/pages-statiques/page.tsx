@@ -124,6 +124,10 @@ export default function AdminPagesStatiques() {
           fieldLabels={{ content_fr: "Contenu (FR)", content_en: "Contenu (EN)", published: "Publiée" }}
           canRestore={canManage}
           onRestored={load}
+          onDataRestored={(snapshot) => {
+            const restored = snapshot as unknown as Row;
+            setRows((prev) => prev.map((r) => (r.slug === restored.slug ? restored : r)));
+          }}
           onClose={() => setShowHistory(false)}
         />
       )}

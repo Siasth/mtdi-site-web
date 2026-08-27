@@ -117,15 +117,19 @@ export default function AdminActualites() {
     setEditingId("new");
   }
 
-  function openEdit(a: Article) {
-    setForm({
+  function articleToForm(a: Article): FormState {
+    return {
       titleFr: a.title_fr, titleEn: a.title_en || "",
       excerptFr: a.excerpt_fr, excerptEn: a.excerpt_en || "",
       categoryId: a.category_id ?? "", image: a.image || "", hrefExternal: a.href_external || "",
       publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
       featured: a.featured, displayOrder: a.display_order, status: a.status,
       attachments: a.attachments || [],
-    });
+    };
+  }
+
+  function openEdit(a: Article) {
+    setForm(articleToForm(a));
     setActiveLang("fr");
     setSaveError("");
     setEditingId(a.id);
@@ -519,6 +523,7 @@ export default function AdminActualites() {
             fieldLabels={{ title_fr: "Titre (FR)", title_en: "Titre (EN)", excerpt_fr: "Extrait (FR)", excerpt_en: "Extrait (EN)", image: "Image", status: "Statut", featured: "À la une", published_at: "Date de publication" }}
             canRestore={canEdit}
             onRestored={load}
+            onDataRestored={(snapshot) => setForm(articleToForm(snapshot as unknown as Article))}
             onClose={() => setShowHistory(false)}
           />
         );

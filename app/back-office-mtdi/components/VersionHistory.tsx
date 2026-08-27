@@ -44,6 +44,7 @@ export default function VersionHistory({
   fieldLabels = {},
   canRestore,
   onRestored,
+  onDataRestored,
   onClose,
 }: {
   table: string;
@@ -52,6 +53,7 @@ export default function VersionHistory({
   fieldLabels?: Record<string, string>;
   canRestore: boolean;
   onRestored: () => void;
+  onDataRestored?: (snapshot: Record<string, unknown>) => void;
   onClose: () => void;
 }) {
   const [versions, setVersions] = useState<VersionRow[]>([]);
@@ -74,6 +76,13 @@ export default function VersionHistory({
     });
     setRestoringId(null);
     if (res.ok) {
+      // On a déjà les données restaurées en mémoire (c'est le contenu de
+      // cette version) : on les transmet directement au parent pour que le
+      // formulaire ouvert se resynchronise sans attendre un rechargement.
+      const restoredVersion = versions.find((v) => v.id === versionId);
+      if (restoredVersion && onDataRestored) {
+        onDataRestored(restoredVersion.snapshot);
+      }
       onRestored();
       onClose();
     } else {
