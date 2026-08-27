@@ -56,7 +56,7 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
         SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
         FROM actualites a
         LEFT JOIN categories c ON c.id = a.category_id
-        WHERE a.deleted_at IS NULL AND a.status = 'publie'
+        WHERE a.deleted_at IS NULL AND a.status = 'publie' AND (a.scheduled_at IS NULL OR a.scheduled_at <= now())
         ORDER BY a.published_at DESC, a.display_order ASC
         LIMIT ${limit}
       `
@@ -64,7 +64,7 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
         SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
         FROM actualites a
         LEFT JOIN categories c ON c.id = a.category_id
-        WHERE a.deleted_at IS NULL AND a.status = 'publie'
+        WHERE a.deleted_at IS NULL AND a.status = 'publie' AND (a.scheduled_at IS NULL OR a.scheduled_at <= now())
         ORDER BY a.published_at DESC, a.display_order ASC
       `;
   return result.rows.map((r) => mapRow(r, locale));
@@ -76,7 +76,7 @@ export async function getActualiteById(id: number, locale: Locale): Promise<Actu
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
     FROM actualites a
     LEFT JOIN categories c ON c.id = a.category_id
-    WHERE a.id = ${id} AND a.deleted_at IS NULL AND a.status = 'publie'
+    WHERE a.id = ${id} AND a.deleted_at IS NULL AND a.status = 'publie' AND (a.scheduled_at IS NULL OR a.scheduled_at <= now())
   `;
   if (result.rows.length === 0) return null;
   return mapRow(result.rows[0], locale);
@@ -89,7 +89,7 @@ export async function getRelatedActualites(articleId: number, categoryId: number
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
     FROM actualites a
     LEFT JOIN categories c ON c.id = a.category_id
-    WHERE a.deleted_at IS NULL AND a.status = 'publie' AND a.category_id = ${categoryId} AND a.id != ${articleId}
+    WHERE a.deleted_at IS NULL AND a.status = 'publie' AND (a.scheduled_at IS NULL OR a.scheduled_at <= now()) AND a.category_id = ${categoryId} AND a.id != ${articleId}
     ORDER BY a.published_at DESC
     LIMIT ${limit}
   `;
@@ -101,7 +101,7 @@ export async function getFeaturedActualites(locale: Locale, limit = 8): Promise<
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
     FROM actualites a
     LEFT JOIN categories c ON c.id = a.category_id
-    WHERE a.deleted_at IS NULL AND a.status = 'publie' AND a.featured = TRUE
+    WHERE a.deleted_at IS NULL AND a.status = 'publie' AND (a.scheduled_at IS NULL OR a.scheduled_at <= now()) AND a.featured = TRUE
     ORDER BY a.display_order ASC
     LIMIT ${limit}
   `;

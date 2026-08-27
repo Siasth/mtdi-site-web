@@ -1802,6 +1802,15 @@ export async function POST(req: NextRequest) {
       ON content_versions(table_name, record_id, changed_at DESC)
     `);
 
+    // ══════════════════════════════════════════════════════════════════
+    // Publication différée : un article peut être marqué "publié" tout en
+    // restant invisible côté public jusqu'à une date/heure future — aucune
+    // tâche planifiée nécessaire, le filtre s'applique directement à la
+    // lecture (scheduled_at NULL ou déjà passée = visible).
+    // ══════════════════════════════════════════════════════════════════
+    await sql.query(`ALTER TABLE actualites ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ`);
+    await sql.query(`CREATE INDEX IF NOT EXISTS idx_actualites_scheduled ON actualites(scheduled_at) WHERE scheduled_at IS NOT NULL`);
+
     return NextResponse.json({ ok: true, message: "Migration appliquée." });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

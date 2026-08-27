@@ -32,13 +32,13 @@ export async function PATCH(
 
   const {
     titleFr, titleEn, excerptFr, excerptEn, categoryId,
-    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status, attachments,
+    image, hrefExternal, publishedAt, readTime, featured, displayOrder, status, attachments, scheduledAt,
   } = body;
 
   if (featured === true) {
     const count = await sql`
       SELECT COUNT(*) AS count FROM actualites
-      WHERE featured = TRUE AND deleted_at IS NULL AND status = 'publie' AND id != ${id}
+      WHERE featured = TRUE AND deleted_at IS NULL AND status = 'publie' AND (scheduled_at IS NULL OR scheduled_at <= now()) AND id != ${id}
     `;
     if (Number(count.rows[0].count) >= 8) {
       return NextResponse.json(
@@ -69,6 +69,7 @@ export async function PATCH(
       display_order = COALESCE(${displayOrder}, display_order),
       status = COALESCE(${status}, status),
       attachments = COALESCE(${attachments ? JSON.stringify(attachments) : null}::jsonb, attachments),
+      scheduled_at = ${scheduledAt || null},
       updated_at = now()
     WHERE id = ${id}
   `;

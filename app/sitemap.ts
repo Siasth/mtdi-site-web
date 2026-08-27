@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const articles = await sql`
       SELECT id, published_at FROM actualites
-      WHERE deleted_at IS NULL AND status = 'publie' AND href_external IS NULL
+      WHERE deleted_at IS NULL AND status = 'publie' AND (scheduled_at IS NULL OR scheduled_at <= now()) AND href_external IS NULL
       ORDER BY published_at DESC
       LIMIT 500
     `;

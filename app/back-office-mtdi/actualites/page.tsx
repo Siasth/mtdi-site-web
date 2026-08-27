@@ -38,6 +38,7 @@ type Article = {
   display_order: number;
   status: string;
   attachments: Attachment[];
+  scheduled_at: string | null;
   deleted_at: string | null;
 };
 
@@ -46,14 +47,29 @@ type FormState = {
   categoryId: number | ""; image: string; hrefExternal: string; publishedAt: string;
   readTime: string; featured: boolean; displayOrder: number; status: string;
   attachments: Attachment[];
+  scheduledAt: string; // datetime-local ("" = publication immédiate)
 };
 
 const emptyForm: FormState = {
   titleFr: "", titleEn: "", excerptFr: "", excerptEn: "",
   categoryId: "", image: "", hrefExternal: "", publishedAt: new Date().toISOString().slice(0, 10),
   readTime: "3 min", featured: false, displayOrder: 0, status: "publie",
-  attachments: [],
+  attachments: [], scheduledAt: "",
 };
+
+// datetime-local (navigateur) n'a pas de fuseau horaire — on convertit
+// explicitement via l'heure locale du navigateur pour éviter tout décalage
+// une fois stocké en TIMESTAMPTZ (le Bénin est UTC+1 toute l'année).
+function isoToDatetimeLocal(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function datetimeLocalToIso(local: string): string {
+  if (!local) return "";
+  return new Date(local).toISOString();
+}
 
 export default function AdminActualites() {
   const canView = useHasPermission("actualites.voir");
@@ -125,6 +141,7 @@ export default function AdminActualites() {
       publishedAt: a.published_at.slice(0, 10), readTime: a.read_time,
       featured: a.featured, displayOrder: a.display_order, status: a.status,
       attachments: a.attachments || [],
+      scheduledAt: isoToDatetimeLocal(a.scheduled_at),
     };
   }
 
@@ -198,7 +215,7 @@ export default function AdminActualites() {
     const res = await fetch(url, {
       method: isNew ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, scheduledAt: datetimeLocalToIso(form.scheduledAt) }),
     });
     if (res.ok) {
       setSaving(false);
@@ -293,6 +310,11 @@ export default function AdminActualites() {
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_LABELS[a.status]?.className || "bg-gray-100 text-gray-600"}`}>
                     {STATUS_LABELS[a.status]?.label || a.status}
                   </span>
+                  {a.status === "publie" && a.scheduled_at && new Date(a.scheduled_at) > new Date() && (
+                    <span className="ml-1 px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700" title={`Publication le ${new Date(a.scheduled_at).toLocaleString("fr-FR")}`}>
+                      Programmé
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-3 text-gray-400 text-xs">{new Date(a.published_at).toLocaleDateString("fr-FR")}</td>
                 <td className="px-5 py-3">{a.featured ? "✓" : ""}</td>
@@ -400,6 +422,27 @@ export default function AdminActualites() {
                   <option value="archive">Archivé</option>
                 </select>
               </div>
+              {form.status === "publie" && (
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Publier plus tard (optionnel)</label>
+                  <input
+                    type="datetime-local"
+                    value={form.scheduledAt}
+                    onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    {form.scheduledAt
+                      ? "L'article restera invisible sur le site jusqu'à cette date et heure."
+                      : "Laisser vide pour une publication immédiate."}
+                  </p>
+                  {form.scheduledAt && (
+                    <button type="button" onClick={() => setForm({ ...form, scheduledAt: "" })} className="text-xs font-bold text-red-600 hover:underline mt-1">
+                      Annuler la programmation (publier maintenant)
+                    </button>
+                  )}
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Date de publication</label>
                 <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
@@ -520,7 +563,7 @@ export default function AdminActualites() {
             table="actualites"
             recordId={article.id}
             current={article}
-            fieldLabels={{ title_fr: "Titre (FR)", title_en: "Titre (EN)", excerpt_fr: "Extrait (FR)", excerpt_en: "Extrait (EN)", image: "Image", status: "Statut", featured: "À la une", published_at: "Date de publication" }}
+            fieldLabels={{ title_fr: "Titre (FR)", title_en: "Titre (EN)", excerpt_fr: "Extrait (FR)", excerpt_en: "Extrait (EN)", image: "Image", status: "Statut", featured: "À la une", published_at: "Date de publication", scheduled_at: "Publication différée" }}
             canRestore={canEdit}
             onRestored={load}
             onDataRestored={(snapshot) => setForm(articleToForm(snapshot as unknown as Article))}

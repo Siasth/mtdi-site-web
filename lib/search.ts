@@ -77,7 +77,7 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
   const articles = await sql`
     SELECT id, title_fr, title_en, excerpt_fr, excerpt_en, href_external
     FROM actualites
-    WHERE deleted_at IS NULL AND status = 'publie'
+    WHERE deleted_at IS NULL AND status = 'publie' AND (scheduled_at IS NULL OR scheduled_at <= now())
       AND (title_fr ILIKE ${like} OR title_en ILIKE ${like} OR excerpt_fr ILIKE ${like} OR excerpt_en ILIKE ${like})
     LIMIT 20
   `;
