@@ -36,7 +36,7 @@ export default function AdminLogs() {
   useEffect(() => {
     if (!canView) return;
     setLoading(true);
-    fetch(`/api/admin/logs?page=${page}`)
+    fetch(`/api/admin/logs?page=${page}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => { setLogs(d.logs); setTotal(d.total); setLoading(false); });
   }, [page, canView]);
