@@ -17,7 +17,11 @@ const VALID: string[] = [];
 
 function requiredPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer"): PermissionCode {
   void resource;
-  return "contenu.modifier";
+  void action;
+  // Jamais atteint en pratique : VALID est vide, la requête est rejetée
+  // avant d'arriver ici. "roles.gerer" (la permission la plus restrictive
+  // du catalogue) sert de garde-fou si cette route était un jour réactivée.
+  return "roles.gerer";
 }
 
 async function checkPermission(resource: string, action: "voir" | "creer" | "modifier" | "supprimer") {

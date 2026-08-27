@@ -9,7 +9,7 @@ function getIp(req: NextRequest): string | null {
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   const { labelFr, labelEn, href, displayOrder, active } = await req.json();
   await sql`
@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   await sql`DELETE FROM sitemap_links WHERE id = ${id}`;
   await logAudit({ userId: session.id, action: "supprimer", module: "sitemap-links", resourceId: id, ip: getIp(req) });

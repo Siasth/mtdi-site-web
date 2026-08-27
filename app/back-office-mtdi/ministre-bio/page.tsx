@@ -25,7 +25,7 @@ type FormState = {
 };
 
 export default function AdminMinistreBio() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);

@@ -9,7 +9,7 @@ type Item = { id: number; title_fr: string; title_en: string | null; description
 const emptyForm = { titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "", type: "PNG", href: "", displayOrder: 0, active: true };
 
 export default function AdminKitPresse() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

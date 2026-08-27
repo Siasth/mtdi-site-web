@@ -10,7 +10,7 @@ type Upcoming = { id: number; event_date: string; title_fr: string; title_en: st
 type Replay = { id: number; title_fr: string; title_en: string | null; source: string | null; replay_date: string | null; url: string; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminDirect() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("mediatheque.gerer");
   const [tab, setTab] = useState<"upcoming" | "replays">("upcoming");
   const [upcoming, setUpcoming] = useState<Upcoming[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);

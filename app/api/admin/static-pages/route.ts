@@ -14,14 +14,14 @@ function getIp(req: NextRequest): string | null {
 
 export async function GET() {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.voir")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const result = await sql`SELECT * FROM static_pages ORDER BY slug ASC`;
   return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function PATCH(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   try {
     const { slug, contentFr, contentEn, published } = await req.json();
     if (!slug) return NextResponse.json({ error: "slug requis" }, { status: 400 });

@@ -14,14 +14,14 @@ function getIp(req: NextRequest): string | null {
 
 export async function GET() {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "mediatheque.voir")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const result = await sql`SELECT * FROM direct_upcoming ORDER BY deleted_at NULLS FIRST, event_date ASC`;
   return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { eventDate, titleFr, titleEn, descriptionFr, descriptionEn, displayOrder, active } = await req.json();
   if (!titleFr || !eventDate) return NextResponse.json({ error: "Titre et date sont requis" }, { status: 400 });
   const result = await sql`

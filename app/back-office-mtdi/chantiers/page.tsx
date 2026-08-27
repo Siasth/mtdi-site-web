@@ -37,7 +37,7 @@ const emptyForm: FormState = {
 };
 
 export default function AdminChantiers() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("accueil.gerer");
   const [chantiers, setChantiers] = useState<Chantier[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");

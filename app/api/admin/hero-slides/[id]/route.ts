@@ -16,7 +16,7 @@ export async function PATCH(
   const body = await req.json();
 
   if (body.restore) {
-    if (!hasPerm(session, "contenu.modifier")) {
+    if (!hasPerm(session, "accueil.gerer")) {
       return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
     }
     await sql`UPDATE hero_slides SET deleted_at = NULL WHERE id = ${id}`;
@@ -24,7 +24,7 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   }
 
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "accueil.gerer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
 
@@ -50,7 +50,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "accueil.gerer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const { id } = await params;

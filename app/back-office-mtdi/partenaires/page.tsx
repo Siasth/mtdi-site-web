@@ -23,7 +23,7 @@ const CATEGORIES = [
 const emptyForm = { category: "institutionnel", name: "", fullFr: "", fullEn: "", descriptionFr: "", descriptionEn: "", accent: "#162233", logoSrc: "", displayOrder: 0, active: true };
 
 export default function AdminPartenaires() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

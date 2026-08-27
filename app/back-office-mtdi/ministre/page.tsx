@@ -17,7 +17,7 @@ type FormState = {
 };
 
 export default function AdminMinistre() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("accueil.gerer");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);

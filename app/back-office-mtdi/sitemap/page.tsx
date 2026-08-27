@@ -8,7 +8,7 @@ type Section = { id: number; title_fr: string; title_en: string | null; display_
 type Link = { id: number; section_id: number; label_fr: string; label_en: string | null; href: string; display_order: number; active: boolean };
 
 export default function AdminSitemap() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [sections, setSections] = useState<Section[]>([]);
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);

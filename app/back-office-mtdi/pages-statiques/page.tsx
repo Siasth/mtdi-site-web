@@ -13,7 +13,7 @@ const PAGES = [
 type Row = { slug: string; content_fr: string; content_en: string; published: boolean };
 
 export default function AdminPagesStatiques() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeSlug, setActiveSlug] = useState(PAGES[0].slug);

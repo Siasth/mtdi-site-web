@@ -13,11 +13,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { id } = await params;
   const body = await req.json();
   if (body.restore) {
-    if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+    if (!hasPerm(session, "ministere.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
     await sql`UPDATE structures SET deleted_at = NULL WHERE id = ${id}`;
     return NextResponse.json({ ok: true });
   }
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ministere.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { acronym, nameFr, nameEn, descriptionFr, descriptionEn, missionsFr, missionsEn, url, accent, logoSrc, labelFr, labelEn, displayOrder, active } = body;
   await sql`
     UPDATE structures SET
@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ministere.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   await sql`UPDATE structures SET deleted_at = now() WHERE id = ${id}`;
   await logAudit({ userId: session.id, action: "supprimer", module: "structures", resourceId: id, ip: getIp(req) });

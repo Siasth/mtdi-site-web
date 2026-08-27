@@ -13,11 +13,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json();
   try {
     if (body.restore) {
-      if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+      if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
       await sql`UPDATE documents SET deleted_at = NULL WHERE id = ${id}`;
       return NextResponse.json({ ok: true });
     }
-    if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+    if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
     const { titleFr, titleEn, category, type, date, descriptionFr, descriptionEn, href, featured, displayOrder, active } = body;
 
     await sql`
@@ -42,7 +42,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   await sql`UPDATE documents SET deleted_at = now() WHERE id = ${id}`;
   await logAudit({ userId: session.id, action: "supprimer", module: "documents", resourceId: id, ip: getIp(req) });

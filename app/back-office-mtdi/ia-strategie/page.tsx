@@ -10,7 +10,7 @@ type Pilier = { id: number; title_fr: string; title_en: string | null; descripti
 type Jalon = { id: number; year: string; title_fr: string; title_en: string | null; description_fr: string | null; description_en: string | null; done: boolean; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminIAStrategie() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("strategie_ia.gerer");
   const [tab, setTab] = useState<"piliers" | "jalons">("piliers");
   const [piliers, setPiliers] = useState<Pilier[]>([]);
   const [jalons, setJalons] = useState<Jalon[]>([]);

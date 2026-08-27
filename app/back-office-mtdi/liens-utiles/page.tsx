@@ -8,7 +8,7 @@ type Item = { id: number; label: string; href: string; display_order: number; ac
 const emptyForm = { label: "", href: "", displayOrder: 0, active: true };
 
 export default function AdminLiensUtiles() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

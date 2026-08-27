@@ -8,7 +8,7 @@ type Item = { id: number; role_fr: string; role_en: string | null; name_fr: stri
 const emptyForm = { role: "", name: "", email: "", phone: "", note: "", accent: "#006828", displayOrder: 0, active: true };
 
 export default function AdminContactsSpecifiques() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

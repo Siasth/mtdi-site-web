@@ -17,7 +17,7 @@ type Direction = {
 const emptyForm = { acronym: "", typeFr: "Direction centrale", typeEn: "", nameFr: "", nameEn: "", director: "", descriptionFr: "", descriptionEn: "", accent: "#162233", displayOrder: 0, active: true };
 
 export default function AdminDirections() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Direction[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

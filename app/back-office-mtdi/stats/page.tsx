@@ -36,8 +36,8 @@ const emptyForm: FormState = {
 };
 
 export default function AdminStats() {
-  const canView = useHasPermission("stats.voir");
-  const canManage = useHasPermission("stats.gerer");
+  const canView = useHasPermission("accueil.voir");
+  const canManage = useHasPermission("accueil.gerer");
 
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);

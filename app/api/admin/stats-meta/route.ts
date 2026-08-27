@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "accueil.voir")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const result = await sql`SELECT value FROM settings WHERE key = 'stats_meta'`;
   const stored = (result.rows[0]?.value as Record<string, string>) || {};
   return NextResponse.json(
@@ -25,7 +25,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "accueil.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   try {
     const body = await req.json();
     const result = await sql`SELECT value FROM settings WHERE key = 'stats_meta'`;

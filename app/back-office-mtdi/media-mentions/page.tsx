@@ -8,7 +8,7 @@ type Item = { id: number; type_fr: string; type_color: string; title_fr: string;
 const emptyForm = { type: "Médias", color: "ROUGE", titleFr: "", titleEn: "", date: "", source: "", excerptFr: "", excerptEn: "", url: "", displayOrder: 0, active: true };
 
 export default function AdminMediaMentions() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

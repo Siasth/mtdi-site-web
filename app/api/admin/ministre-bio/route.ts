@@ -18,7 +18,7 @@ function getIp(req: NextRequest): string | null {
 export async function GET() {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "ministere.voir")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   try {
@@ -32,7 +32,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Non connecté" }, { status: 401 });
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "ministere.gerer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const body = await req.json();

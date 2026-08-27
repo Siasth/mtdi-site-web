@@ -19,7 +19,7 @@ type Structure = {
 const emptyForm = { acronym: "", nameFr: "", nameEn: "", descriptionFr: "", descriptionEn: "", missionsFr: [] as string[], missionsEn: [] as string[], url: "", accent: "#162233", logoSrc: "", labelFr: "", labelEn: "", displayOrder: 0, active: true };
 
 export default function AdminStructures() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Structure[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

@@ -9,7 +9,7 @@ function getIp(req: NextRequest): string | null {
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   const { titleFr, titleEn, displayOrder, active } = await req.json();
   await sql`
@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { id } = await params;
   await sql`DELETE FROM sitemap_sections WHERE id = ${id}`; // CASCADE retire aussi ses liens
   await logAudit({ userId: session.id, action: "supprimer", module: "sitemap-sections", resourceId: id, ip: getIp(req) });

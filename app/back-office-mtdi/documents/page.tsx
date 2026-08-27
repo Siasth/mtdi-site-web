@@ -11,7 +11,7 @@ type Doc = { id: number; title_fr: string; title_en: string | null; category: st
 const emptyForm = { titleFr: "", titleEn: "", category: "rapport", type: "PDF", date: "", descriptionFr: "", descriptionEn: "", href: "", featured: false, displayOrder: 0, active: true };
 
 export default function AdminDocuments() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Doc[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

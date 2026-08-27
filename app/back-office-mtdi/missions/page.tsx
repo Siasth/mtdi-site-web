@@ -9,7 +9,7 @@ const VERT = "#006828";
 type Mission = { id: number; text_fr: string; text_en: string | null; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminMissions() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Mission[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

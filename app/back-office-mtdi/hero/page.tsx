@@ -22,7 +22,7 @@ type FormState = { image: string; video: string; altFr: string; altEn: string; d
 const emptyForm: FormState = { image: "", video: "", altFr: "", altEn: "", displayOrder: 0, active: true };
 
 export default function AdminHero() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("accueil.gerer");
   const [slides, setSlides] = useState<Slide[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");

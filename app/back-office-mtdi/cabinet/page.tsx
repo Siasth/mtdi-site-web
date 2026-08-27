@@ -16,7 +16,7 @@ type Member = {
 const emptyForm = { roleFr: "", roleEn: "", directionFr: "", directionEn: "", descriptionFr: "", descriptionEn: "", accent: "#162233", level: 1, displayOrder: 0, active: true };
 
 export default function AdminCabinet() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

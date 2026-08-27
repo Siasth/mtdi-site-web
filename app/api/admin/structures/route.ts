@@ -15,14 +15,14 @@ function getIp(req: NextRequest): string | null {
 
 export async function GET() {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ministere.voir")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const result = await sql`SELECT * FROM structures ORDER BY deleted_at NULLS FIRST, display_order ASC`;
   return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ministere.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { acronym, nameFr, nameEn, descriptionFr, descriptionEn, missionsFr, missionsEn, url, accent, logoSrc, labelFr, labelEn, displayOrder, active } = await req.json();
   if (!acronym || !nameFr) return NextResponse.json({ error: "Sigle et nom sont requis" }, { status: 400 });
   const result = await sql`

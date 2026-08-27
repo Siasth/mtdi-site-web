@@ -11,7 +11,7 @@ function getIp(req: NextRequest): string | null {
 
 export async function POST(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { sectionId, labelFr, labelEn, href, displayOrder } = await req.json();
   if (!sectionId || !labelFr || !href) return NextResponse.json({ error: "Section, libellé et lien sont requis" }, { status: 400 });
   const result = await sql`

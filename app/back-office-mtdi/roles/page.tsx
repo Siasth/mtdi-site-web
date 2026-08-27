@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { DeleteIcon } from "../components/ActionIcons";
+import { PERMISSIONS, PERMISSION_CATEGORIES, PERMISSION_MODULES } from "@/lib/permissions";
 
 const VERT = "#006828";
 
@@ -53,6 +54,16 @@ export default function AdminRoles() {
     setCheckedCodes(next);
   }
 
+  // Coche/décoche tout un groupe de codes d'un coup (case à cocher parente
+  // d'un module ou d'une catégorie entière).
+  function toggleMany(codes: string[], checked: boolean) {
+    const next = new Set(checkedCodes);
+    for (const code of codes) {
+      if (checked) next.add(code); else next.delete(code);
+    }
+    setCheckedCodes(next);
+  }
+
   async function saveEdit() {
     if (!editingRole) return;
     setSaving(true);
@@ -89,11 +100,6 @@ export default function AdminRoles() {
     if (!res.ok) alert(data.error);
     await load();
   }
-
-  const permsByModule = allPermissions.reduce<Record<string, Permission[]>>((acc, p) => {
-    (acc[p.module] ||= []).push(p);
-    return acc;
-  }, {});
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
@@ -143,7 +149,7 @@ export default function AdminRoles() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-y-auto">
             <h2 className="font-bold text-gray-900 text-lg mb-4">{editingRole.name}</h2>
-            <PermissionChecklist permsByModule={permsByModule} checkedCodes={checkedCodes} onToggle={toggleCode} disabled={editingRole.is_system} />
+            <PermissionChecklist allPermissions={allPermissions} checkedCodes={checkedCodes} onToggle={toggleCode} onToggleMany={toggleMany} disabled={editingRole.is_system} />
             {editingRole.is_system && (
               <p className="text-xs text-amber-600 mt-3">Le rôle Super Admin conserve toujours toutes les permissions.</p>
             )}
@@ -174,7 +180,7 @@ export default function AdminRoles() {
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description</label>
               <input value={newRoleDesc} onChange={(e) => setNewRoleDesc(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
-            <PermissionChecklist permsByModule={permsByModule} checkedCodes={checkedCodes} onToggle={toggleCode} disabled={false} />
+            <PermissionChecklist allPermissions={allPermissions} checkedCodes={checkedCodes} onToggle={toggleCode} onToggleMany={toggleMany} disabled={false} />
             <div className="flex gap-2 pt-2">
               <button type="button" onClick={() => setShowCreate(false)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">
                 Annuler
@@ -190,38 +196,107 @@ export default function AdminRoles() {
   );
 }
 
+// Retrouve la catégorie (éditorial/technique) d'un module à partir du
+// catalogue statique — jamais stockée en base, c'est une donnée fixe liée
+// au code de la permission, pas à une configuration modifiable.
+const MODULE_TO_CATEGORY: Record<string, "editorial" | "technique"> = {};
+for (const p of PERMISSIONS) {
+  MODULE_TO_CATEGORY[p.module] = p.category;
+}
+
+function ParentCheckbox({ checked, indeterminate, onChange, disabled }: { checked: boolean; indeterminate: boolean; onChange: (checked: boolean) => void; disabled: boolean }) {
+  const ref = (el: HTMLInputElement | null) => { if (el) el.indeterminate = indeterminate; };
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+      disabled={disabled}
+      className="mt-0.5"
+    />
+  );
+}
+
 function PermissionChecklist({
-  permsByModule,
+  allPermissions,
   checkedCodes,
   onToggle,
+  onToggleMany,
   disabled,
 }: {
-  permsByModule: Record<string, Permission[]>;
+  allPermissions: Permission[];
   checkedCodes: Set<string>;
   onToggle: (code: string) => void;
+  onToggleMany: (codes: string[], checked: boolean) => void;
   disabled: boolean;
 }) {
+  const permsByModule = allPermissions.reduce<Record<string, Permission[]>>((acc, p) => {
+    (acc[p.module] ||= []).push(p);
+    return acc;
+  }, {});
+
   return (
-    <div className="space-y-4">
-      {Object.entries(permsByModule).map(([module, perms]) => (
-        <div key={module}>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">{module}</p>
-          <div className="space-y-1.5">
-            {perms.map((p) => (
-              <label key={p.code} className="flex items-start gap-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={checkedCodes.has(p.code)}
-                  onChange={() => onToggle(p.code)}
-                  disabled={disabled}
-                  className="mt-0.5"
-                />
-                <span>{p.description}</span>
-              </label>
-            ))}
+    <div className="space-y-6">
+      {PERMISSION_CATEGORIES.map((cat) => {
+        const modulesInCategory = PERMISSION_MODULES.filter((m) => MODULE_TO_CATEGORY[m.key] === cat.key && permsByModule[m.key]?.length);
+        if (modulesInCategory.length === 0) return null;
+        const allCodesInCategory = modulesInCategory.flatMap((m) => permsByModule[m.key].map((p) => p.code));
+        const checkedInCategory = allCodesInCategory.filter((c) => checkedCodes.has(c)).length;
+
+        return (
+          <div key={cat.key}>
+            <div className="flex items-start gap-2 mb-3 pb-2 border-b border-gray-200">
+              <ParentCheckbox
+                checked={checkedInCategory === allCodesInCategory.length}
+                indeterminate={checkedInCategory > 0 && checkedInCategory < allCodesInCategory.length}
+                onChange={(checked) => onToggleMany(allCodesInCategory, checked)}
+                disabled={disabled}
+              />
+              <div>
+                <p className="text-sm font-black text-gray-900">{cat.label}</p>
+                <p className="text-[11px] text-gray-400">{cat.description}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 pl-1">
+              {modulesInCategory.map((mod) => {
+                const perms = permsByModule[mod.key];
+                const codes = perms.map((p) => p.code);
+                const checkedInModule = codes.filter((c) => checkedCodes.has(c)).length;
+
+                return (
+                  <div key={mod.key}>
+                    <label className="flex items-center gap-2 mb-1.5 cursor-pointer">
+                      <ParentCheckbox
+                        checked={checkedInModule === codes.length}
+                        indeterminate={checkedInModule > 0 && checkedInModule < codes.length}
+                        onChange={(checked) => onToggleMany(codes, checked)}
+                        disabled={disabled}
+                      />
+                      <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{mod.label}</span>
+                    </label>
+                    <div className="space-y-1.5 pl-6">
+                      {perms.map((p) => (
+                        <label key={p.code} className="flex items-start gap-2 text-sm text-gray-700">
+                          <input
+                            type="checkbox"
+                            checked={checkedCodes.has(p.code)}
+                            onChange={() => onToggle(p.code)}
+                            disabled={disabled}
+                            className="mt-0.5"
+                          />
+                          <span>{p.description}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

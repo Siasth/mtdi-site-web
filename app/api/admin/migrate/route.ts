@@ -71,6 +71,45 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // Réorganisation des permissions (granularité métier/technique) :
+    // report des droits des rôles existants vers les nouveaux codes AVANT
+    // de retirer les anciens, pour n'exclure personne de l'accès qu'il
+    // avait déjà. "contenu.modifier" donnait un accès complet à tout le
+    // contenu, donc il donne voir+gérer sur les 5 nouveaux groupes.
+    // ══════════════════════════════════════════════════════════════════
+    const legacyToNew: Record<string, string[]> = {
+      "contenu.modifier": [
+        "accueil.voir", "accueil.gerer",
+        "mediatheque.voir", "mediatheque.gerer",
+        "ministere.voir", "ministere.gerer",
+        "ressources.voir", "ressources.gerer",
+        "strategie_ia.voir", "strategie_ia.gerer",
+      ],
+      "stats.voir": ["accueil.voir"],
+      "stats.gerer": ["accueil.gerer"],
+    };
+    for (const [oldCode, newCodes] of Object.entries(legacyToNew)) {
+      const oldPerm = await sql`SELECT id FROM permissions WHERE code = ${oldCode}`;
+      if (oldPerm.rows.length === 0) continue; // déjà nettoyé lors d'une exécution précédente
+      const oldPermId = oldPerm.rows[0].id;
+      const rolesWithOldPerm = await sql`SELECT role_id FROM role_permissions WHERE permission_id = ${oldPermId}`;
+      for (const newCode of newCodes) {
+        const newPerm = await sql`SELECT id FROM permissions WHERE code = ${newCode}`;
+        if (newPerm.rows.length === 0) continue;
+        for (const row of rolesWithOldPerm.rows) {
+          await sql`
+            INSERT INTO role_permissions (role_id, permission_id)
+            VALUES (${row.role_id}, ${newPerm.rows[0].id})
+            ON CONFLICT DO NOTHING
+          `;
+        }
+      }
+    }
+    // Les anciens codes ne sont plus dans le catalogue PERMISSIONS : on les
+    // retire de la base (CASCADE nettoie automatiquement role_permissions).
+    await sql`DELETE FROM permissions WHERE code IN ('contenu.modifier', 'stats.voir', 'stats.gerer')`;
+
     await sql.query(
       `ALTER TABLE users ADD COLUMN IF NOT EXISTS two_factor_enabled BOOLEAN NOT NULL DEFAULT FALSE`
     );

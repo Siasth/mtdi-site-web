@@ -14,7 +14,7 @@ function getIp(req: NextRequest): string | null {
 
 export async function GET() {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.voir")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const sections = await sql`SELECT * FROM sitemap_sections ORDER BY display_order ASC`;
   const links = await sql`SELECT * FROM sitemap_links ORDER BY display_order ASC`;
   return NextResponse.json(
@@ -29,7 +29,7 @@ export async function GET() {
 // ce bouton n'est pas utilisé).
 export async function POST(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
+  if (!hasPerm(session, "ressources.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   try {
     await sql`DELETE FROM sitemap_sections`; // CASCADE supprime aussi sitemap_links
     for (let i = 0; i < SITEMAP_SUGGESTION.length; i++) {

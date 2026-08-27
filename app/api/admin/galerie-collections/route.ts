@@ -14,7 +14,7 @@ function getIp(req: NextRequest): string | null {
 
 export async function GET() {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "mediatheque.voir")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const result = await sql`
@@ -28,7 +28,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await requireSession();
-  if (!hasPerm(session, "contenu.modifier")) {
+  if (!hasPerm(session, "mediatheque.gerer")) {
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const { nameFr, nameEn, displayOrder } = await req.json();

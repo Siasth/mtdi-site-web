@@ -8,7 +8,7 @@ type Texte = { id: number; title_fr: string; title_en: string | null; type_fr: s
 const emptyForm = { titleFr: "", titleEn: "", type: "Loi", reference: "", date: "", status: "En vigueur", descriptionFr: "", descriptionEn: "", articles: "", href: "", displayOrder: 0, active: true };
 
 export default function AdminTextesJuridiques() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Texte[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

@@ -13,7 +13,7 @@ type Item = { id: number; type: string; title_fr: string; title_en: string | nul
 const emptyForm = { type: "appels-offres", titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "", href: "", deadline: "", displayOrder: 0, active: true };
 
 export default function AdminOpportunites() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);

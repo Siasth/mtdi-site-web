@@ -8,7 +8,7 @@ type Edition = { id: number; year: string; title_fr: string; title_en: string | 
 type Critere = { id: number; text_fr: string; text_en: string | null; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminIAOlympiades() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("strategie_ia.gerer");
   const [tab, setTab] = useState<"editions" | "criteres">("editions");
   const [editions, setEditions] = useState<Edition[]>([]);
   const [criteres, setCriteres] = useState<Critere[]>([]);

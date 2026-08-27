@@ -8,7 +8,7 @@ type Video = { id: number; title_fr: string; title_en: string | null; date_label
 const emptyForm = { titleFr: "", titleEn: "", date: "", duration: "", source: "MTDI", url: "", color: "#162233", displayOrder: 0, active: true };
 
 export default function AdminVideos() {
-  const canManage = useHasPermission("contenu.modifier");
+  const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
