@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
+import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 const CATEGORIES = ["rapport", "guide", "juridique", "stratégie"];
@@ -84,7 +85,7 @@ export default function AdminDocuments() {
               <h2 className="font-bold text-gray-900 text-lg">{editing === "new" ? "Nouveau document" : "Modifier"}</h2>
               <div className="flex text-xs font-bold uppercase rounded-lg overflow-hidden border border-gray-200">
                 <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { color: "#666" }}>Français</button>
-                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>English</button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>Version anglaise</button>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4">
@@ -105,7 +106,7 @@ export default function AdminDocuments() {
             )}
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier / lien *</label>
-              <input required value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+              <input required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
               {uploadedFileName && !uploadError && (
                 <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">

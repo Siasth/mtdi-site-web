@@ -46,6 +46,10 @@ export default function AdminSecurite() {
     e.preventDefault();
     setPwdMsg(null);
 
+    if (!newPassword || !confirmPassword) {
+      setPwdMsg({ type: "error", text: "Veuillez renseigner le nouveau mot de passe et sa confirmation." });
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setPwdMsg({ type: "error", text: "Les mots de passe ne correspondent pas" });
       return;

@@ -6,6 +6,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { cleanupOldFile } from "@/lib/client-upload";
+import { URL_PATTERN, isValidUrl } from "@/lib/validators";
 import VersionHistory from "../components/VersionHistory";
 import { uploadFile } from "@/lib/client-upload";
 
@@ -191,7 +192,7 @@ export default function AdminActualites() {
   const [linkLabel, setLinkLabel] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   function addLink() {
-    if (!linkLabel.trim() || !linkUrl.trim()) return;
+    if (!linkLabel.trim() || !linkUrl.trim() || !isValidUrl(linkUrl)) return;
     setForm((f) => ({ ...f, attachments: [...f.attachments, { name: linkLabel.trim(), url: linkUrl.trim(), kind: "link" }] }));
     setLinkLabel("");
     setLinkUrl("");
@@ -420,7 +421,7 @@ export default function AdminActualites() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
-                  <input value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   <p className="text-xs text-gray-400 mt-1">Si renseigné, l'article renvoie vers ce lien au lieu d'une page de détail interne.</p>
                 </div>
               </div>
@@ -528,6 +529,9 @@ export default function AdminActualites() {
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                 />
                 <input
+                  type="url"
+                  pattern={URL_PATTERN}
+                  title="URL valide commençant par http:// ou https://"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://... (Galerie, Vidéothèque, YouTube...)"
@@ -536,7 +540,7 @@ export default function AdminActualites() {
                 <button
                   type="button"
                   onClick={addLink}
-                  disabled={!linkLabel.trim() || !linkUrl.trim()}
+                  disabled={!linkLabel.trim() || !linkUrl.trim() || !isValidUrl(linkUrl)}
                   className="px-4 py-2 text-xs font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-40 flex-shrink-0"
                   style={{ background: VERT }}
                 >

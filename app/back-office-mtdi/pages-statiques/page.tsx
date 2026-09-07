@@ -99,7 +99,7 @@ export default function AdminPagesStatiques() {
               <h2 className="font-bold text-gray-900">Contenu</h2>
               <div className="flex text-xs font-bold uppercase rounded-lg overflow-hidden border border-gray-200">
                 <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { color: "#666" }}>Français</button>
-                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>English</button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>Version anglaise</button>
               </div>
             </div>
             {activeLang === "fr" ? (

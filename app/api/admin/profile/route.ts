@@ -28,6 +28,8 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json();
   const { name, currentPassword, newPassword } = body;
 
+  let didSomething = false;
+
   if (newPassword) {
     if (!currentPassword) {
       return NextResponse.json({ error: "Mot de passe actuel requis" }, { status: 400 });
@@ -48,11 +50,17 @@ export async function PATCH(req: NextRequest) {
       WHERE id = ${session.id}
     `;
     await logAudit({ userId: session.id, action: "modifier", module: "profil", details: { action: "changement_mot_de_passe" }, ip });
+    didSomething = true;
   }
 
   if (typeof name === "string" && name.trim()) {
     await sql`UPDATE users SET name = ${name.trim()}, updated_at = now() WHERE id = ${session.id}`;
     await logAudit({ userId: session.id, action: "modifier", module: "profil", details: { action: "changement_nom", name }, ip });
+    didSomething = true;
+  }
+
+  if (!didSomething) {
+    return NextResponse.json({ error: "Aucune modification n'a été fournie." }, { status: 400 });
   }
 
   return NextResponse.json({ ok: true });

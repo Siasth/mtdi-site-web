@@ -11,11 +11,27 @@ import { upload } from "@vercel/blob/client";
 // de l'upload, pour éviter d'accumuler des fichiers orphelins dans le
 // stockage. Ce nettoyage est best-effort : un échec ne fait jamais échouer
 // l'upload principal ni la sauvegarde du formulaire.
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024; // ANO-128 : 5 Mo max pour les images
+
+function fileKind(file: File): "image" | "video" | "document" {
+  if (file.type.startsWith("image/")) return "image";
+  if (file.type.startsWith("video/")) return "video";
+  return "document";
+}
+
 export async function uploadFile(file: File, previousUrl?: string): Promise<{ url: string; name: string }> {
+  const kind = fileKind(file);
+  if (kind === "image" && file.size > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error("L'image dépasse la taille maximale autorisée de 5 Mo. Compressez-la ou choisissez un autre fichier.");
+  }
   try {
     const blob = await upload(file.name, file, {
       access: "public",
       handleUploadUrl: "/api/admin/upload",
+      // Transmis à onBeforeGenerateToken côté serveur, qui applique la
+      // vraie limite de taille : un contrôle uniquement côté client est
+      // contournable (appel direct à l'API, DevTools...).
+      clientPayload: JSON.stringify({ kind }),
     });
     if (previousUrl && previousUrl !== blob.url) {
       cleanupOldFile(previousUrl);

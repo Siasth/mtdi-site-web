@@ -18,10 +18,17 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async () => {
+      onBeforeGenerateToken: async (_pathname, clientPayload) => {
         const session = await getSession();
         if (!session) {
           throw new Error("Session expirée — reconnectez-vous puis réessayez.");
+        }
+
+        let kind: string | undefined;
+        try {
+          kind = clientPayload ? JSON.parse(clientPayload).kind : undefined;
+        } catch {
+          kind = undefined;
         }
 
         return {
@@ -42,6 +49,10 @@ export async function POST(request: Request): Promise<NextResponse> {
             "application/vnd.ms-excel",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           ],
+          // ANO-128 : 5 Mo max pour les images. Pas de limite additionnelle
+          // pour les vidéos/documents ici (ils passent par un contrôle de
+          // taille distinct, plus permissif, propre à leur usage).
+          maximumSizeInBytes: kind === "image" ? 5 * 1024 * 1024 : undefined,
           // true (et non false) : chaque upload obtient une URL unique,
           // même en réutilisant un nom de fichier déjà uploadé. Sans ça,
           // deux fichiers de même nom entrent en conflit (erreur bloquante),

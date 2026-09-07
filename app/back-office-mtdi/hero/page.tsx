@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
-import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { EditIcon, HideIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
 
 const VERT = "#006828";
@@ -30,7 +30,8 @@ export default function AdminHero() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
 
   function load() {
@@ -75,6 +76,7 @@ export default function AdminHero() {
   async function handleUpload(field: "image" | "video", e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    const setUploading = field === "image" ? setUploadingImage : setUploadingVideo;
     setUploading(true);
     setUploadError("");
     try {
@@ -85,6 +87,16 @@ export default function AdminHero() {
     } finally {
       setUploading(false);
       e.target.value = "";
+    }
+  }
+
+  // ANO-132 : n'afficher que le nom du fichier importé, pas l'URL complète de stockage.
+  function fileNameFromUrl(url: string): string {
+    try {
+      const parts = new URL(url).pathname.split("/");
+      return decodeURIComponent(parts[parts.length - 1] || url);
+    } catch {
+      return url;
     }
   }
 
@@ -109,8 +121,8 @@ export default function AdminHero() {
     }
   }
 
-  async function handleDelete(s: Slide) {
-    if (!confirm("Supprimer ce slide ? (réversible)")) return;
+  async function handleHide(s: Slide) {
+    if (!confirm("Masquer ce slide ? (réversible, il n'apparaîtra plus sur le site tant qu'il n'est pas restauré)")) return;
     await fetch(`/api/admin/hero-slides/${s.id}`, { method: "DELETE" });
     load();
   }
@@ -170,7 +182,7 @@ export default function AdminHero() {
                   ) : (
                     <>
                       <EditIcon label="Modifier" onClick={() => openEdit(s)} />
-                      <DeleteIcon label="Supprimer" onClick={() => handleDelete(s)} />
+                      <HideIcon label="Masquer" onClick={() => handleHide(s)} />
                     </>
                   )}
                 </div>
@@ -203,17 +215,17 @@ export default function AdminHero() {
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image *</label>
               {form.image && <img src={form.image} alt="" className="h-28 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading ? "Envoi..." : "Choisir une image"}
-                <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("image", e)} />
+                {uploadingImage ? "Import en cours…" : "Choisir une image"}
+                <input type="file" accept="image/*" className="hidden" disabled={uploadingImage} onChange={(e) => handleUpload("image", e)} />
               </label>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (optionnel — remplace l'image si présente)</label>
-              {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{form.video}</p>}
+              {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{fileNameFromUrl(form.video)}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading ? "Envoi..." : "Choisir une vidéo"}
-                <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("video", e)} />
+                {uploadingVideo ? "Import en cours…" : "Choisir une vidéo"}
+                <input type="file" accept="video/*" className="hidden" disabled={uploadingVideo} onChange={(e) => handleUpload("video", e)} />
               </label>
               {form.video && (
                 <button type="button" onClick={() => setForm({ ...form, video: "" })} className="ml-2 text-xs text-red-500 hover:underline">
@@ -243,7 +255,7 @@ export default function AdminHero() {
               </label>
               <div className="flex items-center gap-2">
                 <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                <input type="number" value={form.displayOrder || ""} placeholder="0" onChange={(e) => setForm({ ...form, displayOrder: e.target.value === "" ? 0 : Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 

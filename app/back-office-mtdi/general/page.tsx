@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { uploadFile } from "@/lib/client-upload";
 import { useHasPermission } from "../AdminLayoutClient";
+import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -176,7 +177,7 @@ export default function AdminGeneral() {
           ]).map(({ field, label }) => (
             <div key={field}>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
-              <input value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           ))}
         </section>

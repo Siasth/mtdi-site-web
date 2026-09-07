@@ -5,6 +5,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { uploadFile } from "@/lib/client-upload";
+import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -98,12 +99,12 @@ export default function AdminStructures() {
               <h2 className="font-bold text-gray-900 text-lg">{editing === "new" ? "Nouvelle structure" : "Modifier"}</h2>
               <div className="flex text-xs font-bold uppercase rounded-lg overflow-hidden border border-gray-200">
                 <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { color: "#666" }}>Français</button>
-                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>English</button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>Version anglaise</button>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Sigle *</label><input required value={form.acronym} onChange={(e) => setForm({ ...form, acronym: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur / Site web</label><div className="flex gap-2"><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-12 rounded border border-gray-200" /><input value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur / Site web</label><div className="flex gap-2"><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-12 rounded border border-gray-200" /><input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div></div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Logo</label>

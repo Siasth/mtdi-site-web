@@ -257,13 +257,13 @@ export default function AdminChantiers() {
                     <input value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} placeholder="01" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Sous-titre</label>
-                    <input value={form.subtitleFr} onChange={(e) => setForm({ ...form, subtitleFr: e.target.value })} placeholder="ex : SNIAM 2023-2027" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
+                    <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
-                  <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Sous-titre</label>
+                  <input value={form.subtitleFr} onChange={(e) => setForm({ ...form, subtitleFr: e.target.value })} placeholder="ex : SNIAM 2023-2027" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
@@ -274,12 +274,12 @@ export default function AdminChantiers() {
               <div className="space-y-4">
                 {!form.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français.</p>}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Subtitle (English)</label>
-                  <input value={form.subtitleEn} onChange={(e) => setForm({ ...form, subtitleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-                </div>
-                <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title (English)</label>
                   <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Subtitle (English)</label>
+                  <input value={form.subtitleEn} onChange={(e) => setForm({ ...form, subtitleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
@@ -298,7 +298,7 @@ export default function AdminChantiers() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo de fond (optionnel)</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo de fond (optionnel — remplace l'image si présente)</label>
               {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{form.video}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploading === "video" ? "Envoi..." : "Choisir une vidéo"}

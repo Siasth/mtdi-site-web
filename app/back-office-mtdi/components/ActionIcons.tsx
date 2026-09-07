@@ -81,6 +81,16 @@ export function ToggleOffIcon(props: Omit<IconButtonProps, "variant">) {
   );
 }
 
+export function HideIcon(props: Omit<IconButtonProps, "variant">) {
+  return (
+    <IconButton {...props} variant="danger">
+      <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+        <path d="M3 3l18 18M10.58 10.58a2 2 0 002.83 2.83M9.88 5.09A9.77 9.77 0 0112 5c5 0 9 4 10 7-1 1.75-2.6 3.6-4.6 4.83M6.6 6.6C4.6 7.83 3 9.68 2 11.43c1 3 5 7 10 7 1.05 0 2.06-.17 3-.48" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </IconButton>
+  );
+}
+
 export function ResetPasswordIcon(props: Omit<IconButtonProps, "variant">) {
   return (
     <IconButton {...props}>

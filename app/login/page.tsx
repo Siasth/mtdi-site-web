@@ -171,8 +171,8 @@ function LoginForm() {
             <span style={{ color: "#FFBE00" }}>MTDI</span>
           </h1>
           <p className="text-white/80 text-sm font-medium max-w-sm leading-relaxed">
-            Interface de gestion du site du Ministère de la Transformation Digitale
-            et de l'Innovation : République du Bénin.
+            Espace d'administration et de gestion du site du Ministère de la
+            Transformation Digitale et de l'Innovation de la République du Bénin.
           </p>
         </div>
 

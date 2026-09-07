@@ -4,6 +4,7 @@ import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
 import { checkPasswordStrength } from "@/lib/password-policy";
+import { isValidEmail } from "@/lib/validators";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -41,6 +42,9 @@ export async function POST(req: NextRequest) {
   const { email, name, roleId, password } = await req.json();
   if (!email || !name || !roleId || !password) {
     return NextResponse.json({ error: "Tous les champs sont requis" }, { status: 400 });
+  }
+  if (!isValidEmail(email)) {
+    return NextResponse.json({ error: "Format d'email invalide" }, { status: 400 });
   }
 
   const existing = await sql`SELECT id FROM users WHERE email = ${email}`;

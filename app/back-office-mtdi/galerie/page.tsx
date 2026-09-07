@@ -5,6 +5,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { uploadFile } from "@/lib/client-upload";
+import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -414,7 +415,7 @@ export default function AdminGalerie() {
             {itemForm.type === "video" && (
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (fichier ou lien YouTube)</label>
-                <input value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+                <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                   {uploading ? "Envoi..." : "Ou uploader un fichier vidéo"}
                   <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("videoUrl", e)} />
@@ -425,7 +426,7 @@ export default function AdminGalerie() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel — remplace le lien interne par défaut)</label>
-              <input value={itemForm.hrefExternal} onChange={(e) => setItemForm({ ...itemForm, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.hrefExternal} onChange={(e) => setItemForm({ ...itemForm, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
 
             <div className="flex items-center gap-4">

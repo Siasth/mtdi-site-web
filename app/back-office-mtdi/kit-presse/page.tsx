@@ -16,16 +16,27 @@ export default function AdminKitPresse() {
   const [form, setForm] = useState(emptyForm);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   function load() { setLoading(true); fetch("/api/admin/kit-presse", { cache: "no-store" }).then((r) => r.json()).then((d) => { setItems(d); setLoading(false); }); }
   useEffect(() => { if (canManage) load(); }, [canManage]);
 
-  function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setEditing("new"); }
-  function openEdit(it: Item) { setForm({ titleFr: it.title_fr, titleEn: it.title_en || "", descriptionFr: it.description_fr || "", descriptionEn: it.description_en || "", type: it.type, href: it.href, displayOrder: it.display_order, active: it.active }); setEditing(it.id); }
+  function openNew() { setForm({ ...emptyForm, displayOrder: items.length }); setSaveError(""); setEditing("new"); }
+  function openEdit(it: Item) { setForm({ titleFr: it.title_fr, titleEn: it.title_en || "", descriptionFr: it.description_fr || "", descriptionEn: it.description_en || "", type: it.type, href: it.href, displayOrder: it.display_order, active: it.active }); setSaveError(""); setEditing(it.id); }
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    setSaveError("");
+    if (!form.href) {
+      setSaveError("Veuillez importer un fichier avant d'enregistrer.");
+      return;
+    }
     const isNew = editing === "new";
-    await fetch(isNew ? "/api/admin/kit-presse" : `/api/admin/kit-presse/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    const res = await fetch(isNew ? "/api/admin/kit-presse" : `/api/admin/kit-presse/${editing}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setSaveError(data.error || "Erreur lors de l'enregistrement.");
+      return;
+    }
     setEditing(null); load();
   }
   async function handleDelete(it: Item) { if (confirm(`Supprimer "${it.title_fr}" ?`)) { await fetch(`/api/admin/kit-presse/${it.id}`, { method: "DELETE" }); load(); } }
@@ -79,6 +90,7 @@ export default function AdminKitPresse() {
               {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
+            {saveError && <p className="text-xs text-red-600">{saveError}</p>}
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>

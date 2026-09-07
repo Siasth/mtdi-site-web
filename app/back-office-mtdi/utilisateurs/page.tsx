@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon, ResetPasswordIcon } from "../components/ActionIcons";
+import { isValidEmail, EMAIL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -62,8 +63,12 @@ export default function AdminUtilisateurs() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    setCreating(true);
     setError("");
+    if (!isValidEmail(form.email)) {
+      setError("Veuillez saisir une adresse email valide (ex : nom@domaine.fr).");
+      return;
+    }
+    setCreating(true);
     const res = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -210,7 +215,7 @@ export default function AdminUtilisateurs() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email</label>
-              <input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+              <input required type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>

@@ -65,7 +65,7 @@ export default function AdminOpportunites() {
               <h2 className="font-bold text-gray-900 text-lg">{editing === "new" ? "Nouvelle opportunité" : "Modifier"}</h2>
               <div className="flex text-xs font-bold uppercase rounded-lg overflow-hidden border border-gray-200">
                 <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { color: "#666" }}>Français</button>
-                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>English</button>
+                <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2" style={activeLang === "en" ? { background: VERT, color: "white" } : { color: "#666" }}>Version anglaise</button>
               </div>
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type</label><select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{TYPES.map((ty) => <option key={ty.value} value={ty.value}>{ty.label}</option>)}</select></div>
