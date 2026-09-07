@@ -185,7 +185,7 @@ export default async function LeMinisterPage({ params }: Props) {
               {prioritesItems.map((p, i) => (
                 <div key={i} className="group p-8 sm:p-10 bg-white hover:bg-gris-perle transition-colors">
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i % priorityAccents.length], opacity: 0.3 }}>{String(i + 1).padStart(2, "0")}</span>
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: priorityAccents[i % priorityAccents.length] }}>{String(i + 1).padStart(2, "0")}</span>
                     <div className="mt-1 flex-shrink-0" style={{ color: priorityAccents[i % priorityAccents.length] }}>{priorityIcons[i % priorityIcons.length]}</div>
                   </div>
                   <h3 className="text-anthracite font-black text-xl uppercase leading-snug mb-4">{p.title}</h3>

@@ -119,7 +119,7 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                   <div className="flex items-center gap-3">
                     <span
                       className="text-3xl sm:text-4xl font-black leading-none tabular-nums"
-                      style={{ color: ink, opacity: 0.25 }}
+                      style={{ color: ink, opacity: 0.85 }}
                     >
                       {c.number}
                     </span>

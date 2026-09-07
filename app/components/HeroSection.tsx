@@ -66,7 +66,7 @@ export default function HeroSection({ slides: initialSlides, dict }: { slides?: 
       ))}
 
       {/* Dark overlay */}
-      <div className="absolute inset-0" style={{ background: "rgba(13,19,45,0.68)" }} />
+      <div className="absolute inset-0" style={{ background: "rgba(13,19,45,0.72)" }} />
       <div className="hero-overlay absolute inset-0" />
 
       {/* Prev / Next arrows */}
@@ -94,21 +94,21 @@ export default function HeroSection({ slides: initialSlides, dict }: { slides?: 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-white/80 text-[10px] font-semibold uppercase tracking-widest">
+              <span className="text-white text-[10px] font-semibold uppercase tracking-widest">
                 {d.republique ?? "République du Bénin"}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white uppercase leading-tight tracking-tight">
               {d.tagline ?? "Transformer."}{" "}<span style={{ color: "#FCD116" }}>{d.taglineHighlight ?? "Innover."}</span>{" "}{d.taglineSuffix ?? "Servir."}
             </h1>
-            <p className="mt-2 text-white/80 text-sm sm:text-base italic leading-relaxed max-w-md">
+            <p className="mt-2 text-white text-sm sm:text-base italic leading-relaxed max-w-md">
               {d.heroDesc ?? "Le Bénin bâtit sa souveraineté numérique au service de chaque citoyen."}
             </p>
           </div>
 
           <a
             href="#chantiers"
-            className="flex-shrink-0 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/80 hover:text-white hover:gap-3 transition-all"
+            className="flex-shrink-0 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white hover:gap-3 transition-all"
           >
             {d.decouvrir ?? "Découvrir"}
             <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

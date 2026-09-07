@@ -2,6 +2,7 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import { getDirections } from "@/lib/directions";
+import { getReadableTextColor } from "@/lib/color-contrast";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
@@ -51,7 +52,7 @@ export default async function DirectionsCentralesPage({ params }: Props) {
                   <div className="flex flex-wrap items-center gap-3 mb-3">
                     <span
                       className="px-3 py-1 text-[10px] font-black uppercase tracking-widest"
-                      style={{ background: dir.accent, color: dir.accent === "#EB0000" || dir.accent === VERT || dir.accent === "#7A5800" ? "white" : "#1a1a1a" }}
+                      style={{ background: dir.accent, color: getReadableTextColor(dir.accent) }}
                     >
                       {dir.acronym}
                     </span>

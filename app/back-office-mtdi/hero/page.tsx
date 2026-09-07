@@ -163,7 +163,7 @@ export default function AdminHero() {
             <div className="p-4">
               <p className="text-sm font-medium text-gray-900 truncate">{s.alt_fr}</p>
               <div className="flex items-center justify-between mt-3">
-                <span className="text-xs text-gray-400">Ordre : {s.display_order}</span>
+                <span className="text-xs text-anthracite/70">Ordre : {s.display_order}</span>
                 <div className="flex items-center gap-1">
                   {s.deleted_at ? (
                     <RestoreIcon label="Restaurer" onClick={() => handleRestore(s)} />

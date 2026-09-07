@@ -109,7 +109,7 @@ export default function AlaUneCarousel({ items, locale }: { items: Actualite[]; 
               <h3 className="text-lg font-black text-white leading-snug uppercase line-clamp-3">
                 {item.title}
               </h3>
-              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-wider mt-2">
+              <p className="text-white/90 text-[11px] font-semibold uppercase tracking-wider mt-2">
                 {new Date(item.publishedAt).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", { day: "numeric", month: "long", year: "numeric" })}
               </p>
             </div>

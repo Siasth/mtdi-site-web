@@ -179,7 +179,7 @@ function LoginForm() {
         <div className="relative">
           <div className="flex items-center gap-2">
             <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.1)" }} />
-            <span className="text-white/20 text-[10px] font-semibold uppercase tracking-widest">
+            <span className="text-white/60 text-[10px] font-semibold uppercase tracking-widest">
               Accès réservé
             </span>
             <div className="h-px flex-1" style={{ background: "rgba(255,255,255,0.1)" }} />
@@ -201,7 +201,7 @@ function LoginForm() {
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </div>
-            <p className="text-white/30 text-xs font-semibold uppercase tracking-widest">
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest">
               Back-office
             </p>
           </div>
@@ -361,7 +361,7 @@ function LoginForm() {
             )}
           </div>
 
-          <p className="text-center mt-6 text-white/15 text-[10px] font-medium uppercase tracking-widest">
+          <p className="text-center mt-6 text-white/60 text-[10px] font-medium uppercase tracking-widest">
             République du Bénin
           </p>
         </div>

@@ -49,7 +49,7 @@ export default async function InitiativesPage({ params }: Props) {
                 {milestones.map((milestone) => (
                   <div key={milestone.id} className="relative flex items-start gap-8 sm:gap-12 pb-12 last:pb-0">
                     <div className="flex-shrink-0 w-16 sm:w-24 text-right pt-1">
-                      <span className="text-sm font-black tabular-nums" style={{ color: milestone.done ? JAUNE : "rgba(255,255,255,0.25)" }}>
+                      <span className="text-sm font-black tabular-nums" style={{ color: milestone.done ? JAUNE : "rgba(255,255,255,0.75)" }}>
                         {milestone.year}
                       </span>
                     </div>
@@ -65,11 +65,11 @@ export default async function InitiativesPage({ params }: Props) {
                             {t.accompli}
                           </span>
                         )}
-                        <h3 className="text-white font-black text-base uppercase leading-snug" style={{ opacity: milestone.done ? 1 : 0.45 }}>
+                        <h3 className="text-white font-black text-base uppercase leading-snug" style={{ opacity: milestone.done ? 1 : 0.65 }}>
                           {milestone.title}
                         </h3>
                       </div>
-                      <p className="text-sm font-medium leading-relaxed" style={{ color: milestone.done ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.30)" }}>
+                      <p className="text-sm font-medium leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
                         {milestone.description}
                       </p>
                     </div>

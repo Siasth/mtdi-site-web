@@ -265,7 +265,7 @@ export async function POST(req: NextRequest) {
         { fr: "Dossier", en: "Feature", color: "#EB0000" },
         { fr: "Revue de presse", en: "Press Review", color: "#0369a1" },
         { fr: "Nomination", en: "Appointment", color: "#7c3aed" },
-        { fr: "Innovation", en: "Innovation", color: "#0891b2" },
+        { fr: "Innovation", en: "Innovation", color: "#046380" },
       ];
       for (let i = 0; i < defaultCategories.length; i++) {
         const c = defaultCategories[i];
