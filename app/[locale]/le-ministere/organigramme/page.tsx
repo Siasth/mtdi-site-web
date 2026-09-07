@@ -19,7 +19,7 @@ function Box({ label, sub, bg, text = "white", border, wide }: { label: string; 
   return (
     <div className={`px-4 py-3 text-center ${wide ? "w-52 sm:w-56" : ""}`} style={{ background: bg, color: text, border: border || "none" }}>
       <p className="text-[11px] font-bold leading-tight">{label}</p>
-      {sub && <p className="text-[9px] mt-0.5 opacity-70">{sub}</p>}
+      {sub && <p className="text-[9px] mt-0.5" style={{ color: text }}>{sub}</p>}
     </div>
   );
 }

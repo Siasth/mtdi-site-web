@@ -125,7 +125,7 @@ export default function StatsSection({ stats: externalStats, meta, dict }: { sta
                     <span
                       className="text-[10px] font-bold block mt-1"
                       style={{
-                        color: isHovered ? "rgba(26,26,26,0.50)" : "rgba(26,26,26,0.25)",
+                        color: isHovered ? "rgba(26,26,26,0.95)" : "rgba(26,26,26,0.85)",
                         opacity: progress,
                         transition: "color 0.2s",
                       }}
@@ -137,7 +137,7 @@ export default function StatsSection({ stats: externalStats, meta, dict }: { sta
                   {/* Track */}
                   <div
                     className="flex-1 w-full relative rounded-sm overflow-hidden"
-                    style={{ background: "rgba(0,0,0,0.06)" }}
+                    style={{ background: "rgba(0,0,0,0.72)" }}
                   >
                     {/* Remplissage piloté par le scroll */}
                     <div
@@ -168,7 +168,7 @@ export default function StatsSection({ stats: externalStats, meta, dict }: { sta
                     <span
                       className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide leading-tight block line-clamp-2"
                       style={{
-                        color: isHovered ? "rgba(26,26,26,0.60)" : "rgba(26,26,26,0.35)",
+                        color: isHovered ? "rgba(26,26,26,0.95)" : "rgba(26,26,26,0.85)",
                         transition: "color 0.2s",
                       }}
                     >

@@ -68,7 +68,7 @@ export default async function DirectPage({ params }: Props) {
                 </p>
               </div>
 
-              <div className="absolute bottom-4 right-4 text-[9px] font-black uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.15)" }}>
+              <div className="absolute bottom-4 right-4 text-[9px] font-black uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.85)" }}>
                 MTDI · République du Bénin
               </div>
             </div>

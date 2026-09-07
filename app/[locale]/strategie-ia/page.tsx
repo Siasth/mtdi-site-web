@@ -11,6 +11,10 @@ const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 
 const PILIER_ACCENTS = [VERT, "#7A5800", ROUGE, VERT];
+// Variante éclaircie utilisée uniquement sur fond sombre (#0d1826) : les teintes
+// foncées ci-dessus, même à pleine opacité, n'atteignent pas 4.5:1 sur un fond
+// aussi sombre (ANO-099).
+const PILIER_ACCENTS_ON_DARK = ["#4CAF50", JAUNE, "#FF5C5C", "#4CAF50"];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -95,11 +99,11 @@ export default async function StrategieIAPage({ params }: Props) {
               {piliers.map((pilier, i) => (
                 <div key={pilier.id} className="group p-8 sm:p-10 transition-colors" style={{ background: "#0d1826" }}>
                   <div className="flex items-start gap-5 mb-6">
-                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: PILIER_ACCENTS[i % 4], opacity: 0.5 }}>
+                    <span className="text-5xl font-black leading-none tabular-nums flex-shrink-0" style={{ color: PILIER_ACCENTS_ON_DARK[i % 4] }}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
-                    <div className="mt-1 flex-shrink-0" style={{ color: PILIER_ACCENTS[i % 4] }}>
-                      <IconPreset name={pilier.icon} color={PILIER_ACCENTS[i % 4]} size={28} />
+                    <div className="mt-1 flex-shrink-0" style={{ color: PILIER_ACCENTS_ON_DARK[i % 4] }}>
+                      <IconPreset name={pilier.icon} color={PILIER_ACCENTS_ON_DARK[i % 4]} size={28} />
                     </div>
                   </div>
                   <h3 className="text-white font-black text-xl uppercase leading-snug mb-4">{pilier.title}</h3>
