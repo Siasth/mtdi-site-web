@@ -1787,9 +1787,13 @@ export async function POST(req: NextRequest) {
         email TEXT NOT NULL UNIQUE,
         interests JSONB NOT NULL DEFAULT '[]'::jsonb,
         active BOOLEAN NOT NULL DEFAULT TRUE,
+        deleted_at TIMESTAMPTZ,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
+    // Ajoutée après coup sur les bases déjà migrées avec une version
+    // antérieure de ce script (idempotent, sans risque de le rejouer).
+    await sql.query(`ALTER TABLE newsletter_subscribers ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`);
     await sql.query(`
       CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email
       ON newsletter_subscribers(email)

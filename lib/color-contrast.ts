@@ -16,7 +16,7 @@ function srgbChannelToLinear(channel8bit: number): number {
   return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
 }
 
-function relativeLuminance(hex: string): number {
+export function relativeLuminance(hex: string): number {
   const clean = hex.replace("#", "");
   if (clean.length !== 6) return 1; // couleur invalide → on suppose un fond clair
   const r = parseInt(clean.slice(0, 2), 16);
@@ -30,10 +30,15 @@ function relativeLuminance(hex: string): number {
   );
 }
 
-function contrastRatio(luminanceA: number, luminanceB: number): number {
+export function contrastRatio(luminanceA: number, luminanceB: number): number {
   const lighter = Math.max(luminanceA, luminanceB);
   const darker = Math.min(luminanceA, luminanceB);
   return (lighter + 0.05) / (darker + 0.05);
+}
+
+// Ratio de contraste WCAG entre deux couleurs hexadécimales.
+export function contrastBetween(hexA: string, hexB: string): number {
+  return contrastRatio(relativeLuminance(hexA), relativeLuminance(hexB));
 }
 
 const DARK_TEXT = "#1a1a1a";

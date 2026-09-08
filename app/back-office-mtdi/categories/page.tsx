@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon } from "../components/ActionIcons";
+import { ColorContrastHint } from "../components/ColorContrastHint";
 
 const VERT = "#006828";
 
@@ -152,10 +153,13 @@ export default function AdminCategories() {
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (English)</label>
               <input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
-            <div className="flex items-center gap-3">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Couleur</label>
-              <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-8 rounded border border-gray-200 cursor-pointer" />
-              <span className="text-xs text-gray-400 font-mono">{form.color}</span>
+            <div>
+              <div className="flex items-center gap-3">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Couleur</label>
+                <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-8 rounded border border-gray-200 cursor-pointer" />
+                <span className="text-xs text-gray-400 font-mono">{form.color}</span>
+              </div>
+              <ColorContrastHint color={form.color} />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ordre d'affichage</label>

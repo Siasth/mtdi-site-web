@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { TextStyle } from "@tiptap/extension-text-style";
+import { contrastBetween } from "@/lib/color-contrast";
 import { Color } from "@tiptap/extension-color";
 import { FontFamily } from "@tiptap/extension-font-family";
 import { Table } from "@tiptap/extension-table";
@@ -152,6 +153,7 @@ function ToolbarButton({
 
 function Toolbar({ editor }: { editor: Editor | null }) {
   const [showColors, setShowColors] = useState(false);
+  const [colorWarning, setColorWarning] = useState(false);
   const [showCellColors, setShowCellColors] = useState(false);
 
   if (!editor) return null;
@@ -232,34 +234,64 @@ function Toolbar({ editor }: { editor: Editor | null }) {
           <span className="text-sm font-black" style={{ color: (editor.getAttributes("textStyle").color as string) || "#1A1A1A" }}>A</span>
         </ToolbarButton>
         {showColors && (
-          <div className="absolute z-10 top-9 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex flex-wrap gap-1.5 w-40">
-            {TEXT_COLORS.map((c) => (
+          <div className="absolute z-10 top-9 left-0 bg-white border border-gray-200 rounded-lg shadow-lg p-2 w-48">
+            <div className="flex flex-wrap gap-1.5">
+              {TEXT_COLORS.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { editor.chain().focus().setColor(c).run(); setColorWarning(false); setShowColors(false); }}
+                  className="w-6 h-6 rounded-full border border-black/10"
+                  style={{ background: c }}
+                  title={c}
+                />
+              ))}
+              <label className="w-6 h-6 rounded-full border border-black/10 cursor-pointer overflow-hidden relative" title="Couleur personnalisée">
+                <input
+                  type="color"
+                  className="absolute -top-1 -left-1 w-8 h-8 cursor-pointer"
+                  onChange={(e) => {
+                    const c = e.target.value;
+                    editor.chain().focus().setColor(c).run();
+                    // Le texte sera très probablement lu sur fond blanc sur le
+                    // site public : on avertit si ce n'est pas assez lisible,
+                    // sans empêcher le choix (usage parfois volontairement
+                    // décoratif, ex. sur un fond coloré ailleurs).
+                    if (contrastBetween(c, "#FFFFFF") < 4.5) {
+                      setColorWarning(true);
+                    } else {
+                      setColorWarning(false);
+                      setShowColors(false);
+                    }
+                  }}
+                />
+              </label>
               <button
-                key={c}
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => { editor.chain().focus().setColor(c).run(); setShowColors(false); }}
-                className="w-6 h-6 rounded-full border border-black/10"
-                style={{ background: c }}
-                title={c}
-              />
-            ))}
-            <label className="w-6 h-6 rounded-full border border-black/10 cursor-pointer overflow-hidden relative" title="Couleur personnalisée">
-              <input
-                type="color"
-                className="absolute -top-1 -left-1 w-8 h-8 cursor-pointer"
-                onChange={(e) => { editor.chain().focus().setColor(e.target.value).run(); setShowColors(false); }}
-              />
-            </label>
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => { editor.chain().focus().unsetColor().run(); setShowColors(false); }}
-              className="w-6 h-6 rounded-full border border-black/10 flex items-center justify-center text-[10px] text-gray-400"
-              title="Réinitialiser"
-            >
-              ×
-            </button>
+                onClick={() => { editor.chain().focus().unsetColor().run(); setColorWarning(false); setShowColors(false); }}
+                className="w-6 h-6 rounded-full border border-black/10 flex items-center justify-center text-[10px] text-gray-400"
+                title="Réinitialiser"
+              >
+                ×
+              </button>
+            </div>
+            {colorWarning && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-red-600 font-medium leading-snug">
+                  Contraste insuffisant sur fond blanc (moins de 4.5:1) : ce texte risque d'être difficile à lire.
+                </p>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { setColorWarning(false); setShowColors(false); }}
+                  className="mt-1 text-[10px] font-semibold text-gray-500 hover:text-gray-700 underline"
+                >
+                  Conserver quand même
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>

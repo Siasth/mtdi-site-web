@@ -5,6 +5,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { uploadFile } from "@/lib/client-upload";
+import { ColorContrastHint } from "../components/ColorContrastHint";
 
 const VERT = "#006828";
 
@@ -99,7 +100,7 @@ export default function AdminPartenaires() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Catégorie</label><select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur</label><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-full h-9 rounded border border-gray-200" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur</label><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-full h-9 rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Nom / sigle *</label><input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ex: ANIP" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div>

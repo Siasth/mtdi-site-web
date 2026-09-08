@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { ColorContrastHint } from "../components/ColorContrastHint";
 
 const VERT = "#006828";
 type Item = { id: number; role_fr: string; role_en: string | null; name_fr: string; name_en: string | null; email: string; phone: string | null; note_fr: string | null; note_en: string | null; accent: string | null; display_order: number; active: boolean; deleted_at: string | null };
@@ -58,7 +59,7 @@ export default function AdminContactsSpecifiques() {
               <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Téléphone" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Note</label><textarea value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur</label><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-20 h-9 rounded border border-gray-200" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur</label><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-20 h-9 rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>

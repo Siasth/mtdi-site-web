@@ -35,3 +35,5 @@ next-env.d.ts
 
 # 2FA pending codes (runtime data, not source)
 data/.2fa-pending.json
+mtdi-site.zip
+*.zip

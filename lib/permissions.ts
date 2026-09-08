@@ -87,6 +87,7 @@ export const PERMISSION_MODULES: { key: string; label: string }[] = [
   { key: "ministere", label: "Le Ministère" },
   { key: "ressources", label: "Pages & Ressources" },
   { key: "strategie_ia", label: "Stratégie IA" },
+  { key: "newsletter", label: "Newsletter" },
   { key: "utilisateurs", label: "Utilisateurs" },
   { key: "roles", label: "Rôles & permissions" },
   { key: "logs", label: "Journal d'audit" },

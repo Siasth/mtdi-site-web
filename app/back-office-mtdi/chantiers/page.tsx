@@ -5,6 +5,7 @@ import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
 import MarkdownEditor from "../components/MarkdownEditor";
+import { ColorContrastHint } from "../components/ColorContrastHint";
 
 const VERT = "#006828";
 
@@ -316,6 +317,7 @@ export default function AdminChantiers() {
                 <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
                 <span className="text-xs text-gray-400 font-mono">{form.color}</span>
               </div>
+              <ColorContrastHint color={form.color} />
             </div>
 
             <div className="pt-2 border-t border-gray-100">

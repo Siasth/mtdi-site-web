@@ -11,6 +11,7 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,6 +26,7 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
       return;
     }
     setError("");
+    setAlreadySubscribed(false);
     setSubmitting(true);
     try {
       const res = await fetch("/api/newsletter", {
@@ -37,6 +39,7 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
         setError(data.error || (d.erreurEnvoi ?? "Une erreur est survenue. Veuillez réessayer."));
         return;
       }
+      setAlreadySubscribed(Boolean(data.alreadySubscribed));
       setSubmitted(true);
     } catch {
       setError(d.erreurEnvoi ?? "Une erreur est survenue. Veuillez réessayer.");
@@ -106,10 +109,12 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
               </svg>
             </div>
             <h3 className="text-2xl font-black text-white uppercase mb-2">
-              {d.estAbonne ?? "Vous êtes abonné !"}
+              {alreadySubscribed ? (d.dejaAbonne ?? "Vous êtes déjà abonné !") : (d.estAbonne ?? "Vous êtes abonné !")}
             </h3>
             <p className="text-white/70 font-medium">
-              {d.recevrezActualites ?? "Vous recevrez bientôt les dernières actualités du Ministère."}
+              {alreadySubscribed
+                ? (d.dejaAbonneDesc ?? "Cette adresse email est déjà inscrite à notre newsletter.")
+                : (d.recevrezActualites ?? "Vous recevrez bientôt les dernières actualités du Ministère.")}
             </p>
           </div>
         )}
