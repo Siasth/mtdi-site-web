@@ -18,6 +18,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
   if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { eventDate, titleFr, titleEn, descriptionFr, descriptionEn, displayOrder, active } = body;
+  if (eventDate && new Date(eventDate).getTime() < Date.now()) {
+    return NextResponse.json({ error: "La date doit être dans le futur pour un événement à venir." }, { status: 400 });
+  }
   await sql`
     UPDATE direct_upcoming SET
       event_date = COALESCE(${eventDate}, event_date), title_fr = COALESCE(${titleFr}, title_fr), title_en = ${titleEn ?? null},

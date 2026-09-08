@@ -28,14 +28,25 @@ export default function AdminDirect() {
   // Événement à venir
   const [editU, setEditU] = useState<number | "new" | null>(null);
   const [uForm, setUForm] = useState({ eventDate: "", titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "" });
-  function openNewU() { setUForm({ eventDate: new Date().toISOString().slice(0, 16), titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "" }); setEditU("new"); }
-  function openEditU(u: Upcoming) { setUForm({ eventDate: u.event_date.slice(0, 16), titleFr: u.title_fr, titleEn: u.title_en || "", descriptionFr: u.description_fr || "", descriptionEn: u.description_en || "" }); setEditU(u.id); }
+  function openNewU() { setUSaveError(""); setUForm({ eventDate: new Date().toISOString().slice(0, 16), titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: "" }); setEditU("new"); }
+  function openEditU(u: Upcoming) { setUSaveError(""); setUForm({ eventDate: u.event_date.slice(0, 16), titleFr: u.title_fr, titleEn: u.title_en || "", descriptionFr: u.description_fr || "", descriptionEn: u.description_en || "" }); setEditU(u.id); }
+  const [uSaveError, setUSaveError] = useState("");
   async function saveU(e: React.FormEvent) {
     e.preventDefault();
+    setUSaveError("");
+    if (uForm.eventDate && new Date(uForm.eventDate).getTime() < Date.now()) {
+      setUSaveError("La date/heure doit être dans le futur pour un événement \"À venir\".");
+      return;
+    }
     const isNew = editU === "new";
-    await fetch(isNew ? "/api/admin/direct-upcoming" : `/api/admin/direct-upcoming/${editU}`, {
+    const res = await fetch(isNew ? "/api/admin/direct-upcoming" : `/api/admin/direct-upcoming/${editU}`, {
       method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(uForm),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setUSaveError(data.error || "Erreur lors de l'enregistrement.");
+      return;
+    }
     setEditU(null); load();
   }
   async function deleteU(u: Upcoming) { if (confirm(`Supprimer "${u.title_fr}" ?`)) { await fetch(`/api/admin/direct-upcoming/${u.id}`, { method: "DELETE" }); load(); } }
@@ -103,11 +114,12 @@ export default function AdminDirect() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveU} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
             <h2 className="font-bold text-gray-900 text-lg">{editU === "new" ? "Nouvel événement" : "Modifier"}</h2>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date et heure *</label><input required type="datetime-local" value={uForm.eventDate} onChange={(e) => setUForm({ ...uForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date et heure *</label><input required type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={uForm.eventDate} onChange={(e) => setUForm({ ...uForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={uForm.titleFr} onChange={(e) => setUForm({ ...uForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={uForm.titleEn} onChange={(e) => setUForm({ ...uForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><textarea value={uForm.descriptionFr} onChange={(e) => setUForm({ ...uForm, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><textarea value={uForm.descriptionEn} onChange={(e) => setUForm({ ...uForm, descriptionEn: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            {uSaveError && <p className="text-xs text-red-600">{uSaveError}</p>}
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditU(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>

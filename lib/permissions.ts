@@ -47,6 +47,10 @@ export const PERMISSIONS = [
   { code: "strategie_ia.voir", module: "strategie_ia", category: "editorial", description: "Voir le contenu de la Stratégie IA (piliers, jalons, olympiades, critères)" },
   { code: "strategie_ia.gerer", module: "strategie_ia", category: "editorial", description: "Modifier le contenu de la Stratégie IA (piliers, jalons, olympiades, critères)" },
 
+  // Newsletter : abonnés inscrits depuis le front-office
+  { code: "newsletter.voir", module: "newsletter", category: "editorial", description: "Voir la liste des abonnés à la newsletter" },
+  { code: "newsletter.gerer", module: "newsletter", category: "editorial", description: "Exporter ou supprimer des abonnés à la newsletter" },
+
   // ══════════════════════ ADMINISTRATION TECHNIQUE ══════════════════════
 
   // Utilisateurs

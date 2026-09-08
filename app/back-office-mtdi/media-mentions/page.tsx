@@ -55,7 +55,7 @@ export default function AdminMediaMentions() {
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="grid grid-cols-2 gap-3">
               <input value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} placeholder="Source (ex: Instagram)" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              <input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="Date" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Extrait (FR)</label><textarea value={form.excerptFr} onChange={(e) => setForm({ ...form, excerptFr: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Extrait (EN)</label><textarea value={form.excerptEn} onChange={(e) => setForm({ ...form, excerptEn: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>

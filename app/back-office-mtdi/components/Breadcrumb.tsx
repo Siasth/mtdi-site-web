@@ -7,12 +7,13 @@ import { usePathname } from "next/navigation";
 // l'ajout de nouveaux modules (Directions, Structures, etc.).
 const LABELS: Record<string, string> = {
   "back-office-mtdi": "Tableau de bord",
-  hero: "Hero",
+  hero: "Carousels",
   actualites: "Actualités",
   galerie: "Galerie",
   chantiers: "Chantiers",
   stats: "Chiffres clés",
   direct: "Direct",
+  newsletter: "Newsletter",
   ministre: "Mot du Ministre",
   securite: "Mon profil",
   autres: "Autres",

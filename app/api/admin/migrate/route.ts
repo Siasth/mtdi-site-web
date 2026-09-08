@@ -1771,6 +1771,30 @@ export async function POST(req: NextRequest) {
       ON form_submissions(form_type, ip_hash, created_at)
     `);
 
+    // ══════════════════════════════════════════════════════════════════
+    // ANO-152 : abonnés newsletter. Remplace l'ancien stockage en fichier
+    // JSON local (data/newsletter.json via fs.writeFile), qui ne fonctionne
+    // pas de façon fiable sur Vercel : le système de fichiers du déploiement
+    // est en lecture seule en production, et même /tmp n'est pas partagé
+    // entre invocations serverless. Résultat : les inscriptions échouaient
+    // silencieusement ou étaient perdues, et n'étaient de toute façon
+    // consultables nulle part dans le back-office.
+    // ══════════════════════════════════════════════════════════════════
+    await sql.query(`
+      CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        interests JSONB NOT NULL DEFAULT '[]'::jsonb,
+        active BOOLEAN NOT NULL DEFAULT TRUE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `);
+    await sql.query(`
+      CREATE INDEX IF NOT EXISTS idx_newsletter_subscribers_email
+      ON newsletter_subscribers(email)
+    `);
+
     // Nettoyage de 2 permissions mortes depuis longtemps (remplacées à
     // l'époque par contenu.modifier, lui-même depuis remplacé par les
     // groupes actuels) — sans ça, elles continueraient à apparaître comme

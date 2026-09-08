@@ -156,7 +156,7 @@ export default function AdminHero() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Hero</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Carousels</h1>
           <p className="text-sm text-gray-500 mt-1">Images/vidéos en carrousel sur la bannière d'accueil</p>
         </div>
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>

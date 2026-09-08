@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { parseDuration, formatDuration, VIDEO_DURATION_UNITS } from "@/lib/duration";
 
 const VERT = "#006828";
 type Video = { id: number; title_fr: string; title_en: string | null; date_label: string | null; duration: string | null; source: string | null; url: string; color: string | null; display_order: number; active: boolean; deleted_at: string | null };
@@ -53,9 +54,29 @@ export default function AdminVideos() {
             <h2 className="font-bold text-gray-900 text-lg">{editing === "new" ? "Nouvelle vidéo" : "Modifier"}</h2>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-3">
               <input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="Date" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-              <input value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} placeholder="Durée" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              {(() => {
+                const { amount, unit } = parseDuration(form.duration, VIDEO_DURATION_UNITS);
+                return (
+                  <>
+                    <input
+                      type="number" min={0} step={1} inputMode="numeric"
+                      value={amount}
+                      onChange={(e) => setForm({ ...form, duration: formatDuration(e.target.value, unit) })}
+                      placeholder="Durée"
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                    <select
+                      value={unit}
+                      onChange={(e) => setForm({ ...form, duration: formatDuration(amount, e.target.value) })}
+                      className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    >
+                      {VIDEO_DURATION_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+                    </select>
+                  </>
+                );
+              })()}
               <input value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} placeholder="Source" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien YouTube *</label><input required value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>

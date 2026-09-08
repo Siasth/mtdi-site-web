@@ -103,8 +103,8 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                 />
               </div>
 
-              {/* Overlay sombre uniforme */}
-              <div className="absolute inset-0 z-[1]" style={{ background: "rgba(0,0,0,0.62)" }} />
+              {/* Overlay teinté par la couleur d'accent du chantier (ANO-138) */}
+              <div className="absolute inset-0 z-[1]" style={{ background: c.overlay }} />
 
               {/* Contenu centré verticalement, défilable en interne si le
                   contenu déborde de la hauteur disponible (résolutions

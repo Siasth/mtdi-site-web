@@ -24,6 +24,9 @@ export async function POST(req: NextRequest) {
   if (!hasPerm(session, "mediatheque.gerer")) return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   const { eventDate, titleFr, titleEn, descriptionFr, descriptionEn, displayOrder, active } = await req.json();
   if (!titleFr || !eventDate) return NextResponse.json({ error: "Titre et date sont requis" }, { status: 400 });
+  if (new Date(eventDate).getTime() < Date.now()) {
+    return NextResponse.json({ error: "La date doit être dans le futur pour un événement à venir." }, { status: 400 });
+  }
   const result = await sql`
     INSERT INTO direct_upcoming (event_date, title_fr, title_en, description_fr, description_en, display_order, active, created_by)
     VALUES (${eventDate}, ${titleFr}, ${titleEn || null}, ${descriptionFr || null}, ${descriptionEn || null}, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})

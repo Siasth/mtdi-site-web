@@ -7,6 +7,7 @@ import MarkdownEditor from "../components/MarkdownEditor";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { cleanupOldFile } from "@/lib/client-upload";
 import { URL_PATTERN, isValidUrl } from "@/lib/validators";
+import { parseDuration, formatDuration, READ_TIME_UNITS } from "@/lib/duration";
 import VersionHistory from "../components/VersionHistory";
 import { uploadFile } from "@/lib/client-upload";
 
@@ -384,7 +385,27 @@ export default function AdminActualites() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
-                  <input value={form.readTime} onChange={(e) => setForm({ ...form, readTime: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
+                  {(() => {
+                    const { amount, unit } = parseDuration(form.readTime, READ_TIME_UNITS);
+                    return (
+                      <div className="flex gap-2 max-w-[220px]">
+                        <input
+                          type="number" min={0} step={1} inputMode="numeric"
+                          value={amount}
+                          onChange={(e) => setForm({ ...form, readTime: formatDuration(e.target.value, unit) })}
+                          placeholder="3"
+                          className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                        />
+                        <select
+                          value={unit}
+                          onChange={(e) => setForm({ ...form, readTime: formatDuration(amount, e.target.value) })}
+                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                        >
+                          {READ_TIME_UNITS.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
+                        </select>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ) : (

@@ -11,9 +11,10 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) {
       setError(d.champRequis ?? "Veuillez remplir tous les champs.");
@@ -24,7 +25,24 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
       return;
     }
     setError("");
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || (d.erreurEnvoi ?? "Une erreur est survenue. Veuillez réessayer."));
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setError(d.erreurEnvoi ?? "Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -62,10 +80,11 @@ export default function Newsletter({ dict }: { dict?: HomeDict }) {
               />
               <button
                 type="submit"
-                className="px-6 py-3.5 font-bold text-sm uppercase tracking-wider rounded-sm transition-all hover:opacity-90 whitespace-nowrap"
+                disabled={submitting}
+                className="px-6 py-3.5 font-bold text-sm uppercase tracking-wider rounded-sm transition-all hover:opacity-90 whitespace-nowrap disabled:opacity-60"
                 style={{ background: "#0E0E0E", color: "white" }}
               >
-                {d.sabonner ?? "S'abonner"}
+                {submitting ? (d.envoiEnCours ?? "Envoi…") : (d.sabonner ?? "S'abonner")}
               </button>
             </form>
 

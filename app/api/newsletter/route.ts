@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readData, writeData, nextId } from "../../../lib/data";
+import { sql } from "@/lib/db";
 import { isHoneypotTriggered, checkRateLimit } from "@/lib/anti-spam";
+import { isValidEmail } from "@/lib/validators";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
-type Subscriber = { id: number; name: string; email: string; interests: string[]; createdAt: string };
-type NewsletterData = { subscribers: Subscriber[] };
+// ANO-152 : anciennement stocké dans data/newsletter.json via fs.writeFile.
+// Ce fichier n'est pas fiable sur Vercel (système de fichiers en lecture
+// seule en production, /tmp non partagé entre invocations serverless) et
+// les abonnés n'étaient de toute façon consultables nulle part dans le
+// back-office. Migré vers la table Postgres newsletter_subscribers.
 
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
@@ -24,31 +26,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Trop de tentatives. Réessayez plus tard." }, { status: 429 });
   }
 
-  const name      = String(body.name      ?? "").trim();
-  const email     = String(body.email     ?? "").trim();
+  const name = String(body.name ?? "").trim();
+  const email = String(body.email ?? "").trim();
   const interests = Array.isArray(body.interests) ? (body.interests as string[]) : [];
 
   if (!name || !email) {
     return NextResponse.json({ error: "Nom et email requis." }, { status: 400 });
   }
-  if (!EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     return NextResponse.json({ error: "Adresse email invalide." }, { status: 400 });
   }
 
-  const data = await readData<NewsletterData>("newsletter");
-  const alreadyExists = data.subscribers.some((s) => s.email.toLowerCase() === email.toLowerCase());
-  if (alreadyExists) {
-    return NextResponse.json({ success: true });
-  }
+  await sql`
+    INSERT INTO newsletter_subscribers (name, email, interests)
+    VALUES (${name}, ${email.toLowerCase()}, ${JSON.stringify(interests)})
+    ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, interests = EXCLUDED.interests, active = TRUE
+  `;
 
-  data.subscribers.push({
-    id: nextId(data.subscribers),
-    name,
-    email,
-    interests,
-    createdAt: new Date().toISOString(),
-  });
-
-  await writeData("newsletter", data);
   return NextResponse.json({ success: true });
 }
