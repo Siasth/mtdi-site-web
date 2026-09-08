@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
@@ -23,6 +24,7 @@ const emptyForm = { acronym: "", nameFr: "", nameEn: "", descriptionFr: "", desc
 export default function AdminStructures() {
   const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Structure[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -74,6 +76,8 @@ export default function AdminStructures() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -81,7 +85,7 @@ export default function AdminStructures() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle structure</button>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {items.map((s) => (
+        {pageItems.map((s) => (
           <div key={s.id} className={`flex items-center justify-between p-4 ${s.deleted_at ? "opacity-40" : ""}`}>
             <div className="flex items-center gap-3">
               {s.logo_src && <img src={s.logo_src} alt="" className="h-8 w-16 object-contain" />}
@@ -92,6 +96,7 @@ export default function AdminStructures() {
         ))}
         {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucune structure</p>}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">

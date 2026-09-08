@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
@@ -11,6 +12,7 @@ type Mission = { id: number; text_fr: string; text_en: string | null; display_or
 export default function AdminMissions() {
   const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Mission[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState({ textFr: "", textEn: "", displayOrder: 0, active: true });
@@ -32,6 +34,8 @@ export default function AdminMissions() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -39,7 +43,7 @@ export default function AdminMissions() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle mission</button>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {items.map((m) => (
+        {pageItems.map((m) => (
           <div key={m.id} className={`flex items-center justify-between p-4 gap-4 ${m.deleted_at ? "opacity-40" : ""}`}>
             <p className="text-sm text-gray-900 flex-1">{m.text_fr}</p>
             <div className="flex gap-1 flex-shrink-0">{m.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(m)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(m)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(m)} /></>}</div>
@@ -47,6 +51,7 @@ export default function AdminMissions() {
         ))}
         {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucune mission</p>}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">

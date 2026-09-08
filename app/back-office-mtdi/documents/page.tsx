@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
@@ -14,6 +15,7 @@ const emptyForm = { titleFr: "", titleEn: "", category: "rapport", type: "PDF", 
 export default function AdminDocuments() {
   const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Doc[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -59,6 +61,8 @@ export default function AdminDocuments() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -66,7 +70,7 @@ export default function AdminDocuments() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau document</button>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {items.map((d) => (
+        {pageItems.map((d) => (
           <div key={d.id} className={`flex items-center justify-between p-4 ${d.deleted_at ? "opacity-40" : ""}`}>
             <div className="flex items-center gap-3 min-w-0">
               <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-gray-100 text-gray-600 flex-shrink-0">{d.category}</span>
@@ -77,6 +81,7 @@ export default function AdminDocuments() {
         ))}
         {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucun document</p>}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">

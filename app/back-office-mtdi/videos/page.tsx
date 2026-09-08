@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { parseDuration, formatDuration, VIDEO_DURATION_UNITS } from "@/lib/duration";
@@ -12,6 +13,7 @@ const emptyForm = { titleFr: "", titleEn: "", date: "", duration: "", source: "M
 export default function AdminVideos() {
   const canManage = useHasPermission("mediatheque.gerer");
   const [items, setItems] = useState<Video[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -33,6 +35,8 @@ export default function AdminVideos() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -40,7 +44,7 @@ export default function AdminVideos() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle vidéo</button>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {items.map((v) => (
+        {pageItems.map((v) => (
           <div key={v.id} className={`flex items-center justify-between p-4 ${v.deleted_at ? "opacity-40" : ""}`}>
             <div><p className="font-medium text-gray-900 text-sm">{v.title_fr}</p><p className="text-xs text-gray-400">{v.source} · {v.date_label} · {v.duration}</p></div>
             <div className="flex gap-1">{v.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(v)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(v)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(v)} /></>}</div>
@@ -48,6 +52,7 @@ export default function AdminVideos() {
         ))}
         {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucune vidéo</p>}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import Link from "next/link";
 import { useHasPermission } from "../AdminLayoutClient";
 import MarkdownEditor from "../components/MarkdownEditor";
@@ -81,6 +82,7 @@ export default function AdminActualites() {
   const canRestore = useHasPermission("actualites.restaurer");
 
   const [articles, setArticles] = useState<Article[]>([]);
+  const [page, setPage] = useState(1);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -261,6 +263,8 @@ export default function AdminActualites() {
     );
   }
 
+  const { pageItems, totalPages, safePage } = paginate(articles, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -296,7 +300,7 @@ export default function AdminActualites() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {articles.map((a) => (
+            {pageItems.map((a) => (
               <tr key={a.id} className={a.deleted_at ? "opacity-40" : ""}>
                 <td className="px-5 py-3 font-medium text-gray-900 max-w-xs">{a.title_fr}</td>
                 <td className="px-5 py-3">
@@ -337,6 +341,7 @@ export default function AdminActualites() {
             )}
           </tbody>
         </table>
+        <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       {editingId !== null && (

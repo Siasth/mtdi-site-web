@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { IconPreset, ICON_PRESET_KEYS } from "../../components/IconPreset";
@@ -11,6 +12,7 @@ const emptyForm = { titleFr: "", titleEn: "", descriptionFr: "", descriptionEn: 
 export default function AdminEServices() {
   const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -32,6 +34,8 @@ export default function AdminEServices() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -39,7 +43,7 @@ export default function AdminEServices() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau service</button>
       </div>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-        {items.map((it) => (
+        {pageItems.map((it) => (
           <div key={it.id} className={`flex items-center justify-between p-4 ${it.deleted_at ? "opacity-40" : ""}`}>
             <div className="flex items-center gap-3"><IconPreset name={it.icon_key} color={VERT} size={20} /><p className="font-medium text-gray-900 text-sm">{it.title_fr}</p></div>
             <div className="flex gap-1">{it.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(it)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(it)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(it)} /></>}</div>
@@ -47,6 +51,7 @@ export default function AdminEServices() {
         ))}
         {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucun service</p>}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
