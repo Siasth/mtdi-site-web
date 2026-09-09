@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { ColorContrastHint } from "../components/ColorContrastHint";
@@ -41,6 +42,7 @@ export default function AdminStats() {
   const canManage = useHasPermission("accueil.gerer");
 
   const [stats, setStats] = useState<Stat[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -161,6 +163,8 @@ export default function AdminStats() {
     );
   }
 
+  const { pageItems, totalPages, safePage } = paginate(stats, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -220,7 +224,7 @@ export default function AdminStats() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {stats.map((s) => (
+            {pageItems.map((s) => (
               <tr key={s.id} className={s.deleted_at ? "opacity-40" : ""}>
                 <td className="px-5 py-3 font-medium text-gray-900">{s.label_fr}</td>
                 <td className="px-5 py-3">
@@ -254,6 +258,7 @@ export default function AdminStats() {
             )}
           </tbody>
         </table>
+        <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       {editingId !== null && (

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
@@ -12,6 +13,8 @@ export default function AdminIAOlympiades() {
   const [tab, setTab] = useState<"editions" | "criteres">("editions");
   const [editions, setEditions] = useState<Edition[]>([]);
   const [criteres, setCriteres] = useState<Critere[]>([]);
+  const [editionsPage, setEditionsPage] = useState(1);
+  const [criteresPage, setCriteresPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -52,6 +55,9 @@ export default function AdminIAOlympiades() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems: pageOfEditions, totalPages: editionsTotalPages, safePage: editionsSafePage } = paginate(editions, editionsPage, 10);
+  const { pageItems: pageOfCriteres, totalPages: criteresTotalPages, safePage: criteresSafePage } = paginate(criteres, criteresPage, 10);
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Olympiades IA</h1>
@@ -66,7 +72,7 @@ export default function AdminIAOlympiades() {
         <>
           <div className="mb-4 flex justify-end"><button onClick={openNewE} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle édition</button></div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {editions.map((ed) => (
+            {pageOfEditions.map((ed) => (
               <div key={ed.id} className={`flex items-center justify-between p-4 ${ed.deleted_at ? "opacity-40" : ""}`}>
                 <div><p className="font-medium text-gray-900 text-sm">{ed.year} — {ed.title_fr}</p><p className="text-xs text-gray-400">{ed.highlight_fr}</p></div>
                 <div className="flex gap-1">{ed.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreE(ed)} /> : <><EditIcon label="Modifier" onClick={() => openEditE(ed)} /><DeleteIcon label="Supprimer" onClick={() => deleteE(ed)} /></>}</div>
@@ -74,6 +80,7 @@ export default function AdminIAOlympiades() {
             ))}
             {editions.length === 0 && <p className="p-8 text-center text-gray-400">Aucune édition</p>}
           </div>
+          <Pagination page={editionsSafePage} totalPages={editionsTotalPages} onChange={setEditionsPage} />
         </>
       )}
 
@@ -81,7 +88,7 @@ export default function AdminIAOlympiades() {
         <>
           <div className="mb-4 flex justify-end"><button onClick={openNewC} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau critère</button></div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {criteres.map((c) => (
+            {pageOfCriteres.map((c) => (
               <div key={c.id} className={`flex items-center justify-between p-4 gap-4 ${c.deleted_at ? "opacity-40" : ""}`}>
                 <p className="text-sm text-gray-900 flex-1">{c.text_fr}</p>
                 <div className="flex gap-1 flex-shrink-0">{c.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreC(c)} /> : <><EditIcon label="Modifier" onClick={() => openEditC(c)} /><DeleteIcon label="Supprimer" onClick={() => deleteC(c)} /></>}</div>
@@ -89,6 +96,7 @@ export default function AdminIAOlympiades() {
             ))}
             {criteres.length === 0 && <p className="p-8 text-center text-gray-400">Aucun critère</p>}
           </div>
+          <Pagination page={criteresSafePage} totalPages={criteresTotalPages} onChange={setCriteresPage} />
         </>
       )}
 

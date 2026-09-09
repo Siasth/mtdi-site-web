@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
@@ -49,6 +50,8 @@ export default function AdminGalerie() {
   const [tab, setTab] = useState<"items" | "collections">("items");
   const [items, setItems] = useState<GalerieItem[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [itemsPage, setItemsPage] = useState(1);
+  const [collectionsPage, setCollectionsPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -204,6 +207,9 @@ export default function AdminGalerie() {
     );
   }
 
+  const { pageItems: pageOfItems, totalPages: itemsTotalPages, safePage: itemsSafePage } = paginate(items, itemsPage, 10);
+  const { pageItems: pageOfCollections, totalPages: collectionsTotalPages, safePage: collectionsSafePage } = paginate(collections, collectionsPage, 10);
+
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
@@ -245,7 +251,7 @@ export default function AdminGalerie() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {items.map((it) => (
+                {pageOfItems.map((it) => (
                   <tr key={it.id} className={it.deleted_at ? "opacity-40" : ""}>
                     <td className="px-5 py-3 font-medium text-gray-900 max-w-xs truncate">{it.title_fr}</td>
                     <td className="px-5 py-3 text-gray-500 capitalize">{it.type}</td>
@@ -278,6 +284,7 @@ export default function AdminGalerie() {
                 )}
               </tbody>
             </table>
+            <Pagination page={itemsSafePage} totalPages={itemsTotalPages} onChange={setItemsPage} />
           </div>
         </>
       )}
@@ -302,7 +309,7 @@ export default function AdminGalerie() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {collections.map((c) => (
+                {pageOfCollections.map((c) => (
                   <tr key={c.id}>
                     <td className="px-5 py-3 font-medium text-gray-900">{c.name_fr}</td>
                     <td className="px-5 py-3 text-gray-500">{c.name_en || <span className="text-amber-600 text-xs">⚠ non traduit</span>}</td>
@@ -322,6 +329,7 @@ export default function AdminGalerie() {
                 )}
               </tbody>
             </table>
+            <Pagination page={collectionsSafePage} totalPages={collectionsTotalPages} onChange={setCollectionsPage} />
           </div>
         </>
       )}

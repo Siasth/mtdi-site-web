@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
@@ -14,6 +15,8 @@ export default function AdminDirect() {
   const [tab, setTab] = useState<"upcoming" | "replays">("upcoming");
   const [upcoming, setUpcoming] = useState<Upcoming[]>([]);
   const [replays, setReplays] = useState<Replay[]>([]);
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [replaysPage, setReplaysPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -71,6 +74,9 @@ export default function AdminDirect() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems: pageOfUpcoming, totalPages: upcomingTotalPages, safePage: upcomingSafePage } = paginate(upcoming, upcomingPage, 10);
+  const { pageItems: pageOfReplays, totalPages: replaysTotalPages, safePage: replaysSafePage } = paginate(replays, replaysPage, 10);
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Direct</h1>
@@ -84,7 +90,7 @@ export default function AdminDirect() {
         <>
           <div className="mb-4 flex justify-end"><button onClick={openNewU} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvel événement</button></div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {upcoming.map((u) => (
+            {pageOfUpcoming.map((u) => (
               <div key={u.id} className={`flex items-center justify-between p-4 ${u.deleted_at ? "opacity-40" : ""}`}>
                 <div><p className="font-medium text-gray-900 text-sm">{u.title_fr}</p><p className="text-xs text-gray-400">{new Date(u.event_date).toLocaleString("fr-FR")}</p></div>
                 <div className="flex gap-1">{u.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreU(u)} /> : <><EditIcon label="Modifier" onClick={() => openEditU(u)} /><DeleteIcon label="Supprimer" onClick={() => deleteU(u)} /></>}</div>
@@ -92,6 +98,7 @@ export default function AdminDirect() {
             ))}
             {upcoming.length === 0 && <p className="p-8 text-center text-gray-400">Aucun événement</p>}
           </div>
+          <Pagination page={upcomingSafePage} totalPages={upcomingTotalPages} onChange={setUpcomingPage} />
         </>
       )}
 
@@ -99,7 +106,7 @@ export default function AdminDirect() {
         <>
           <div className="mb-4 flex justify-end"><button onClick={openNewR} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle rediffusion</button></div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {replays.map((r) => (
+            {pageOfReplays.map((r) => (
               <div key={r.id} className={`flex items-center justify-between p-4 ${r.deleted_at ? "opacity-40" : ""}`}>
                 <div><p className="font-medium text-gray-900 text-sm">{r.title_fr}</p><p className="text-xs text-gray-400">{r.source}</p></div>
                 <div className="flex gap-1">{r.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreR(r)} /> : <><EditIcon label="Modifier" onClick={() => openEditR(r)} /><DeleteIcon label="Supprimer" onClick={() => deleteR(r)} /></>}</div>
@@ -107,6 +114,7 @@ export default function AdminDirect() {
             ))}
             {replays.length === 0 && <p className="p-8 text-center text-gray-400">Aucune rediffusion</p>}
           </div>
+          <Pagination page={replaysSafePage} totalPages={replaysTotalPages} onChange={setReplaysPage} />
         </>
       )}
 

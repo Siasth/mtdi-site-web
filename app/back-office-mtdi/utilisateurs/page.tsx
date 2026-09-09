@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon, ResetPasswordIcon } from "../components/ActionIcons";
 import { isValidEmail, EMAIL_PATTERN } from "@/lib/validators";
@@ -23,6 +24,7 @@ type UserRow = {
 export default function AdminUtilisateurs() {
   const canView = useHasPermission("utilisateurs.voir");
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [page, setPage] = useState(1);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -138,6 +140,8 @@ export default function AdminUtilisateurs() {
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(users, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -167,7 +171,7 @@ export default function AdminUtilisateurs() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {users.map((u) => (
+            {pageItems.map((u) => (
               <tr key={u.id} className={u.deleted_at ? "opacity-40" : ""}>
                 <td className="px-5 py-3 font-medium text-gray-900">{u.name}</td>
                 <td className="px-5 py-3 text-gray-500">{u.email}</td>
@@ -201,6 +205,7 @@ export default function AdminUtilisateurs() {
             ))}
           </tbody>
         </table>
+        <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       {showCreate && (

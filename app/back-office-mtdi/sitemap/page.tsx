@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon } from "../components/ActionIcons";
 
@@ -10,6 +11,7 @@ type Link = { id: number; section_id: number; label_fr: string; label_en: string
 export default function AdminSitemap() {
   const canManage = useHasPermission("ressources.gerer");
   const [sections, setSections] = useState<Section[]>([]);
+  const [linkPagesBySection, setLinkPagesBySection] = useState<Record<number, number>>({});
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
@@ -76,7 +78,10 @@ export default function AdminSitemap() {
       <p className="text-xs text-gray-400 mb-6">"Régénérer la suggestion" reconstruit tout le plan du site à partir des pages connues du site actuel — pratique pour repartir d'une base à jour, mais écrase vos modifications manuelles. Pensez à vérifier le résultat avant de le laisser en ligne.</p>
 
       <div className="space-y-6">
-        {sections.map((sec) => (
+        {sections.map((sec) => {
+          const sectionLinks = links.filter((l) => l.section_id === sec.id);
+          const { pageItems, totalPages, safePage } = paginate(sectionLinks, linkPagesBySection[sec.id] || 1, 10);
+          return (
           <div key={sec.id} className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="font-bold text-gray-900">{sec.title_fr}</p>
@@ -87,16 +92,18 @@ export default function AdminSitemap() {
               </div>
             </div>
             <div className="divide-y divide-gray-100">
-              {links.filter((l) => l.section_id === sec.id).map((l) => (
+              {pageItems.map((l) => (
                 <div key={l.id} className="flex items-center justify-between py-2">
                   <div><p className="text-sm text-gray-800">{l.label_fr}</p><p className="text-xs text-gray-400">{l.href}</p></div>
                   <div className="flex gap-1"><EditIcon label="Modifier" onClick={() => openEditLink(l)} /><DeleteIcon label="Supprimer" onClick={() => deleteLink(l)} /></div>
                 </div>
               ))}
-              {links.filter((l) => l.section_id === sec.id).length === 0 && <p className="py-2 text-xs text-gray-400">Aucun lien</p>}
+              {sectionLinks.length === 0 && <p className="py-2 text-xs text-gray-400">Aucun lien</p>}
             </div>
+            <Pagination page={safePage} totalPages={totalPages} onChange={(p) => setLinkPagesBySection((prev) => ({ ...prev, [sec.id]: p }))} />
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {editSec !== null && (

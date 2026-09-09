@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, HideIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
@@ -24,6 +25,7 @@ const emptyForm: FormState = { image: "", video: "", altFr: "", altEn: "", displ
 export default function AdminHero() {
   const canManage = useHasPermission("accueil.gerer");
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -152,6 +154,8 @@ export default function AdminHero() {
     );
   }
 
+  const { pageItems, totalPages, safePage } = paginate(slides, page, 9);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -165,7 +169,7 @@ export default function AdminHero() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {slides.map((s) => (
+        {pageItems.map((s) => (
           <div key={s.id} className={`bg-white rounded-xl border border-gray-200 overflow-hidden ${s.deleted_at ? "opacity-40" : ""}`}>
             <div className="relative h-32 bg-gray-100">
               <img src={s.image} alt="" className="w-full h-full object-cover" />
@@ -194,6 +198,7 @@ export default function AdminHero() {
           <p className="text-gray-400 col-span-full text-center py-8">Aucun slide — ajoutez-en un pour l'afficher sur la page d'accueil</p>
         )}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {editingId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">

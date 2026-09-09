@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
@@ -26,6 +27,7 @@ const emptyForm = { category: "institutionnel", name: "", fullFr: "", fullEn: ""
 export default function AdminPartenaires() {
   const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Partner[]>([]);
+  const [pagesByCategory, setPagesByCategory] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -73,20 +75,25 @@ export default function AdminPartenaires() {
         <h1 className="text-2xl font-bold text-gray-900">Partenaires</h1>
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau partenaire</button>
       </div>
-      {CATEGORIES.map((cat) => (
+      {CATEGORIES.map((cat) => {
+        const itemsOfCat = items.filter((p) => p.category === cat.value);
+        const { pageItems, totalPages, safePage } = paginate(itemsOfCat, pagesByCategory[cat.value] || 1, 10);
+        return (
         <div key={cat.value} className="mb-6">
           <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">{cat.label}</h2>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {items.filter((p) => p.category === cat.value).map((p) => (
+            {pageItems.map((p) => (
               <div key={p.id} className={`flex items-center justify-between p-4 ${p.deleted_at ? "opacity-40" : ""}`}>
                 <div className="flex items-center gap-3">{p.logo_src && <img src={p.logo_src} alt="" className="h-6 w-14 object-contain" />}<div><p className="font-medium text-gray-900 text-sm">{p.name}</p><p className="text-xs text-gray-400">{p.full_fr}</p></div></div>
                 <div className="flex gap-1">{p.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(p)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(p)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(p)} /></>}</div>
               </div>
             ))}
-            {items.filter((p) => p.category === cat.value).length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucun</p>}
+            {itemsOfCat.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucun</p>}
           </div>
+          <Pagination page={safePage} totalPages={totalPages} onChange={(pg) => setPagesByCategory((prev) => ({ ...prev, [cat.value]: pg }))} />
         </div>
-      ))}
+        );
+      })}
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">

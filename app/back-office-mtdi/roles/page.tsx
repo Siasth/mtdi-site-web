@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { DeleteIcon } from "../components/ActionIcons";
 import { PERMISSIONS, PERMISSION_CATEGORIES, PERMISSION_MODULES } from "@/lib/permissions";
@@ -13,6 +14,7 @@ type Role = { id: number; name: string; description: string | null; is_system: b
 export default function AdminRoles() {
   const canView = useHasPermission("roles.voir");
   const [roles, setRoles] = useState<Role[]>([]);
+  const [page, setPage] = useState(1);
   const [allPermissions, setAllPermissions] = useState<Permission[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
@@ -103,6 +105,8 @@ export default function AdminRoles() {
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(roles, page, 9);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -120,7 +124,7 @@ export default function AdminRoles() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {roles.map((role) => (
+        {pageItems.map((role) => (
           <div key={role.id} className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-start justify-between mb-2">
               <div>
@@ -143,6 +147,7 @@ export default function AdminRoles() {
           </div>
         ))}
       </div>
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
       {/* Modale édition permissions (rôle existant) */}
       {editingRole && (

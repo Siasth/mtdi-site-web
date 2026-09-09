@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { uploadFile } from "@/lib/client-upload";
@@ -40,6 +41,7 @@ const emptyForm: FormState = {
 export default function AdminChantiers() {
   const canManage = useHasPermission("accueil.gerer");
   const [chantiers, setChantiers] = useState<Chantier[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -175,6 +177,8 @@ export default function AdminChantiers() {
     );
   }
 
+  const { pageItems, totalPages, safePage } = paginate(chantiers, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -200,7 +204,7 @@ export default function AdminChantiers() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {chantiers.map((c) => (
+            {pageItems.map((c) => (
               <tr key={c.id} className={c.deleted_at ? "opacity-40" : ""}>
                 <td className="px-5 py-3 font-black" style={{ color: c.color || VERT }}>{c.number}</td>
                 <td className="px-5 py-3 font-medium text-gray-900 max-w-sm">{c.title_fr}</td>
@@ -232,6 +236,7 @@ export default function AdminChantiers() {
             )}
           </tbody>
         </table>
+        <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       {editingId !== null && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon } from "../components/ActionIcons";
 import { ColorContrastHint } from "../components/ColorContrastHint";
@@ -24,6 +25,7 @@ export default function AdminCategories() {
   const canManage = useHasPermission("categories.gerer");
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -89,6 +91,8 @@ export default function AdminCategories() {
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems, totalPages, safePage } = paginate(categories, page, 10);
+
   return (
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
@@ -115,7 +119,7 @@ export default function AdminCategories() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {categories.map((c) => (
+            {pageItems.map((c) => (
               <tr key={c.id}>
                 <td className="px-5 py-3">
                   <span className="inline-block w-5 h-5 rounded-full border border-black/10" style={{ background: c.color }} />
@@ -138,6 +142,7 @@ export default function AdminCategories() {
             )}
           </tbody>
         </table>
+        <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
       {editingId !== null && (

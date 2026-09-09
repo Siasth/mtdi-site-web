@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { IconPreset, ICON_PRESET_KEYS } from "../../components/IconPreset";
@@ -14,6 +15,7 @@ export default function AdminIAStrategie() {
   const [tab, setTab] = useState<"piliers" | "jalons">("piliers");
   const [piliers, setPiliers] = useState<Pilier[]>([]);
   const [jalons, setJalons] = useState<Jalon[]>([]);
+  const [jalonsPage, setJalonsPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -56,6 +58,8 @@ export default function AdminIAStrategie() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
+  const { pageItems: pageOfJalons, totalPages: jalonsTotalPages, safePage: jalonsSafePage } = paginate(jalons, jalonsPage, 10);
+
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Stratégie IA — Vision & Initiatives</h1>
@@ -84,7 +88,7 @@ export default function AdminIAStrategie() {
         <>
           <div className="mb-4 flex justify-end"><button onClick={openNewJ} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau jalon</button></div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {jalons.map((j) => (
+            {pageOfJalons.map((j) => (
               <div key={j.id} className={`flex items-center justify-between p-4 ${j.deleted_at ? "opacity-40" : ""}`}>
                 <div className="flex items-center gap-3">
                   <span className="px-2 py-0.5 rounded text-xs font-black" style={{ background: j.done ? "#dcfce7" : "#fef9c3", color: j.done ? "#166534" : "#854d0e" }}>{j.year}</span>
@@ -94,6 +98,7 @@ export default function AdminIAStrategie() {
               </div>
             ))}
           </div>
+          <Pagination page={jalonsSafePage} totalPages={jalonsTotalPages} onChange={setJalonsPage} />
         </>
       )}
 

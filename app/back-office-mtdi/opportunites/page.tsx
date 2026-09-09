@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
@@ -15,6 +16,7 @@ const emptyForm = { type: "appels-offres", titleFr: "", titleEn: "", description
 export default function AdminOpportunites() {
   const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
+  const [pagesByType, setPagesByType] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -43,20 +45,25 @@ export default function AdminOpportunites() {
         <div><h1 className="text-2xl font-bold text-gray-900">Opportunités</h1><p className="text-sm text-gray-500 mt-1">Appels d'offres, emplois, stages — page Participer. Sans aucune offre publiée, le message d'attente par défaut s'affiche automatiquement.</p></div>
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle opportunité</button>
       </div>
-      {TYPES.map((ty) => (
+      {TYPES.map((ty) => {
+        const itemsOfType = items.filter((it) => it.type === ty.value);
+        const { pageItems, totalPages, safePage } = paginate(itemsOfType, pagesByType[ty.value] || 1, 10);
+        return (
         <div key={ty.value} className="mb-6">
           <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">{ty.label}</h2>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
-            {items.filter((it) => it.type === ty.value).map((it) => (
+            {pageItems.map((it) => (
               <div key={it.id} className={`flex items-center justify-between p-4 ${it.deleted_at ? "opacity-40" : ""}`}>
                 <div><p className="font-medium text-gray-900 text-sm">{it.title_fr}</p><p className="text-xs text-gray-400">{it.deadline_label}</p></div>
                 <div className="flex gap-1">{it.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(it)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(it)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(it)} /></>}</div>
               </div>
             ))}
-            {items.filter((it) => it.type === ty.value).length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucune — message d'attente affiché sur le site</p>}
+            {itemsOfType.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucune — message d'attente affiché sur le site</p>}
           </div>
+          <Pagination page={safePage} totalPages={totalPages} onChange={(p) => setPagesByType((prev) => ({ ...prev, [ty.value]: p }))} />
         </div>
-      ))}
+        );
+      })}
 
       {editing !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
