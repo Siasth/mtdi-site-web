@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import type { MediaMention } from "@/lib/media-mentions";
+import { Pagination, paginate } from "@/app/components/Pagination";
 
 const VERT  = "#162233";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
 const FILTER_ALL = "all";
+const PAGE_SIZE = 10;
 
 type Dict = { tous: string; medias: string; voir: string };
 
@@ -16,6 +18,7 @@ function colorFor(key: string): { bg: string; text: string } {
 
 export default function MediaListClient({ items, dict }: { items: MediaMention[]; dict: Dict }) {
   const [activeFilter, setActiveFilter] = useState(FILTER_ALL);
+  const [page, setPage] = useState(1);
 
   const filters = [
     { value: FILTER_ALL, label: dict.tous },
@@ -23,6 +26,7 @@ export default function MediaListClient({ items, dict }: { items: MediaMention[]
   ];
 
   const filtered = activeFilter === FILTER_ALL ? items : items.filter((item) => item.type === activeFilter);
+  const { pageItems, totalPages, safePage } = paginate(filtered, page, PAGE_SIZE);
 
   return (
     <>
@@ -33,7 +37,7 @@ export default function MediaListClient({ items, dict }: { items: MediaMention[]
             {filters.map((filter) => (
               <button
                 key={filter.value}
-                onClick={() => setActiveFilter(filter.value)}
+                onClick={() => { setActiveFilter(filter.value); setPage(1); }}
                 className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors"
                 style={{ background: activeFilter === filter.value ? VERT : "rgba(0,0,0,0.04)", color: activeFilter === filter.value ? "white" : "rgba(26,26,26,0.45)" }}
               >
@@ -48,7 +52,7 @@ export default function MediaListClient({ items, dict }: { items: MediaMention[]
       <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gris-perle">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
-            {filtered.map((item) => {
+            {pageItems.map((item) => {
               const c = colorFor(item.typeColor);
               return (
                 <a key={item.id} href={item.url} target="_blank" rel="noopener noreferrer" className="group bg-white hover:bg-gris-perle transition-colors p-6 sm:p-8 block">
@@ -70,6 +74,7 @@ export default function MediaListClient({ items, dict }: { items: MediaMention[]
               );
             })}
           </div>
+          <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
         </div>
       </section>
     </>

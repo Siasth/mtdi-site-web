@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
 import { getOpportunites } from "@/lib/opportunites";
+import OffersListClient from "./OffersListClient";
 
 const VERT       = "#162233";
 const JAUNE      = "#FFBE00";
@@ -120,31 +121,12 @@ export default async function ParticiperPage({ params }: Props) {
               </div>
 
               {section.offers.length > 0 ? (
-                <div className="flex flex-col gap-4 max-w-3xl">
-                  {section.offers.map((offer) => (
-                    <div key={offer.id} className="p-6 sm:p-8 bg-white" style={{ border: "1px solid rgba(0,0,0,0.08)" }}>
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h3 className="text-anthracite font-black text-base uppercase leading-snug">{offer.title}</h3>
-                        {offer.deadline && (
-                          <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest" style={{ background: `${JAUNE}30`, color: "#7A5800" }}>{offer.deadline}</span>
-                        )}
-                      </div>
-                      {offer.description && <p className="text-anthracite/75 text-sm font-medium leading-relaxed mb-4">{offer.description}</p>}
-                      {offer.href && (
-                        <a
-                          href={offer.href}
-                          target={offer.href.startsWith("http") ? "_blank" : undefined}
-                          rel={offer.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                          className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider transition-all hover:gap-4"
-                          style={{ color: VERT }}
-                        >
-                          {section.cta.external ? t.consulterAppelsOffres : t.voirOffre}
-                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" /></svg>
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <OffersListClient
+                  offers={section.offers}
+                  ctaExternal={section.cta.external}
+                  consulterAppelsOffres={t.consulterAppelsOffres}
+                  voirOffre={t.voirOffre}
+                />
               ) : (
                 <div
                   className="p-8 flex flex-col gap-5 max-w-3xl"

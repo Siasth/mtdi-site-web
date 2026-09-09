@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Actualite } from "@/lib/actualites";
+import { Pagination, paginate } from "@/app/components/Pagination";
 
 const VERT = "#006828";
 
@@ -27,7 +28,7 @@ export default function ActualitesListClient({
   dict: { tous: string; lire: string; chargerPlus: string };
 }) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const prefix = locale === "en" ? "/en" : "";
 
@@ -37,7 +38,7 @@ export default function ActualitesListClient({
   const filtered = normalizedQuery
     ? byCategory.filter((a) => a.title.toLowerCase().includes(normalizedQuery))
     : byCategory;
-  const visible = showAll ? filtered : filtered.slice(0, 6);
+  const { pageItems: visible, totalPages, safePage } = paginate(filtered, page, 6);
 
   return (
     <>
@@ -47,7 +48,7 @@ export default function ActualitesListClient({
           <div className="flex gap-px overflow-x-auto" role="list" aria-label="Filtrer par catégorie" style={{ scrollbarWidth: "none" }}>
             <button
               role="listitem"
-              onClick={() => { setActiveCategory(null); setShowAll(false); }}
+              onClick={() => { setActiveCategory(null); setPage(1); }}
               className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest"
               aria-current={activeCategory === null ? "true" : undefined}
               style={{ background: activeCategory === null ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === null ? "white" : "rgba(26,26,26,0.65)" }}
@@ -58,7 +59,7 @@ export default function ActualitesListClient({
               <button
                 key={cat}
                 role="listitem"
-                onClick={() => { setActiveCategory(cat); setShowAll(false); }}
+                onClick={() => { setActiveCategory(cat); setPage(1); }}
                 className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest"
                 aria-current={activeCategory === cat ? "true" : undefined}
                 style={{ background: activeCategory === cat ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat ? "white" : "rgba(26,26,26,0.65)" }}
@@ -75,7 +76,7 @@ export default function ActualitesListClient({
             <input
               type="search"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setShowAll(false); }}
+              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
               placeholder={locale === "en" ? "Search an article..." : "Rechercher un article..."}
               className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
               style={{ border: "1px solid rgba(0,0,0,0.08)" }}
@@ -127,21 +128,7 @@ export default function ActualitesListClient({
             })}
           </div>
 
-          {!showAll && filtered.length > 6 && (
-            <div className="mt-10 flex justify-center">
-              <button
-                type="button"
-                onClick={() => setShowAll(true)}
-                className="inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-widest bg-white"
-                style={{ border: "1px solid rgba(0,0,0,0.15)", color: "rgba(26,26,26,0.75)" }}
-              >
-                {dict.chargerPlus}
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          )}
+          <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
           </>
           )}
         </div>

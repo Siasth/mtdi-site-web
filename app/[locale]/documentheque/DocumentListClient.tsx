@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { DocumentItem } from "@/lib/documents";
+import { Pagination, paginate } from "@/app/components/Pagination";
 
 const VERT = "#162233";
 const ROUGE = "#EB0000";
@@ -20,7 +21,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
   ];
 
   const [activeCategory, setActiveCategory] = useState("all");
-  const [showAllDocs, setShowAllDocs] = useState(false);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
 
   const byCategory = activeCategory === "all" ? documents : documents.filter((d) => d.category === activeCategory);
@@ -28,7 +29,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
   const filtered = normalizedQuery ? byCategory.filter((d) => d.title.toLowerCase().includes(normalizedQuery)) : byCategory;
   const featured = filtered.filter((d) => d.featured);
   const others = filtered.filter((d) => !d.featured);
-  const visibleOthers = showAllDocs ? others : others.slice(0, DOCS_PAGE_SIZE);
+  const { pageItems: visibleOthers, totalPages, safePage } = paginate(others, page, DOCS_PAGE_SIZE);
 
   return (
     <>
@@ -39,7 +40,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
             {categories.map((cat) => (
               <button
                 key={cat.value}
-                onClick={() => { setActiveCategory(cat.value); setShowAllDocs(false); }}
+                onClick={() => { setActiveCategory(cat.value); setPage(1); }}
                 className="px-4 py-2 text-xs font-black uppercase tracking-widest cursor-pointer transition-colors"
                 style={{ background: activeCategory === cat.value ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat.value ? "white" : "rgba(26,26,26,0.50)" }}
               >
@@ -55,7 +56,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
             <input
               type="search"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setShowAllDocs(false); }}
+              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
               placeholder={locale === "en" ? "Search a document..." : "Rechercher un document..."}
               className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
               style={{ border: "1px solid rgba(0,0,0,0.08)" }}
@@ -121,14 +122,7 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
               ))}
             </div>
 
-            {!showAllDocs && others.length > DOCS_PAGE_SIZE && (
-              <div className="mt-10 flex justify-center">
-                <button type="button" onClick={() => setShowAllDocs(true)} className="inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-widest bg-white" style={{ border: "1px solid rgba(0,0,0,0.15)", color: "rgba(26,26,26,0.75)" }}>
-                  {locale === "en" ? "Load more" : "Charger plus"}
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-                </button>
-              </div>
-            )}
+            <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
           </div>
         </section>
       )}

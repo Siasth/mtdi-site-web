@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
 import { getTextesJuridiques } from "@/lib/textes-juridiques";
+import TextesJuridiquesListClient from "./TextesJuridiquesListClient";
 
 const VERT  = "#162233";
 const JAUNE = "#FFBE00";
@@ -76,51 +77,7 @@ export default async function TextesJuridiquesPage({ params }: Props) {
             <h2 className="text-xs font-black uppercase tracking-widest mb-10" style={{ color: VERT }}>
               {t.textesReglementaires}
             </h2>
-            <div className="flex flex-col gap-0">
-              {textes.map((texte, i) => (
-                <div
-                  key={texte.id}
-                  className="py-8"
-                  style={{ borderBottom: i < textes.length - 1 ? "1px solid rgba(0,0,0,0.08)" : "none" }}
-                >
-                  <div className="flex flex-wrap items-center gap-3 mb-3">
-                    <span className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white" style={{ background: VERT }}>
-                      {texte.type}
-                    </span>
-                    <span className="text-xs font-bold text-anthracite/70 tabular-nums">{texte.reference}</span>
-                    <span className="text-xs font-medium text-anthracite/60">{texte.date}</span>
-                    <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest" style={{ background: "#16a34a20", color: "#16a34a" }}>
-                      {texte.status}
-                    </span>
-                  </div>
-                  <h3 className="text-anthracite font-black text-lg uppercase leading-snug mb-3 max-w-4xl">{texte.title}</h3>
-                  <p className="text-anthracite/75 text-sm font-medium leading-relaxed mb-4 max-w-3xl">{texte.description}</p>
-                  <div className="flex flex-wrap items-center gap-6">
-                    <span className="text-xs font-medium text-anthracite/60">{texte.articles}</span>
-                    {texte.href !== "#" ? (
-                      <Link
-                        href={texte.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wider transition-all hover:gap-4"
-                        style={{ color: VERT }}
-                      >
-                        {t.consulterTexte}
-                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15,3 21,3 21,9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </Link>
-                    ) : (
-                      <span className="inline-flex items-center gap-2 text-sm font-black uppercase tracking-wider text-anthracite/50">
-                        {t.documentNonDisponible}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TextesJuridiquesListClient textes={textes} dict={{ consulterTexte: t.consulterTexte, documentNonDisponible: t.documentNonDisponible }} />
           </div>
         </section>
 

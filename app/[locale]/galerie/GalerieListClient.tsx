@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import type { GalerieItem, GalerieCollection } from "@/lib/galerie";
+import { Pagination, paginate } from "@/app/components/Pagination";
 
 const VERT = "#006828";
 const ROUGE = "#EB0000";
@@ -26,7 +27,7 @@ export default function GalerieListClient({
 }) {
   const [activeFilter, setActiveFilter] = useState<number | "all">("all");
   const [search, setSearch] = useState("");
-  const [showAll, setShowAll] = useState(false);
+  const [page, setPage] = useState(1);
   const prefix = locale === "en" ? "/en" : "";
 
   const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -45,7 +46,7 @@ export default function GalerieListClient({
     .filter((item) => activeFilter === "all" || item.collectionId === activeFilter)
     .filter(matchesSearch);
 
-  const visibleFiltered = showAll ? filtered : filtered.slice(0, PAGE_SIZE);
+  const { pageItems: visibleFiltered, totalPages, safePage } = paginate(filtered, page, PAGE_SIZE);
 
   const sections =
     activeFilter === "all"
@@ -93,7 +94,7 @@ export default function GalerieListClient({
             <input
               type="text"
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setShowAll(false); }}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder={dict.rechercherPlaceholder}
               aria-label={dict.rechercherPlaceholder}
               className="w-full pl-12 pr-4 py-4 text-sm font-medium text-anthracite placeholder-anthracite/30 outline-none bg-transparent"
@@ -118,7 +119,7 @@ export default function GalerieListClient({
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex gap-px overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             <button
-              onClick={() => { setActiveFilter("all"); setShowAll(false); }}
+              onClick={() => { setActiveFilter("all"); setPage(1); }}
               className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors"
               style={{ background: activeFilter === "all" ? VERT : "rgba(0,0,0,0.04)", color: activeFilter === "all" ? "white" : "rgba(26,26,26,0.45)" }}
             >
@@ -127,7 +128,7 @@ export default function GalerieListClient({
             {collections.map((c) => (
               <button
                 key={c.id}
-                onClick={() => { setActiveFilter(c.id); setShowAll(false); }}
+                onClick={() => { setActiveFilter(c.id); setPage(1); }}
                 className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest transition-colors"
                 style={{ background: activeFilter === c.id ? VERT : "rgba(0,0,0,0.04)", color: activeFilter === c.id ? "white" : "rgba(26,26,26,0.45)" }}
               >
@@ -224,21 +225,7 @@ export default function GalerieListClient({
         ))}
       </div>
 
-      {!showAll && filtered.length > PAGE_SIZE && (
-        <div className="px-4 sm:px-6 lg:px-8 pb-16 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setShowAll(true)}
-            className="inline-flex items-center gap-3 px-8 py-4 text-xs font-black uppercase tracking-widest bg-white"
-            style={{ border: "1px solid rgba(0,0,0,0.15)", color: "rgba(26,26,26,0.75)" }}
-          >
-            {locale === "en" ? "Load more" : "Charger plus"}
-            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      )}
+      <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       <style>{`
         .prose-institutionnel p { margin: 0.3em 0; }
         .prose-institutionnel strong { font-weight: 900; }
