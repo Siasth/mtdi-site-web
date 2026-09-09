@@ -136,16 +136,16 @@ export default function AdminAdministration() {
         <form onSubmit={handleSmtpSave} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hôte SMTP</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hôte SMTP *</label>
               <input required value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} placeholder="smtp.gmail.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Port</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Port *</label>
               <input required value={smtp.port} onChange={(e) => setSmtp({ ...smtp, port: e.target.value })} placeholder="587" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Utilisateur</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Utilisateur *</label>
             <input required value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
@@ -159,7 +159,7 @@ export default function AdminAdministration() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse d'expédition</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse d'expédition *</label>
             <input required value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
 
