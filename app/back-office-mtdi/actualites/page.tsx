@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import Link from "next/link";
 import { useHasPermission } from "../AdminLayoutClient";
@@ -376,6 +377,7 @@ export default function AdminActualites() {
                   {!form.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
                 </button>
               </div>
+              <ModalCloseButton onClick={() => setEditingId(null)} />
             </div>
 
             {activeLang === "fr" ? (

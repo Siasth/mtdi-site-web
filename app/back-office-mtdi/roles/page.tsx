@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Pagination, paginate } from "../components/Pagination";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { useHasPermission } from "../AdminLayoutClient";
 import { DeleteIcon } from "../components/ActionIcons";
 import { PERMISSIONS, PERMISSION_CATEGORIES, PERMISSION_MODULES } from "@/lib/permissions";
@@ -153,7 +154,10 @@ export default function AdminRoles() {
       {editingRole && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-y-auto">
-            <h2 className="font-bold text-gray-900 text-lg mb-4">{editingRole.name}</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-gray-900 text-lg">{editingRole.name}</h2>
+              <ModalCloseButton onClick={() => setEditingRole(null)} />
+            </div>
             <PermissionChecklist allPermissions={allPermissions} checkedCodes={checkedCodes} onToggle={toggleCode} onToggleMany={toggleMany} disabled={editingRole.is_system} />
             {editingRole.is_system && (
               <p className="text-xs text-amber-600 mt-3">Le rôle Super Admin conserve toujours toutes les permissions.</p>
@@ -176,7 +180,10 @@ export default function AdminRoles() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={createRole} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[85vh] overflow-y-auto space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">Nouveau rôle</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">Nouveau rôle</h2>
+              <ModalCloseButton onClick={() => setShowCreate(false)} />
+            </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom du rôle</label>
               <input required value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

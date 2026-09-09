@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
@@ -347,6 +348,7 @@ export default function AdminGalerie() {
                   {!itemForm.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
                 </button>
               </div>
+              <ModalCloseButton onClick={() => setEditingItem(null)} />
             </div>
 
             {activeLang === "fr" ? (
@@ -460,7 +462,10 @@ export default function AdminGalerie() {
       {editingColl !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={handleSaveColl} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editingColl === "new" ? "Nouvelle collection" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingColl === "new" ? "Nouvelle collection" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditingColl(null)} />
+            </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (Français) *</label>
               <input required value={collForm.nameFr} onChange={(e) => setCollForm({ ...collForm, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

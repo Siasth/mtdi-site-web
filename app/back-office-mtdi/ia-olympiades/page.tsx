@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
@@ -103,7 +104,10 @@ export default function AdminIAOlympiades() {
       {editE !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
           <form onSubmit={saveE} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-auto">
-            <h2 className="font-bold text-gray-900 text-lg">{editE === "new" ? "Nouvelle édition" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editE === "new" ? "Nouvelle édition" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditE(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Année *</label><input required type="number" inputMode="numeric" min={2000} max={2100} step={1} value={eForm.year} onChange={(e) => setEForm({ ...eForm, year: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={eForm.titleFr} onChange={(e) => setEForm({ ...eForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={eForm.titleEn} onChange={(e) => setEForm({ ...eForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
@@ -119,7 +123,10 @@ export default function AdminIAOlympiades() {
       {editC !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveC} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editC === "new" ? "Nouveau critère" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editC === "new" ? "Nouveau critère" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditC(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Texte (FR) *</label><textarea required value={cForm.textFr} onChange={(e) => setCForm({ ...cForm, textFr: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Texte (EN)</label><textarea value={cForm.textEn} onChange={(e) => setCForm({ ...cForm, textEn: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditC(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>

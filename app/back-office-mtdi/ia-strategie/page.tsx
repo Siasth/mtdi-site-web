@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
@@ -105,7 +106,10 @@ export default function AdminIAStrategie() {
       {editP !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-8 overflow-y-auto">
           <form onSubmit={saveP} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4 my-auto">
-            <h2 className="font-bold text-gray-900 text-lg">{editP === "new" ? "Nouveau pilier" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editP === "new" ? "Nouveau pilier" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditP(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={pForm.titleFr} onChange={(e) => setPForm({ ...pForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={pForm.titleEn} onChange={(e) => setPForm({ ...pForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><textarea value={pForm.descriptionFr} onChange={(e) => setPForm({ ...pForm, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
@@ -128,7 +132,10 @@ export default function AdminIAStrategie() {
       {editJ !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveJ} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editJ === "new" ? "Nouveau jalon" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editJ === "new" ? "Nouveau jalon" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditJ(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Année *</label><input required type="number" inputMode="numeric" min={2000} max={2100} step={1} value={jForm.year} onChange={(e) => setJForm({ ...jForm, year: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={jForm.titleFr} onChange={(e) => setJForm({ ...jForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={jForm.titleEn} onChange={(e) => setJForm({ ...jForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>

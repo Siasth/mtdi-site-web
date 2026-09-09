@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon, ResetPasswordIcon } from "../components/ActionIcons";
@@ -211,7 +212,10 @@ export default function AdminUtilisateurs() {
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={handleCreate} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">Nouvel utilisateur</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">Nouvel utilisateur</h2>
+              <ModalCloseButton onClick={() => setShowCreate(false)} />
+            </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet</label>
@@ -255,7 +259,10 @@ export default function AdminUtilisateurs() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           {resetSuccess ? (
             <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-              <h2 className="font-bold text-gray-900 text-lg">Mot de passe réinitialisé</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-gray-900 text-lg">Mot de passe réinitialisé</h2>
+                <ModalCloseButton onClick={() => setResetTarget(null)} />
+              </div>
               <p className="text-sm text-gray-600">
                 Communiquez ce nouveau mot de passe à <strong>{resetTarget.name}</strong> par un canal sûr (pas par email en clair dans l'idéal). Il devra le changer dès sa prochaine connexion.
               </p>
@@ -273,7 +280,10 @@ export default function AdminUtilisateurs() {
             </div>
           ) : (
             <form onSubmit={handleResetPassword} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-              <h2 className="font-bold text-gray-900 text-lg">Réinitialiser le mot de passe</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-gray-900 text-lg">Réinitialiser le mot de passe</h2>
+                <ModalCloseButton onClick={() => setResetTarget(null)} />
+              </div>
               <p className="text-sm text-gray-500">Pour <strong>{resetTarget.name}</strong> ({resetTarget.email})</p>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nouveau mot de passe</label>

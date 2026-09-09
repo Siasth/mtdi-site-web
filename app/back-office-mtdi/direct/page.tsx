@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
@@ -121,7 +122,10 @@ export default function AdminDirect() {
       {editU !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveU} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editU === "new" ? "Nouvel événement" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editU === "new" ? "Nouvel événement" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditU(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date et heure *</label><input required type="datetime-local" min={new Date().toISOString().slice(0, 16)} value={uForm.eventDate} onChange={(e) => setUForm({ ...uForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={uForm.titleFr} onChange={(e) => setUForm({ ...uForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={uForm.titleEn} onChange={(e) => setUForm({ ...uForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
@@ -136,7 +140,10 @@ export default function AdminDirect() {
       {editR !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveR} className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editR === "new" ? "Nouvelle rediffusion" : "Modifier"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editR === "new" ? "Nouvelle rediffusion" : "Modifier"}</h2>
+              <ModalCloseButton onClick={() => setEditR(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={rForm.titleFr} onChange={(e) => setRForm({ ...rForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={rForm.titleEn} onChange={(e) => setRForm({ ...rForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Source</label><input value={rForm.source} onChange={(e) => setRForm({ ...rForm, source: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>

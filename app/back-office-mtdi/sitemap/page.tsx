@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon } from "../components/ActionIcons";
@@ -109,7 +110,10 @@ export default function AdminSitemap() {
       {editSec !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveSec} className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editSec === "new" ? "Nouvelle section" : "Modifier la section"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editSec === "new" ? "Nouvelle section" : "Modifier la section"}</h2>
+              <ModalCloseButton onClick={() => setEditSec(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={secForm.titleFr} onChange={(e) => setSecForm({ ...secForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={secForm.titleEn} onChange={(e) => setSecForm({ ...secForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditSec(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
@@ -120,7 +124,10 @@ export default function AdminSitemap() {
       {editLink !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={saveLink} className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editLink === "new" ? "Nouveau lien" : "Modifier le lien"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editLink === "new" ? "Nouveau lien" : "Modifier le lien"}</h2>
+              <ModalCloseButton onClick={() => setEditLink(null)} />
+            </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Libellé (FR) *</label><input required value={linkForm.labelFr} onChange={(e) => setLinkForm({ ...linkForm, labelFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Libellé (EN)</label><input value={linkForm.labelEn} onChange={(e) => setLinkForm({ ...linkForm, labelEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien (chemin interne, ex: /contact) *</label><input required value={linkForm.href} onChange={(e) => setLinkForm({ ...linkForm, href: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>

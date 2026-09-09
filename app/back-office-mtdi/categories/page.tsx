@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon } from "../components/ActionIcons";
@@ -148,7 +149,10 @@ export default function AdminCategories() {
       {editingId !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <form onSubmit={handleSave} className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl space-y-4">
-            <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvelle catégorie" : "Modifier la catégorie"}</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-gray-900 text-lg">{editingId === "new" ? "Nouvelle catégorie" : "Modifier la catégorie"}</h2>
+              <ModalCloseButton onClick={() => setEditingId(null)} />
+            </div>
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (Français) *</label>
