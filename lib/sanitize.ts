@@ -30,6 +30,9 @@ export function sanitizeRichText(html: string): string {
       h3: ["style"],
       td: ["colspan", "rowspan", "style"],
       th: ["colspan", "rowspan", "style"],
+      // "start" : reprise manuelle de la numérotation d'une liste ordonnée
+      // interrompue par un autre bloc (cf. MarkdownEditor.tsx).
+      ol: ["start"],
     },
     // Propriétés CSS conservées, strictement limitées par élément :
     // - color/font-family sur le texte en ligne

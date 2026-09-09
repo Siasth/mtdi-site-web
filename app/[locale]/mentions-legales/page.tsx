@@ -52,6 +52,8 @@ export default async function MentionsLegalesPage({ params }: Props) {
         .prose-legal p { margin: 0 0 0.9em; }
         .prose-legal p:last-child { margin-bottom: 0; }
         .prose-legal ul { list-style: disc; padding-left: 1.4em; margin: 0.7em 0; }
+        .prose-legal ol { list-style: decimal; padding-left: 1.4em; margin: 0.7em 0; }
+        .prose-legal li h2 { margin-top: 0; }
         .prose-legal a { color: ${VERT}; text-decoration: underline; }
         .prose-legal strong { font-weight: 900; }
       `}</style>

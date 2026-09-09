@@ -15,6 +15,7 @@ import { TableHeader as BaseTableHeader } from "@tiptap/extension-table-header";
 import { TableCell as BaseTableCell } from "@tiptap/extension-table-cell";
 import { TextAlign } from "@tiptap/extension-text-align";
 import Paragraph from "@tiptap/extension-paragraph";
+import { ListItem as BaseListItem } from "@tiptap/extension-list-item";
 
 // Étend les paragraphes pour supporter interligne et espacement entre
 // paragraphes (attributs appliqués comme style CSS inline, conservés par
@@ -59,6 +60,17 @@ const ParagraphWithSpacing = Paragraph.extend({
     if (styleParts.length > 0) attrs.style = styleParts.join("; ");
     return ["p", attrs, 0];
   },
+});
+
+// Un item de liste (<li>) n'accepte par défaut qu'un paragraphe comme
+// premier bloc ("paragraph block*"). Résultat : appliquer un style de titre
+// à la première ligne d'un item numéroté est impossible pour l'éditeur, qui
+// éjecte alors la ligne de la liste (perte du numéro) pour respecter le
+// schéma. On autorise ici un titre OU un paragraphe en tête de l'item, afin
+// de pouvoir composer « 1. Titre + paragraphe » sans quitter la liste ni
+// casser la numérotation.
+const ListItem = BaseListItem.extend({
+  content: "(paragraph | heading) block*",
 });
 
 // Étend les cellules pour supporter une couleur de fond personnalisée
@@ -304,6 +316,24 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <ToolbarButton title="Liste numérotée" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
         <span className="text-xs font-bold">1.</span>
       </ToolbarButton>
+      {editor.isActive("orderedList") && (
+        <input
+          type="number"
+          min={1}
+          title="Reprendre la numérotation à…"
+          // Filet de sécurité : si une liste numérotée doit être interrompue
+          // par un élément qui ne peut pas vivre dans un item (image,
+          // tableau…), la liste suivante recommence à 1 par défaut (comme en
+          // HTML standard). Ce champ permet de corriger manuellement le
+          // numéro de reprise sans tout retaper.
+          value={(editor.getAttributes("orderedList").start as number | undefined) ?? 1}
+          onChange={(e) => {
+            const n = Math.max(1, Number(e.target.value) || 1);
+            editor.chain().focus().updateAttributes("orderedList", { start: n }).run();
+          }}
+          className="w-12 text-xs border border-gray-200 rounded px-1 py-1 bg-white text-gray-600"
+        />
+      )}
       <ToolbarButton title="Citation" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
         <span className="text-sm">"</span>
       </ToolbarButton>
@@ -445,8 +475,9 @@ export default function MarkdownEditor({
     // sur leur dernier état jusqu'à la prochaine frappe.
     shouldRerenderOnTransaction: true,
     extensions: [
-      StarterKit.configure({ link: false, paragraph: false }),
+      StarterKit.configure({ link: false, paragraph: false, listItem: false }),
       ParagraphWithSpacing,
+      ListItem,
       Link.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder: placeholder || "Écrivez ici…" }),
       TextStyle,
@@ -495,6 +526,8 @@ export default function MarkdownEditor({
         .prose-editor p { margin: 0.4em 0; }
         .prose-editor ul { list-style: disc; padding-left: 1.4em; margin: 0.4em 0; }
         .prose-editor ol { list-style: decimal; padding-left: 1.4em; margin: 0.4em 0; }
+        .prose-editor li h1, .prose-editor li h2, .prose-editor li h3 { margin-top: 0; }
+        .prose-editor li p { margin: 0.2em 0; }
         .prose-editor blockquote { border-left: 2px solid ${VERT}; padding-left: 0.8em; color: #666; font-style: italic; margin: 0.5em 0; }
         .prose-editor code { background: #f1f1ef; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; }
         .prose-editor a { color: ${VERT}; text-decoration: underline; }
