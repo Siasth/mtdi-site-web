@@ -327,7 +327,8 @@
     "stagesMessage": "Internship opportunities within MTDI and its supervised entities are published here. Subscribe to the newsletter to be informed as soon as an offer is available.",
     "appelsOffresMessage": "Public contracts related to the Ministry are published on the national government tender platform. Consult the platform to access current tender files.",
     "abonnerNewsletter": "Subscribe to the newsletter",
-    "consulterAppelsOffres": "Visit appels-offres.gouv.bj"
+    "consulterAppelsOffres": "Visit appels-offres.gouv.bj",
+    "voirOffre": "View offer"
   },
   "documentheque": {
     "titre": "Document Library",

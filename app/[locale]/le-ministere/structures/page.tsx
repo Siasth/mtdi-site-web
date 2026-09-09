@@ -101,18 +101,20 @@ export default async function StructuresPage({ params }: Props) {
 
                       <div className="text-anthracite/75 text-sm font-medium leading-relaxed mb-6 prose-institutionnel" dangerouslySetInnerHTML={{ __html: structure.description }} />
 
-                      <Link
-                        href={structure.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all hover:gap-4"
-                        style={{ color: structure.accent }}
-                      >
-                        {t.visiter} {structure.acronym}
-                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
-                        </svg>
-                      </Link>
+                      {structure.url && (
+                        <Link
+                          href={structure.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider transition-all hover:gap-4"
+                          style={{ color: structure.accent }}
+                        >
+                          {t.visiter} {structure.acronym}
+                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
+                          </svg>
+                        </Link>
+                      )}
                     </div>
 
                     {/* Right: Missions */}

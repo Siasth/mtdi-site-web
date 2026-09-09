@@ -146,7 +146,7 @@ export default function AdminAdministration() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Utilisateur *</label>
-            <input required value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input required type="email" value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mot de passe</label>
@@ -160,7 +160,7 @@ export default function AdminAdministration() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse d'expédition *</label>
-            <input required value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input required type="email" value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
 
           {smtpMsg && <p className={`text-sm ${smtpMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{smtpMsg.text}</p>}

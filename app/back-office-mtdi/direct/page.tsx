@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
+import { URL_PATTERN } from "@/lib/validators";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
@@ -148,7 +149,7 @@ export default function AdminDirect() {
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={rForm.titleEn} onChange={(e) => setRForm({ ...rForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Source</label><input value={rForm.source} onChange={(e) => setRForm({ ...rForm, source: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date</label><input type="date" value={rForm.replayDate} onChange={(e) => setRForm({ ...rForm, replayDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien *</label><input required value={rForm.url} onChange={(e) => setRForm({ ...rForm, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien *</label><input required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={rForm.url} onChange={(e) => setRForm({ ...rForm, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditR(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>

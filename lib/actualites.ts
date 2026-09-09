@@ -71,6 +71,13 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
 }
 
 // Un seul article publié, par id (page de détail interne).
+// ANO-140 : permet de distinguer un ID qui n'existe pas du tout (vraie 404)
+// d'un article existant mais non publié (message spécifique côté page).
+export async function actualiteExistsButUnpublished(id: number): Promise<boolean> {
+  const result = await sql`SELECT id FROM actualites WHERE id = ${id} AND deleted_at IS NULL`;
+  return result.rows.length > 0;
+}
+
 export async function getActualiteById(id: number, locale: Locale): Promise<Actualite | null> {
   const result = await sql`
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color

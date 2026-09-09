@@ -327,7 +327,8 @@
     "stagesMessage": "Les opportunités de stage au sein du MTDI et de ses structures sous tutelle sont publiées ici. Abonnez-vous à la newsletter pour être informé dès qu'une offre est disponible.",
     "appelsOffresMessage": "Les marchés publics liés au Ministère sont publiés sur la plateforme nationale des appels d'offres du Gouvernement du Bénin. Consultez la plateforme pour accéder aux dossiers d'appel d'offres en cours.",
     "abonnerNewsletter": "S'abonner à la newsletter",
-    "consulterAppelsOffres": "Consulter appels-offres.gouv.bj"
+    "consulterAppelsOffres": "Consulter appels-offres.gouv.bj",
+    "voirOffre": "Voir l'offre"
   },
   "documentheque": {
     "titre": "Documenthèque",

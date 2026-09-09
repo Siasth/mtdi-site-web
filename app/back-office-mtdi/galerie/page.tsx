@@ -115,6 +115,10 @@ export default function AdminGalerie() {
 
   async function handleSaveItem(e: React.FormEvent) {
     e.preventDefault();
+    if (!itemForm.image) {
+      setSaveError("Veuillez importer une image avant d'enregistrer.");
+      return;
+    }
     setSaving(true);
     setSaveError("");
     const isNew = editingItem === "new";
@@ -414,7 +418,7 @@ export default function AdminGalerie() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image *</label>
               {itemForm.image && <img src={itemForm.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploading ? "Envoi..." : "Choisir une image"}

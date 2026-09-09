@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
+import { URL_PATTERN } from "@/lib/validators";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
@@ -68,7 +69,7 @@ export default function AdminMediaMentions() {
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Extrait (FR)</label><textarea value={form.excerptFr} onChange={(e) => setForm({ ...form, excerptFr: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Extrait (EN)</label><textarea value={form.excerptEn} onChange={(e) => setForm({ ...form, excerptEn: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien *</label><input required value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien *</label><input required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>

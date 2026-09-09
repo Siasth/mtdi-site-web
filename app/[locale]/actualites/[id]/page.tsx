@@ -5,7 +5,7 @@ import { getDictionary, type Locale } from "../../dictionaries";
 import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Newsletter from "../../../components/Newsletter";
-import { getActualiteById, getRelatedActualites } from "@/lib/actualites";
+import { getActualiteById, getRelatedActualites, actualiteExistsButUnpublished } from "@/lib/actualites";
 
 const BANNER = "#162233"; // même bleu nuit que le bandeau standard du site
 const VERT = "#006828";
@@ -25,7 +25,42 @@ export default async function ActualiteDetailPage({ params }: Props) {
   if (!Number.isFinite(numericId)) notFound();
 
   const article = await getActualiteById(numericId, isEn ? "en" : "fr");
-  if (!article) notFound();
+  if (!article) {
+    const exists = await actualiteExistsButUnpublished(numericId);
+    if (exists) {
+      return (
+        <>
+          <Navbar locale={locale} dict={dict.nav} />
+          <main style={{ paddingTop: "80px" }}>
+            <section className="px-4 sm:px-6 lg:px-8 py-24 sm:py-32" style={{ background: BANNER }}>
+              <div className="max-w-2xl mx-auto text-center">
+                <p className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: VERT }}>
+                  {isEn ? "Article unavailable" : "Article indisponible"}
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-black text-white uppercase leading-tight mb-4">
+                  {isEn ? "This article is no longer available" : "Cet article n'est plus disponible"}
+                </h1>
+                <p className="text-white/70 text-base font-medium leading-relaxed mb-10">
+                  {isEn
+                    ? "It may have been unpublished or removed. You can browse our other news below."
+                    : "Il a peut-être été dépublié ou retiré. Vous pouvez consulter nos autres actualités ci-dessous."}
+                </p>
+                <Link
+                  href={`${prefix}/actualites`}
+                  className="inline-flex items-center gap-3 px-7 py-4 text-sm font-black uppercase tracking-wider transition-all hover:gap-5"
+                  style={{ background: "#FFBE00", color: BANNER }}
+                >
+                  {isEn ? "Back to news" : "Retour aux actualités"}
+                </Link>
+              </div>
+            </section>
+          </main>
+          <Footer locale={locale} dict={dict.footer} />
+        </>
+      );
+    }
+    notFound();
+  }
 
   const related = await getRelatedActualites(article.id, article.categoryId, isEn ? "en" : "fr", 4);
 

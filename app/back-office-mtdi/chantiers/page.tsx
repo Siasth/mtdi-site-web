@@ -128,6 +128,10 @@ export default function AdminChantiers() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.image) {
+      setSaveError("Veuillez importer une image avant d'enregistrer.");
+      return;
+    }
     setSaving(true);
     setSaveError("");
     const isNew = editingId === "new";
@@ -297,7 +301,7 @@ export default function AdminChantiers() {
             )}
 
             <div className="pt-2 border-t border-gray-100">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image de fond</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image de fond *</label>
               {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploading === "image" ? "Envoi..." : "Choisir une image"}
