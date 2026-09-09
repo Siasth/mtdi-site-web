@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import type { Video } from "@/lib/videos";
+import type { VideoItem } from "@/lib/videos";
 import { Pagination, paginate } from "@/app/components/Pagination";
 
 const VERT  = "#162233";
@@ -11,7 +11,7 @@ const PAGE_SIZE = 12;
 
 type Dict = { video: string; regarder: string; regarderLien: string };
 
-export default function VideothequeListClient({ videos, dict }: { videos: Video[]; dict: Dict }) {
+export default function VideothequeListClient({ videos, dict }: { videos: VideoItem[]; dict: Dict }) {
   const [page, setPage] = useState(1);
   const { pageItems, totalPages, safePage } = paginate(videos, page, PAGE_SIZE);
 
