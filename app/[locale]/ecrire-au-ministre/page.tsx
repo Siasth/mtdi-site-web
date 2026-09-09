@@ -184,7 +184,11 @@ export default function EcrireAuMinistrePage() {
                       className="w-full px-4 py-3 text-sm font-medium bg-gris-perle border-0 outline-none text-anthracite/80 file:mr-4 file:py-1 file:px-3 file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:text-white file:bg-[var(--tw-file-bg)] file:cursor-pointer"
                       style={{ "--tw-file-bg": VERT_BENIN } as React.CSSProperties}
                     />
-                    <p className="mt-1.5 text-[10px] text-anthracite/60 font-medium">
+                    {/* ANO-066 : le texte d'aide était trop clair (contraste
+                        insuffisant) ; /60 est mesuré à peine 4,57:1 sur
+                        blanc, on remonte à /75 pour une marge de sécurité
+                        confortable (≈7,6:1). */}
+                    <p className="mt-1.5 text-[10px] text-anthracite/75 font-medium">
                       {t.pieceJointeNote}
                     </p>
                   </div>

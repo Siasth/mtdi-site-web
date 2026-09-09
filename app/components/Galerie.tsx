@@ -13,6 +13,9 @@ export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict
 
   function getHref(item: (typeof items)[number]) {
     if (item.hrefExternal) return item.hrefExternal;
+    // ANO-003 : le clic sur une vignette vidéo renvoyait vers la liste
+    // générique /videotheque au lieu d'ouvrir directement la vidéo associée.
+    if (item.type === "video" && item.videoUrl) return item.videoUrl;
     if (item.type === "video") return `${prefix}/videotheque`;
     return `${prefix}/galerie`;
   }
@@ -43,12 +46,14 @@ export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict
 
         {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {items.map((item, i) => (
+          {items.map((item, i) => {
+            const isExternalNav = !!item.hrefExternal || (item.type === "video" && !!item.videoUrl);
+            return (
             <a
               key={item.id}
               href={getHref(item)}
-              target={item.hrefExternal ? "_blank" : undefined}
-              rel={item.hrefExternal ? "noopener noreferrer" : undefined}
+              target={isExternalNav ? "_blank" : undefined}
+              rel={isExternalNav ? "noopener noreferrer" : undefined}
               aria-label={item.title}
               className={`group relative overflow-hidden ${i === 0 ? "col-span-2 row-span-2" : ""}`}
               style={{ aspectRatio: i === 0 ? "1/1" : "1/1" }}
@@ -66,7 +71,8 @@ export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict
                 )}
               </div>
             </a>
-          ))}
+            );
+          })}
         </div>
 
         <a

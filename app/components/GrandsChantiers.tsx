@@ -119,7 +119,13 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                   <div className="flex items-center gap-3">
                     <span
                       className="text-3xl sm:text-4xl font-black leading-none tabular-nums"
-                      style={{ color: ink, opacity: 0.85 }}
+                      // ANO-082 : la couleur d'accent (overlay) est choisie
+                      // librement dans le back-office, donc le contraste du
+                      // numéro (blanc, opacity 0.85) n'était pas garanti sur
+                      // les teintes claires. Opacité pleine + ombre portée
+                      // pour assurer un contraste suffisant quelle que soit
+                      // la couleur retenue.
+                      style={{ color: ink, opacity: 1, textShadow: "0 1px 4px rgba(0,0,0,0.55)" }}
                     >
                       {c.number}
                     </span>

@@ -4,6 +4,14 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 const VERT  = "#006828";
 const JAUNE = "#FFBE00";
+// ANO-079 : #FFBE00 (jaune) offre un contraste de 1,66:1 sur fond blanc, très
+// inférieur au minimum WCAG AA (4,5:1) requis pour du texte. On garde le
+// jaune vif pour le remplissage des barres (élément graphique, pas du
+// texte), mais on utilise cette variante plus sombre pour tout texte.
+const JAUNE_TEXTE = "#7A5800";
+function textColorFor(color: string): string {
+  return color === JAUNE ? JAUNE_TEXTE : color;
+}
 
 type StatItem = { id: number; label: string; value: number; max: number; unit: string; noSpace?: boolean; color?: string | null };
 type Dict = Record<string, string>;
@@ -116,7 +124,7 @@ export default function StatsSection({ stats: externalStats, meta, dict }: { sta
                     <span
                       className="text-xs font-black tabular-nums block leading-tight line-clamp-2"
                       style={{
-                        color: bar.color,
+                        color: textColorFor(bar.color),
                         opacity: progress,
                       }}
                     >
