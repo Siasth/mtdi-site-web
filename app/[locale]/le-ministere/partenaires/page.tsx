@@ -3,75 +3,11 @@ import Navbar from "../../../components/Navbar";
 import Footer from "../../../components/Footer";
 import Link from "next/link";
 import Image from "next/image";
+import { getPartners } from "@/lib/partners";
 
 const VERT = "#162233";
 const JAUNE = "#FFBE00";
 const ROUGE = "#EB0000";
-
-type Partner = { name: string; full: string; description: string; accent: string; logoSrc?: string };
-
-const partenairesInstitutionnels: Partner[] = [
-  {
-    name: "Présidence",
-    full: "Présidence de la République du Bénin",
-    description: "Autorité de tutelle du gouvernement béninois, dont les priorités numériques guident la feuille de route du ministère.",
-    accent: "#006828",
-  },
-  {
-    name: "APDP",
-    full: "Autorité de Protection des Données Personnelles",
-    description: "Instance nationale de contrôle du traitement des données à caractère personnel, garante du respect de la vie privée numérique au Bénin.",
-    accent: "#006828",
-  },
-  {
-    name: "ANIP",
-    full: "Agence Nationale d'Identification des Personnes",
-    description: "Gère l'identité civile et délivre les documents d'identité officiels des citoyens béninois, dont le programme MonIdentité.bj.",
-    accent: "#006828",
-    logoSrc: "/logo-anip.png",
-  },
-  {
-    name: "Sèmè City",
-    full: "Cité de l'Innovation et du Savoir",
-    description: "Hub d'innovation et d'entrepreneuriat du Bénin, laboratoire de la transformation digitale africaine situé à Cotonou.",
-    accent: "#006828",
-    logoSrc: "/logo-seme-city.svg",
-  },
-];
-const partenairesTechnologiques: Partner[] = [
-  {
-    name: "Banque Mondiale",
-    full: "Groupe de la Banque Mondiale",
-    description: "Partenaire financier et technique des grands projets d'infrastructure numérique et de renforcement de capacités numériques.",
-    accent: "#7A5800",
-  },
-  {
-    name: "Smart Africa",
-    full: "Alliance Smart Africa",
-    description: "Alliance continentale promouvant la transformation numérique inclusive en Afrique ; le Bénin en est membre actif.",
-    accent: "#7A5800",
-  },
-  {
-    name: "ITU",
-    full: "Union Internationale des Télécommunications",
-    description: "Agence spécialisée des Nations Unies pour les TIC ; appuie le Bénin sur la gouvernance et les politiques de connectivité.",
-    accent: "#7A5800",
-  },
-];
-const partenairesAcademiques: Partner[] = [
-  {
-    name: "UAC",
-    full: "Université d'Abomey-Calavi",
-    description: "Principale université du Bénin, partenaire des programmes de formation aux métiers du numérique et de la recherche en intelligence artificielle.",
-    accent: ROUGE,
-  },
-  {
-    name: "INFOTI",
-    full: "Institut National de Formation aux Technologies de l'Information",
-    description: "Institut public de formation professionnelle dans les domaines des TIC, du numérique et des télécommunications.",
-    accent: ROUGE,
-  },
-];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -83,10 +19,17 @@ export default async function PartenairesPage({ params }: Props) {
   const t = dict.ministere.partenaires;
   const prefix = locale === "en" ? "/en" : "";
 
+  // ANO-113/ANO-156 : cette page affichait une liste de partenaires codée en
+  // dur dans le code, totalement déconnectée du back-office — un partenaire
+  // créé, modifié ou dépublié depuis l'interface d'administration n'avait
+  // donc jamais le moindre effet sur le site. getPartners() lit la vraie
+  // table (et exclut déjà les partenaires supprimés ou désactivés).
+  const allPartners = await getPartners(locale === "en" ? "en" : "fr");
+
   const categories = [
-    { label: "Partenaires institutionnels", id: "institutionnels", accent: "#006828", partners: partenairesInstitutionnels },
-    { label: "Partenaires technologiques & internationaux", id: "technologiques", accent: "#A07800", partners: partenairesTechnologiques },
-    { label: "Partenaires académiques", id: "academiques", accent: ROUGE, partners: partenairesAcademiques },
+    { label: "Partenaires institutionnels", id: "institutionnels", accent: "#006828", partners: allPartners.filter((p) => p.category === "institutionnel") },
+    { label: "Partenaires technologiques & internationaux", id: "technologiques", accent: "#A07800", partners: allPartners.filter((p) => p.category === "technologique") },
+    { label: "Partenaires académiques", id: "academiques", accent: ROUGE, partners: allPartners.filter((p) => p.category === "academique") },
   ];
 
   return (
@@ -140,7 +83,7 @@ export default async function PartenairesPage({ params }: Props) {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
                   {category.partners.map((partner) => (
-                    <div key={partner.name} className="group p-8 bg-white hover:bg-gris-perle transition-colors">
+                    <div key={partner.id} className="group p-8 bg-white hover:bg-gris-perle transition-colors">
                       <div className="relative h-10 w-full mb-4 flex items-center justify-center">
                         {partner.logoSrc && (
                           <Image src={partner.logoSrc} alt={`Logo ${partner.name}`} fill className="object-contain" sizes="128px" />
