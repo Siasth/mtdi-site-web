@@ -200,6 +200,11 @@ export default async function StructuresPage({ params }: Props) {
         .prose-institutionnel a { color: #006828; text-decoration: underline; }
         .prose-institutionnel ul { list-style: disc; padding-left: 1.2em; }
         .prose-institutionnel ol { list-style: decimal; padding-left: 1.2em; }
+        .prose-institutionnel li h1, .prose-institutionnel li h2, .prose-institutionnel li h3 { margin-top: 0; }
+        .prose-institutionnel li:has(> h1) { font-size: 2em; font-weight: 900; }
+        .prose-institutionnel li:has(> h2) { font-size: 1.5em; font-weight: 900; }
+        .prose-institutionnel li:has(> h3) { font-size: 1.17em; font-weight: 900; }
+        .prose-institutionnel li:has(> h1) > h1, .prose-institutionnel li:has(> h2) > h2, .prose-institutionnel li:has(> h3) > h3 { font-size: 1em; }
       `}</style>
 
       <Footer locale={locale} dict={dict.footer} />

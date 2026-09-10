@@ -116,6 +116,11 @@ export default async function ActualiteDetailPage({ params }: Props) {
                 .prose-actualite p { margin: 0.7em 0; }
                 .prose-actualite ul { list-style: disc; padding-left: 1.4em; margin: 0.7em 0; }
                 .prose-actualite ol { list-style: decimal; padding-left: 1.4em; margin: 0.7em 0; }
+                .prose-actualite li h1, .prose-actualite li h2, .prose-actualite li h3 { margin-top: 0; }
+                .prose-actualite li:has(> h1) { font-size: 1.5em; font-weight: 900; }
+                .prose-actualite li:has(> h2) { font-size: 1.25em; font-weight: 900; }
+                .prose-actualite li:has(> h3) { font-size: 1.1em; font-weight: 900; }
+                .prose-actualite li:has(> h1) > h1, .prose-actualite li:has(> h2) > h2, .prose-actualite li:has(> h3) > h3 { font-size: 1em; }
                 .prose-actualite blockquote { border-left: 3px solid ${VERT}; padding-left: 1em; color: rgba(26,26,26,0.6); font-style: italic; margin: 0.8em 0; }
                 .prose-actualite code { background: #f1f1ef; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; }
                 .prose-actualite a { color: ${VERT}; text-decoration: underline; }

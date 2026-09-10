@@ -84,6 +84,11 @@ export default async function MinistryMessage({ dict, locale = "fr" }: { dict?: 
               .prose-ministre h1, .prose-ministre h2, .prose-ministre h3 { font-weight: 900; margin: 0.6em 0 0.3em; }
               .prose-ministre ul { list-style: disc; padding-left: 1.4em; margin: 0.5em 0; }
               .prose-ministre ol { list-style: decimal; padding-left: 1.4em; margin: 0.5em 0; }
+              .prose-ministre li h1, .prose-ministre li h2, .prose-ministre li h3 { margin-top: 0; }
+              .prose-ministre li:has(> h1) { font-size: 2em; font-weight: 900; }
+              .prose-ministre li:has(> h2) { font-size: 1.5em; font-weight: 900; }
+              .prose-ministre li:has(> h3) { font-size: 1.17em; font-weight: 900; }
+              .prose-ministre li:has(> h1) > h1, .prose-ministre li:has(> h2) > h2, .prose-ministre li:has(> h3) > h3 { font-size: 1em; }
               .prose-ministre blockquote { border-left: 3px solid #006828; padding-left: 1em; font-style: italic; margin: 0.6em 0; }
               .prose-ministre table { border-collapse: collapse; margin: 0.8em 0; width: 100%; }
               .prose-ministre td, .prose-ministre th { border: 1px solid rgba(0,0,0,0.12); padding: 6px 10px; }

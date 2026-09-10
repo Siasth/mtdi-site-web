@@ -31,8 +31,13 @@ export function sanitizeRichText(html: string): string {
       td: ["colspan", "rowspan", "style"],
       th: ["colspan", "rowspan", "style"],
       // "start" : reprise manuelle de la numérotation d'une liste ordonnée
-      // interrompue par un autre bloc (cf. MarkdownEditor.tsx).
-      ol: ["start"],
+      // interrompue par un autre bloc ; "type" : style de numérotation
+      // (1/A/a/I/i), attribut HTML natif d'<ol> (cf. MarkdownEditor.tsx).
+      ol: ["start", "type"],
+      // "style" : style de puce (disc/circle/square), pas d'équivalent
+      // d'attribut natif pour <ul>, donc porté par du CSS inline restreint
+      // ci-dessous (allowedStyles.ul).
+      ul: ["style"],
     },
     // Propriétés CSS conservées, strictement limitées par élément :
     // - color/font-family sur le texte en ligne
@@ -49,6 +54,7 @@ export function sanitizeRichText(html: string): string {
       h3: { "text-align": [/^(left|center|right|justify)$/] },
       td: { "background-color": [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/] },
       th: { "background-color": [/^#[0-9a-fA-F]{3,6}$/, /^rgb\(/] },
+      ul: { "list-style-type": [/^(disc|circle|square)$/] },
     },
     // Force tout lien externe à s'ouvrir de façon sûre
     transformTags: {
