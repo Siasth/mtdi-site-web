@@ -109,7 +109,7 @@ export default function AdminMinistre() {
             Français
           </button>
           <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
-            English
+            Version anglaise
             {!form.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
           </button>
         </div>

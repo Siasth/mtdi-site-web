@@ -58,6 +58,15 @@ export default function Footer({ locale: _locale, dict: _dict }: { locale?: stri
     fetch("/api/liens-utiles").then((r) => r.json()).then(setLiensUtiles).catch(() => {});
   }, []);
 
+  // ANO-146 : une page légale dépubliée doit disparaître du footer. On
+  // suppose les 3 pages publiées par défaut (cas normal, évite un flash au
+  // premier rendu) puis on corrige dès que le vrai statut est connu.
+  const LEGAL_SLUGS = ["mentions-legales", "confidentialite", "accessibilite"];
+  const [publishedLegalSlugs, setPublishedLegalSlugs] = useState<string[]>(LEGAL_SLUGS);
+  useEffect(() => {
+    fetch("/api/legal-pages-status").then((r) => r.json()).then(setPublishedLegalSlugs).catch(() => {});
+  }, []);
+
   useEffect(() => {
     fetch("/api/general-settings")
       .then((r) => r.json())
@@ -178,11 +187,15 @@ export default function Footer({ locale: _locale, dict: _dict }: { locale?: stri
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex flex-wrap gap-4">
             {[
-              { label: prefix ? "Legal notices" : "Mentions légales", href: `${prefix}/mentions-legales` },
-              { label: prefix ? "Privacy policy" : "Politique de confidentialité", href: `${prefix}/confidentialite` },
-              { label: prefix ? "Accessibility" : "Accessibilité", href: `${prefix}/accessibilite` },
-              { label: prefix ? "Site map" : "Plan du site", href: `${prefix}/plan-du-site` },
-            ].map((item) => (
+              { slug: "mentions-legales", label: prefix ? "Legal notices" : "Mentions légales", href: `${prefix}/mentions-legales` },
+              { slug: "confidentialite", label: prefix ? "Privacy policy" : "Politique de confidentialité", href: `${prefix}/confidentialite` },
+              { slug: "accessibilite", label: prefix ? "Accessibility" : "Accessibilité", href: `${prefix}/accessibilite` },
+              { slug: null, label: prefix ? "Site map" : "Plan du site", href: `${prefix}/plan-du-site` },
+            ]
+              // ANO-146 : une page légale dépubliée disparaît du footer (le
+              // "Plan du site", sans slug de page légale, reste toujours affiché).
+              .filter((item) => item.slug === null || publishedLegalSlugs.includes(item.slug))
+              .map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

@@ -42,6 +42,19 @@ export async function uploadFile(file: File, previousUrl?: string): Promise<{ ur
   }
 }
 
+// Affiche uniquement le nom du fichier importé plutôt que l'URL complète de
+// stockage, qui n'apporte rien à l'utilisateur et nuit à la lisibilité du
+// formulaire (ANO-132, appliqué de façon cohérente partout où un fichier est
+// importé dans le back-office).
+export function fileNameFromUrl(url: string): string {
+  try {
+    const parts = new URL(url).pathname.split("/");
+    return decodeURIComponent(parts[parts.length - 1] || url);
+  } catch {
+    return url;
+  }
+}
+
 export function cleanupOldFile(url: string) {
   fetch("/api/admin/upload/delete", {
     method: "POST",

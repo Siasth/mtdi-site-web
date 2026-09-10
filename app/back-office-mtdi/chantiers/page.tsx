@@ -5,7 +5,7 @@ import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
-import { uploadFile } from "@/lib/client-upload";
+import { uploadFile, fileNameFromUrl } from "@/lib/client-upload";
 import MarkdownEditor from "../components/MarkdownEditor";
 import { ColorContrastHint } from "../components/ColorContrastHint";
 
@@ -38,6 +38,15 @@ const emptyForm: FormState = {
   descriptionFr: "", descriptionEn: "", image: "", video: "", color: "#006828",
   stats: [], displayOrder: 0, active: true,
 };
+
+// ANO-137 : le descriptif est tronqué en front-office (line-clamp-2, sans
+// lien "lire la suite" — voir GrandsChantiers.tsx), sans qu'aucune limite ne
+// soit indiquée ni contrôlée à la saisie. On fixe une limite cohérente avec
+// cet affichage (2 lignes) et on la fait respecter côté formulaire.
+const DESCRIPTION_MAX_CHARS = 220;
+function plainText(html: string): string {
+  return html.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
 
 export default function AdminChantiers() {
   const canManage = useHasPermission("accueil.gerer");
@@ -130,6 +139,14 @@ export default function AdminChantiers() {
     e.preventDefault();
     if (!form.image) {
       setSaveError("Veuillez importer une image avant d'enregistrer.");
+      return;
+    }
+    if (plainText(form.descriptionFr).length > DESCRIPTION_MAX_CHARS) {
+      setSaveError(`Le descriptif (Français) dépasse la limite de ${DESCRIPTION_MAX_CHARS} caractères. Raccourcissez-le avant d'enregistrer.`);
+      return;
+    }
+    if (plainText(form.descriptionEn).length > DESCRIPTION_MAX_CHARS) {
+      setSaveError(`Le descriptif (English) dépasse la limite de ${DESCRIPTION_MAX_CHARS} caractères. Raccourcissez-le avant d'enregistrer.`);
       return;
     }
     setSaving(true);
@@ -254,7 +271,7 @@ export default function AdminChantiers() {
                   Français
                 </button>
                 <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
-                  English
+                  Version anglaise
                   {!form.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
                 </button>
               </div>
@@ -280,6 +297,10 @@ export default function AdminChantiers() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
                   <MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} />
+                  <p className={`text-[11px] mt-1 ${plainText(form.descriptionFr).length > DESCRIPTION_MAX_CHARS ? "text-red-600 font-semibold" : "text-gray-400"}`}>
+                    {plainText(form.descriptionFr).length} / {DESCRIPTION_MAX_CHARS} caractères
+                    {plainText(form.descriptionFr).length > DESCRIPTION_MAX_CHARS && " — limite dépassée, le texte sera coupé sur le site"}
+                  </p>
                 </div>
               </div>
             ) : (
@@ -296,6 +317,10 @@ export default function AdminChantiers() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
                   <MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} />
+                  <p className={`text-[11px] mt-1 ${plainText(form.descriptionEn).length > DESCRIPTION_MAX_CHARS ? "text-red-600 font-semibold" : "text-gray-400"}`}>
+                    {plainText(form.descriptionEn).length} / {DESCRIPTION_MAX_CHARS} caractères
+                    {plainText(form.descriptionEn).length > DESCRIPTION_MAX_CHARS && " — limite dépassée, le texte sera coupé sur le site"}
+                  </p>
                 </div>
               </div>
             )}
@@ -311,9 +336,11 @@ export default function AdminChantiers() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo de fond (optionnel — remplace l'image si présente)</label>
-              {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{form.video}</p>}
+              {/* Aligné sur le même correctif que Hero (ANO-132) : n'afficher
+                  que le nom de fichier, pas l'URL complète de stockage. */}
+              {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{fileNameFromUrl(form.video)}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading === "video" ? "Envoi..." : "Choisir une vidéo"}
+                {uploading === "video" ? "Import en cours…" : "Choisir une vidéo"}
                 <input type="file" accept="video/*" className="hidden" disabled={!!uploading} onChange={(e) => handleUpload("video", e)} />
               </label>
               {form.video && (

@@ -348,7 +348,7 @@ export default function AdminGalerie() {
               <div className="flex text-xs font-bold uppercase tracking-wider rounded-lg overflow-hidden border border-gray-200">
                 <button type="button" onClick={() => setActiveLang("fr")} className="px-4 py-2" style={activeLang === "fr" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>Français</button>
                 <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
-                  English
+                  Version anglaise
                   {!itemForm.titleEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
                 </button>
               </div>

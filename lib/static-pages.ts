@@ -12,3 +12,11 @@ export async function getStaticPage(slug: string, locale: Locale): Promise<Stati
     published: row.published as boolean,
   };
 }
+
+// ANO-146 : une page légale dépubliée depuis le back-office doit disparaître
+// du footer public — sinon elle y reste accessible malgré la dépublication.
+// Utilisé par l'API publique consommée par Footer.tsx.
+export async function getPublishedLegalSlugs(): Promise<string[]> {
+  const result = await sql`SELECT slug FROM static_pages WHERE published = TRUE`;
+  return result.rows.map((r) => r.slug as string);
+}

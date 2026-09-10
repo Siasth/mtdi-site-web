@@ -5,7 +5,7 @@ import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, HideIcon, RestoreIcon } from "../components/ActionIcons";
-import { uploadFile } from "@/lib/client-upload";
+import { uploadFile, fileNameFromUrl } from "@/lib/client-upload";
 
 const VERT = "#006828";
 
@@ -94,14 +94,7 @@ export default function AdminHero() {
   }
 
   // ANO-132 : n'afficher que le nom du fichier importé, pas l'URL complète de stockage.
-  function fileNameFromUrl(url: string): string {
-    try {
-      const parts = new URL(url).pathname.split("/");
-      return decodeURIComponent(parts[parts.length - 1] || url);
-    } catch {
-      return url;
-    }
-  }
+  // (fonction partagée : voir lib/client-upload.ts)
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -211,7 +204,7 @@ export default function AdminHero() {
                   Français
                 </button>
                 <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
-                  English
+                  Version anglaise
                   {!form.altEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
                 </button>
               </div>

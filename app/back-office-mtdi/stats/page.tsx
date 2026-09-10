@@ -272,7 +272,7 @@ export default function AdminStats() {
                   Français
                 </button>
                 <button type="button" onClick={() => setActiveLang("en")} className="px-4 py-2 flex items-center gap-1.5" style={activeLang === "en" ? { background: VERT, color: "white" } : { background: "white", color: "#666" }}>
-                  English
+                  Version anglaise
                   {!form.labelEn && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" title="Pas encore traduit" />}
                 </button>
               </div>
@@ -319,7 +319,10 @@ export default function AdminStats() {
 
             <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur actuelle *</label>
+                {/* ANO-133 : la validation numérique existait déjà (type="number"
+                    empêche la saisie de lettres), seul le libellé restait à
+                    préciser. */}
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur numérique (actuelle) *</label>
                 <input required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div>

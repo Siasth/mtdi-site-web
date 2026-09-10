@@ -143,6 +143,12 @@ export default function AdminLayoutClient({
   const router = useRouter();
   const [showWarning, setShowWarning] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  // ANO-125 : la barre latérale était fixe (256px, jamais masquée), ce qui
+  // rendait tout le back-office inutilisable sur mobile/tablette (contenu
+  // écrasé ou débordement horizontal sur chaque page, puisque cette coquille
+  // est partagée par toutes). Elle devient un tiroir dépliable sous le seuil
+  // "lg", fermé par défaut.
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const warningTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -168,6 +174,11 @@ export default function AdminLayoutClient({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  // Referme le tiroir mobile après chaque navigation.
+  useEffect(() => {
+    setMobileNavOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -218,9 +229,22 @@ export default function AdminLayoutClient({
         </div>
       )}
 
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 sticky top-0 h-screen">
-        <div className="p-5 border-b border-gray-200">
+      {/* Overlay + bouton de fermeture du tiroir mobile */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar : tiroir plein écran sous "lg", panneau fixe sticky au-delà */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 h-screen transition-transform duration-200
+          lg:sticky lg:top-0 lg:translate-x-0
+          ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <div className="p-5 border-b border-gray-200 flex items-center justify-between">
           <Link href="/back-office-mtdi" className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: VERT }}>
               <svg width="18" height="18" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
@@ -232,6 +256,13 @@ export default function AdminLayoutClient({
               <p className="text-[10px] text-gray-400 font-medium">Gestion du contenu</p>
             </div>
           </Link>
+          <button
+            onClick={() => setMobileNavOpen(false)}
+            className="lg:hidden p-1.5 text-gray-400 hover:text-gray-700"
+            aria-label="Fermer le menu"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
@@ -298,8 +329,15 @@ export default function AdminLayoutClient({
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 min-w-0">
-        <div className="flex justify-end px-8 pt-4">
+      <main className="flex-1 min-w-0 w-full">
+        <div className="flex items-center justify-between px-4 sm:px-8 pt-4 gap-2">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            className="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900"
+            aria-label="Ouvrir le menu"
+          >
+            <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
           <Link
             href="/back-office-mtdi/securite"
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
