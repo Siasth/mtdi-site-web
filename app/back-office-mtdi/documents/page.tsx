@@ -96,24 +96,24 @@ export default function AdminDocuments() {
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Catégorie</label><select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Type de fichier</label><input value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value.toUpperCase() })} placeholder="PDF, DOCX..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date (libellé libre)</label><input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="ex: Octobre 2025" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="categorie">Catégorie</label><select id="categorie" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="type-de-fichier">Type de fichier</label><input id="type-de-fichier" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value.toUpperCase() })} placeholder="PDF, DOCX..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date-libelle-libre">Date (libellé libre)</label><input id="date-libelle-libre" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="ex: Octobre 2025" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             </div>
             {activeLang === "fr" ? (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><textarea value={form.descriptionFr} onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-fr">Titre (FR) *</label><input id="titre-fr" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><textarea id="description-fr" value={form.descriptionFr} onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
               </>
             ) : (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Title (EN)</label><input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><textarea value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="title-en">Title (EN)</label><input id="title-en" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><textarea id="description-en" value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
               </>
             )}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier / lien *</label>
-              <input required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="fichier-lien">Fichier / lien *</label>
+              <input id="fichier-lien" required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
               {uploadedFileName && !uploadError && (
                 <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">

@@ -160,30 +160,30 @@ export default function AdminMinistreBio() {
           </div>
           {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet</label>
-            <input value={form.name} onChange={(e) => setField("name", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-complet">Nom complet</label>
+            <input id="nom-complet" value={form.name} onChange={(e) => setField("name", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien Wikipédia (bouton "Voir plus")</label>
-            <input value={form.wikipediaUrl} onChange={(e) => setField("wikipediaUrl", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="lien-wikipedia-bouton-voir-plus">Lien Wikipédia (bouton "Voir plus")</label>
+            <input id="lien-wikipedia-bouton-voir-plus" value={form.wikipediaUrl} onChange={(e) => setField("wikipediaUrl", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
         </section>
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Textes courts ({activeLang === "fr" ? "Français" : "English"})</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fil d'Ariane</label><input value={form[`breadcrumb${suffix}`]} onChange={(e) => setField(`breadcrumb${suffix}` as "breadcrumbFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Badge</label><input value={form[`badge${suffix}`]} onChange={(e) => setField(`badge${suffix}` as "badgeFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Badge (sous-titre)</label><input value={form[`badgeSousTitre${suffix}`]} onChange={(e) => setField(`badgeSousTitre${suffix}` as "badgeSousTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre signature</label><input value={form[`signatureTitre${suffix}`]} onChange={(e) => setField(`signatureTitre${suffix}` as "signatureTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="fil-d-ariane">Fil d'Ariane</label><input id="fil-d-ariane" value={form[`breadcrumb${suffix}`]} onChange={(e) => setField(`breadcrumb${suffix}` as "breadcrumbFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="badge">Badge</label><input id="badge" value={form[`badge${suffix}`]} onChange={(e) => setField(`badge${suffix}` as "badgeFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="badge-sous-titre">Badge (sous-titre)</label><input id="badge-sous-titre" value={form[`badgeSousTitre${suffix}`]} onChange={(e) => setField(`badgeSousTitre${suffix}` as "badgeSousTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-signature">Titre signature</label><input id="titre-signature" value={form[`signatureTitre${suffix}`]} onChange={(e) => setField(`signatureTitre${suffix}` as "signatureTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Sous-titre (fonction complète)</label>
-            <input value={form[`sousTitre${suffix}`]} onChange={(e) => setField(`sousTitre${suffix}` as "sousTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="sous-titre-fonction-complete">Sous-titre (fonction complète)</label>
+            <input id="sous-titre-fonction-complete" value={form[`sousTitre${suffix}`]} onChange={(e) => setField(`sousTitre${suffix}` as "sousTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Texte alternatif photo (accessibilité)</label>
-            <input value={form[`imageAlt${suffix}`]} onChange={(e) => setField(`imageAlt${suffix}` as "imageAltFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="texte-alternatif-photo-accessibilite">Texte alternatif photo (accessibilité)</label>
+            <input id="texte-alternatif-photo-accessibilite" value={form[`imageAlt${suffix}`]} onChange={(e) => setField(`imageAlt${suffix}` as "imageAltFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
         </section>
 

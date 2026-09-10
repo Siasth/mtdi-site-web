@@ -194,13 +194,13 @@ export default function AdminStats() {
           </div>
           {activeLang === "fr" ? (
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date des données (FR)</label><input value={meta.dateLabelFr} onChange={(e) => setMeta({ ...meta, dateLabelFr: e.target.value })} placeholder="ex: Données au 1ᵉʳ juillet 2026" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fréquence de mise à jour (FR)</label><input value={meta.frequencyFr} onChange={(e) => setMeta({ ...meta, frequencyFr: e.target.value })} placeholder="ex: Mise à jour trimestrielle" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date-des-donnees-fr">Date des données (FR)</label><input id="date-des-donnees-fr" value={meta.dateLabelFr} onChange={(e) => setMeta({ ...meta, dateLabelFr: e.target.value })} placeholder="ex: Données au 1ᵉʳ juillet 2026" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="frequence-de-mise-a-jour-fr">Fréquence de mise à jour (FR)</label><input id="frequence-de-mise-a-jour-fr" value={meta.frequencyFr} onChange={(e) => setMeta({ ...meta, frequencyFr: e.target.value })} placeholder="ex: Mise à jour trimestrielle" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Date des données (EN)</label><input value={meta.dateLabelEn} onChange={(e) => setMeta({ ...meta, dateLabelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fréquence de mise à jour (EN)</label><input value={meta.frequencyEn} onChange={(e) => setMeta({ ...meta, frequencyEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date-des-donnees-en">Date des données (EN)</label><input id="date-des-donnees-en" value={meta.dateLabelEn} onChange={(e) => setMeta({ ...meta, dateLabelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="frequence-de-mise-a-jour-en">Fréquence de mise à jour (EN)</label><input id="frequence-de-mise-a-jour-en" value={meta.frequencyEn} onChange={(e) => setMeta({ ...meta, frequencyEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             </div>
           )}
           <div className="flex items-center gap-3">
@@ -282,17 +282,17 @@ export default function AdminStats() {
             {activeLang === "fr" ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (Français) *</label>
-                  <input required value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} placeholder="ex : Communes connectées à la fibre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="libelle-francais">Libellé (Français) *</label>
+                  <input id="libelle-francais" required value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} placeholder="ex : Communes connectées à la fibre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unité (pluriel)</label>
-                    <input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="ex : communes, %, km" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="unite-pluriel">Unité (pluriel)</label>
+                    <input id="unite-pluriel" value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} placeholder="ex : communes, %, km" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unité (singulier)</label>
-                    <input value={form.unitFrSingular} onChange={(e) => setForm({ ...form, unitFrSingular: e.target.value })} placeholder="ex : commune (si 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="unite-singulier">Unité (singulier)</label>
+                    <input id="unite-singulier" value={form.unitFrSingular} onChange={(e) => setForm({ ...form, unitFrSingular: e.target.value })} placeholder="ex : commune (si 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                 </div>
                 <p className="text-xs text-gray-400">Le singulier n'est utilisé que si la valeur affichée est 1 ou -1. Laissez vide si l'unité ne varie pas (%, km...).</p>
@@ -301,17 +301,17 @@ export default function AdminStats() {
               <div className="space-y-4">
                 {!form.labelFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français (onglet précédent).</p>}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Libellé (English)</label>
-                  <input value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="libelle-english">Libellé (English)</label>
+                  <input id="libelle-english" value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unit (plural)</label>
-                    <input value={form.unitEn} onChange={(e) => setForm({ ...form, unitEn: e.target.value })} placeholder="ex : municipalities, %, km — laisser vide = même qu'en FR" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="unit-plural">Unit (plural)</label>
+                    <input id="unit-plural" value={form.unitEn} onChange={(e) => setForm({ ...form, unitEn: e.target.value })} placeholder="ex : municipalities, %, km — laisser vide = même qu'en FR" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Unit (singular)</label>
-                    <input value={form.unitEnSingular} onChange={(e) => setForm({ ...form, unitEnSingular: e.target.value })} placeholder="ex : municipality (if 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="unit-singular">Unit (singular)</label>
+                    <input id="unit-singular" value={form.unitEnSingular} onChange={(e) => setForm({ ...form, unitEnSingular: e.target.value })} placeholder="ex : municipality (if 1)" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                 </div>
               </div>
@@ -322,12 +322,12 @@ export default function AdminStats() {
                 {/* ANO-133 : la validation numérique existait déjà (type="number"
                     empêche la saisie de lettres), seul le libellé restait à
                     préciser. */}
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Valeur numérique (actuelle) *</label>
-                <input required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="valeur-numerique-actuelle">Valeur numérique (actuelle) *</label>
+                <input id="valeur-numerique-actuelle" required type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Objectif (max) *</label>
-                <input required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="objectif-max">Objectif (max) *</label>
+                <input id="objectif-max" required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Couleur</label>
@@ -351,8 +351,8 @@ export default function AdminStats() {
                 Visible sur le site
               </label>
               <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                <label className="text-sm text-gray-700" htmlFor="ordre-d-affichage">Ordre d'affichage</label>
+                <input id="ordre-d-affichage" type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 

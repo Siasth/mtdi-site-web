@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
-import { hasPerm } from "@/lib/permissions";
+import { hasPerm, withRequiredViewPermissions } from "@/lib/permissions";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -61,7 +61,8 @@ export async function POST(req: NextRequest) {
   `;
   const roleId = roleResult.rows[0].id;
 
-  const codes: string[] = permissionCodes || [];
+  // ANO-153 : filet de sécurité serveur — complète les "voir" manquants.
+  const codes: string[] = withRequiredViewPermissions(permissionCodes || []);
   for (const code of codes) {
     const perm = await sql`SELECT id FROM permissions WHERE code = ${code}`;
     if (perm.rows[0]) {

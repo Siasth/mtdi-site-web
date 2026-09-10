@@ -358,8 +358,8 @@ export default function AdminGalerie() {
             {activeLang === "fr" ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
-                  <input required value={itemForm.titleFr} onChange={(e) => setItemForm({ ...itemForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-francais">Titre (Français) *</label>
+                  <input id="titre-francais" required value={itemForm.titleFr} onChange={(e) => setItemForm({ ...itemForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
@@ -370,8 +370,8 @@ export default function AdminGalerie() {
               <div className="space-y-4">
                 {!itemForm.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le français.</p>}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title (English)</label>
-                  <input value={itemForm.titleEn} onChange={(e) => setItemForm({ ...itemForm, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="title-english">Title (English)</label>
+                  <input id="title-english" value={itemForm.titleEn} onChange={(e) => setItemForm({ ...itemForm, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
@@ -382,33 +382,33 @@ export default function AdminGalerie() {
 
             <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Type</label>
-                <select value={itemForm.type} onChange={(e) => setItemForm({ ...itemForm, type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="type">Type</label>
+                <select id="type" value={itemForm.type} onChange={(e) => setItemForm({ ...itemForm, type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
                   <option value="photo">Photo</option>
                   <option value="video">Vidéo</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Collection</label>
-                <select value={itemForm.collectionId} onChange={(e) => setItemForm({ ...itemForm, collectionId: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="collection">Collection</label>
+                <select id="collection" value={itemForm.collectionId} onChange={(e) => setItemForm({ ...itemForm, collectionId: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
                   <option value="">Aucune</option>
                   {collections.map((c) => <option key={c.id} value={c.id}>{c.name_fr}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Date *</label>
-                <input required type="date" value={itemForm.eventDate} onChange={(e) => setItemForm({ ...itemForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="date">Date *</label>
+                <input id="date" required type="date" value={itemForm.eventDate} onChange={(e) => setItemForm({ ...itemForm, eventDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Crédit photo/vidéo</label>
-                <input value={itemForm.credit} onChange={(e) => setItemForm({ ...itemForm, credit: e.target.value })} placeholder="ex : MTDI / Direction de la Communication" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="credit-photo-video">Crédit photo/vidéo</label>
+                <input id="credit-photo-video" value={itemForm.credit} onChange={(e) => setItemForm({ ...itemForm, credit: e.target.value })} placeholder="ex : MTDI / Direction de la Communication" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
-                <select value={itemForm.status} onChange={(e) => setItemForm({ ...itemForm, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="statut">Statut</label>
+                <select id="statut" value={itemForm.status} onChange={(e) => setItemForm({ ...itemForm, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
                   <option value="brouillon">Brouillon</option>
                   <option value="publie">Publié</option>
                   <option value="depublie">Dépublié</option>
@@ -428,8 +428,8 @@ export default function AdminGalerie() {
 
             {itemForm.type === "video" && (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (fichier ou lien YouTube)</label>
-                <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="video-fichier-ou-lien-youtube">Vidéo (fichier ou lien YouTube)</label>
+                <input id="video-fichier-ou-lien-youtube" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                   {uploading ? "Envoi..." : "Ou uploader un fichier vidéo"}
                   <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("videoUrl", e)} />
@@ -439,8 +439,8 @@ export default function AdminGalerie() {
             {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel — remplace le lien interne par défaut)</label>
-              <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.hrefExternal} onChange={(e) => setItemForm({ ...itemForm, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="lien-externe-optionnel-remplace-le-lien-">Lien externe (optionnel — remplace le lien interne par défaut)</label>
+              <input id="lien-externe-optionnel-remplace-le-lien-" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.hrefExternal} onChange={(e) => setItemForm({ ...itemForm, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
 
             <div className="flex items-center gap-4">
@@ -471,16 +471,16 @@ export default function AdminGalerie() {
               <ModalCloseButton onClick={() => setEditingColl(null)} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (Français) *</label>
-              <input required value={collForm.nameFr} onChange={(e) => setCollForm({ ...collForm, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-francais">Nom (Français) *</label>
+              <input id="nom-francais" required value={collForm.nameFr} onChange={(e) => setCollForm({ ...collForm, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (English)</label>
-              <input value={collForm.nameEn} onChange={(e) => setCollForm({ ...collForm, nameEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-english">Nom (English)</label>
+              <input id="nom-english" value={collForm.nameEn} onChange={(e) => setCollForm({ ...collForm, nameEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ordre</label>
-              <input type="number" value={collForm.displayOrder} onChange={(e) => setCollForm({ ...collForm, displayOrder: Number(e.target.value) })} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="ordre">Ordre</label>
+              <input id="ordre" type="number" value={collForm.displayOrder} onChange={(e) => setCollForm({ ...collForm, displayOrder: Number(e.target.value) })} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
             </div>
             {collError && <p className="text-sm text-red-600">{collError}</p>}
             <div className="flex gap-2 pt-2">

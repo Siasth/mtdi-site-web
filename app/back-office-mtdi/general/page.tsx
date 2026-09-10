@@ -131,17 +131,17 @@ export default function AdminGeneral() {
             <input value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Sigle</label>
-            <input value={form.siteNameShort} onChange={(e) => setForm({ ...form, siteNameShort: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="sigle">Sigle</label>
+            <input id="sigle" value={form.siteNameShort} onChange={(e) => setForm({ ...form, siteNameShort: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Slogan (Français)</label>
-              <input value={form.taglineFr} onChange={(e) => setForm({ ...form, taglineFr: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="slogan-francais">Slogan (Français)</label>
+              <input id="slogan-francais" value={form.taglineFr} onChange={(e) => setForm({ ...form, taglineFr: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Slogan (English)</label>
-              <input value={form.taglineEn} onChange={(e) => setForm({ ...form, taglineEn: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="slogan-english">Slogan (English)</label>
+              <input id="slogan-english" value={form.taglineEn} onChange={(e) => setForm({ ...form, taglineEn: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           </div>
         </section>
@@ -180,8 +180,8 @@ export default function AdminGeneral() {
             { field: "youtube" as const, label: "YouTube" },
           ]).map(({ field, label }) => (
             <div key={field}>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
-              <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor={`reseau-social-${field}`}>{label}</label>
+              <input id={`reseau-social-${field}`} type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form[field]} onChange={(e) => setForm({ ...form, [field]: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           ))}
         </section>
@@ -195,18 +195,18 @@ export default function AdminGeneral() {
             <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email-destinataire-formulaire-ecrire-au-">
               Email destinataire — formulaire "Écrire au Ministre"
             </label>
-            <input value={form.ministreEmail} onChange={(e) => setForm({ ...form, ministreEmail: e.target.value })} placeholder="mtdi.contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="email-destinataire-formulaire-ecrire-au-" value={form.ministreEmail} onChange={(e) => setForm({ ...form, ministreEmail: e.target.value })} placeholder="mtdi.contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Téléphone</label>
-            <input value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 01 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="telephone">Téléphone</label>
+            <input id="telephone" value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="Optionnel — ex : +229 01 21 30 00 00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse (Français)</label>
-            <textarea
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="adresse-francais">Adresse (Français)</label>
+            <textarea id="adresse-francais"
               value={form.contactAddress}
               onChange={(e) => setForm({ ...form, contactAddress: e.target.value })}
               placeholder={"Optionnel — ex :\nBoulevard de la Marina\n01 BP 412 Cotonou\nRépublique du Bénin"}
@@ -215,8 +215,8 @@ export default function AdminGeneral() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse (English)</label>
-            <textarea
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="adresse-english">Adresse (English)</label>
+            <textarea id="adresse-english"
               value={form.contactAddressEn}
               onChange={(e) => setForm({ ...form, contactAddressEn: e.target.value })}
               placeholder={"Laisser vide pour reprendre l'adresse française telle quelle"}
@@ -226,17 +226,17 @@ export default function AdminGeneral() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Horaires d'ouverture (Français)</label>
-              <input value={form.openingHoursFr} onChange={(e) => setForm({ ...form, openingHoursFr: e.target.value })} placeholder="ex : Lundi – Vendredi : 8h00 – 17h00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="horaires-d-ouverture-francais">Horaires d'ouverture (Français)</label>
+              <input id="horaires-d-ouverture-francais" value={form.openingHoursFr} onChange={(e) => setForm({ ...form, openingHoursFr: e.target.value })} placeholder="ex : Lundi – Vendredi : 8h00 – 17h00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Opening hours (English)</label>
-              <input value={form.openingHoursEn} onChange={(e) => setForm({ ...form, openingHoursEn: e.target.value })} placeholder="Laisser vide = reprend le français" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="opening-hours-english">Opening hours (English)</label>
+              <input id="opening-hours-english" value={form.openingHoursEn} onChange={(e) => setForm({ ...form, openingHoursEn: e.target.value })} placeholder="Laisser vide = reprend le français" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Localisation (lien carte)</label>
-            <input
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="localisation-lien-carte">Localisation (lien carte)</label>
+            <input id="localisation-lien-carte"
               value={form.locationMapUrl}
               onChange={(e) => setForm({ ...form, locationMapUrl: e.target.value })}
               placeholder="Optionnel — lien Google Maps par exemple"
@@ -245,8 +245,8 @@ export default function AdminGeneral() {
             <p className="text-xs text-gray-400 mt-1">Affiche un lien "Voir sur la carte" sur la page Contact si renseigné.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Document de la Stratégie Nationale d'IA (lien de téléchargement)</label>
-            <input
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="document-de-la-strategie-nationale-d-ia-">Document de la Stratégie Nationale d'IA (lien de téléchargement)</label>
+            <input id="document-de-la-strategie-nationale-d-ia-"
               type="url"
               pattern={URL_PATTERN}
               title="URL valide commençant par http:// ou https://"
@@ -258,8 +258,8 @@ export default function AdminGeneral() {
             <p className="text-xs text-gray-400 mt-1">Utilisé par le bouton "Télécharger la stratégie" sur la page Stratégie Nationale d'IA.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Plateforme externe des appels d'offres</label>
-            <input
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="plateforme-externe-des-appels-d-offres">Plateforme externe des appels d'offres</label>
+            <input id="plateforme-externe-des-appels-d-offres"
               type="url"
               pattern={URL_PATTERN}
               title="URL valide commençant par http:// ou https://"

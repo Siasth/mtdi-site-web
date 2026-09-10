@@ -136,21 +136,21 @@ export default function AdminAdministration() {
         <form onSubmit={handleSmtpSave} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Hôte SMTP *</label>
-              <input required value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} placeholder="smtp.gmail.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="hote-smtp">Hôte SMTP *</label>
+              <input id="hote-smtp" required value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} placeholder="smtp.gmail.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Port *</label>
-              <input required value={smtp.port} onChange={(e) => setSmtp({ ...smtp, port: e.target.value })} placeholder="587" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="port">Port *</label>
+              <input id="port" required value={smtp.port} onChange={(e) => setSmtp({ ...smtp, port: e.target.value })} placeholder="587" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Utilisateur *</label>
-            <input required type="email" value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="utilisateur">Utilisateur *</label>
+            <input id="utilisateur" required value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mot de passe</label>
-            <input
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="mot-de-passe">Mot de passe</label>
+            <input id="mot-de-passe"
               type="password"
               value={smtp.pass}
               onChange={(e) => setSmtp({ ...smtp, pass: e.target.value })}
@@ -159,8 +159,8 @@ export default function AdminAdministration() {
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Adresse d'expédition *</label>
-            <input required type="email" value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="adresse-d-expedition">Adresse d'expédition *</label>
+            <input id="adresse-d-expedition" required value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
 
           {smtpMsg && <p className={`text-sm ${smtpMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{smtpMsg.text}</p>}

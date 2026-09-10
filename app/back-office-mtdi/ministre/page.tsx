@@ -129,8 +129,8 @@ export default function AdminMinistre() {
             {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet</label>
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-complet">Nom complet</label>
+            <input id="nom-complet" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
         </section>
 
@@ -139,22 +139,22 @@ export default function AdminMinistre() {
             <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
               <h2 className="font-bold text-gray-900">Contenu (Français)</h2>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre / fonction complète</label>
-                <input value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-fonction-complete">Titre / fonction complète</label>
+                <input id="titre-fonction-complete" value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (ligne 1)</label>
-                  <input value={form.badgeFr} onChange={(e) => setForm({ ...form, badgeFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-ligne-1">Badge (ligne 1)</label>
+                  <input id="badge-ligne-1" value={form.badgeFr} onChange={(e) => setForm({ ...form, badgeFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (ligne 2)</label>
-                  <input value={form.badgeSubFr} onChange={(e) => setForm({ ...form, badgeSubFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-ligne-2">Badge (ligne 2)</label>
+                  <input id="badge-ligne-2" value={form.badgeSubFr} onChange={(e) => setForm({ ...form, badgeSubFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre accrocheur (une phrase par ligne)</label>
-                <textarea value={form.headingFr} onChange={(e) => setForm({ ...form, headingFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-accrocheur-une-phrase-par-ligne">Titre accrocheur (une phrase par ligne)</label>
+                <textarea id="titre-accrocheur-une-phrase-par-ligne" value={form.headingFr} onChange={(e) => setForm({ ...form, headingFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             </section>
 
@@ -170,22 +170,22 @@ export default function AdminMinistre() {
               {!form.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français.</p>}
               <h2 className="font-bold text-gray-900">Content (English)</h2>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title / full function</label>
-                <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="title-full-function">Title / full function</label>
+                <input id="title-full-function" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (line 1)</label>
-                  <input value={form.badgeEn} onChange={(e) => setForm({ ...form, badgeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-line-1">Badge (line 1)</label>
+                  <input id="badge-line-1" value={form.badgeEn} onChange={(e) => setForm({ ...form, badgeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Badge (line 2)</label>
-                  <input value={form.badgeSubEn} onChange={(e) => setForm({ ...form, badgeSubEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-line-2">Badge (line 2)</label>
+                  <input id="badge-line-2" value={form.badgeSubEn} onChange={(e) => setForm({ ...form, badgeSubEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catchy title (one sentence per line)</label>
-                <textarea value={form.headingEn} onChange={(e) => setForm({ ...form, headingEn: e.target.value })} rows={3} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="catchy-title-one-sentence-per-line">Catchy title (one sentence per line)</label>
+                <textarea id="catchy-title-one-sentence-per-line" value={form.headingEn} onChange={(e) => setForm({ ...form, headingEn: e.target.value })} rows={3} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             </section>
 

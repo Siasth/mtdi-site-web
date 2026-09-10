@@ -114,8 +114,8 @@ export default function AdminSitemap() {
               <h2 className="font-bold text-gray-900 text-lg">{editSec === "new" ? "Nouvelle section" : "Modifier la section"}</h2>
               <ModalCloseButton onClick={() => setEditSec(null)} />
             </div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={secForm.titleFr} onChange={(e) => setSecForm({ ...secForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={secForm.titleEn} onChange={(e) => setSecForm({ ...secForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-fr">Titre (FR) *</label><input id="titre-fr" required value={secForm.titleFr} onChange={(e) => setSecForm({ ...secForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-en">Titre (EN)</label><input id="titre-en" value={secForm.titleEn} onChange={(e) => setSecForm({ ...secForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditSec(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>
@@ -128,9 +128,9 @@ export default function AdminSitemap() {
               <h2 className="font-bold text-gray-900 text-lg">{editLink === "new" ? "Nouveau lien" : "Modifier le lien"}</h2>
               <ModalCloseButton onClick={() => setEditLink(null)} />
             </div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Libellé (FR) *</label><input required value={linkForm.labelFr} onChange={(e) => setLinkForm({ ...linkForm, labelFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Libellé (EN)</label><input value={linkForm.labelEn} onChange={(e) => setLinkForm({ ...linkForm, labelEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien (chemin interne, ex: /contact) *</label><input required pattern="^(/|https?://).+" title="Doit commencer par / (chemin interne) ou http(s):// (lien externe)" value={linkForm.href} onChange={(e) => setLinkForm({ ...linkForm, href: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="libelle-fr">Libellé (FR) *</label><input id="libelle-fr" required value={linkForm.labelFr} onChange={(e) => setLinkForm({ ...linkForm, labelFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="libelle-en">Libellé (EN)</label><input id="libelle-en" value={linkForm.labelEn} onChange={(e) => setLinkForm({ ...linkForm, labelEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien-chemin-interne-ex-contact">Lien (chemin interne, ex: /contact) *</label><input id="lien-chemin-interne-ex-contact" required value={linkForm.href} onChange={(e) => setLinkForm({ ...linkForm, href: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditLink(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>

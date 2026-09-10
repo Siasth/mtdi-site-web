@@ -383,8 +383,8 @@ export default function AdminActualites() {
             {activeLang === "fr" ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
-                  <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-francais">Titre (Français) *</label>
+                  <input id="titre-francais" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
@@ -421,8 +421,8 @@ export default function AdminActualites() {
                   <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français (onglet précédent).</p>
                 )}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (English)</label>
-                  <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-english">Titre (English)</label>
+                  <input id="titre-english" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (English)</label>
@@ -436,8 +436,8 @@ export default function AdminActualites() {
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Classement</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catégorie *</label>
-                  <select
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="categorie">Catégorie *</label>
+                  <select id="categorie"
                     required
                     value={form.categoryId}
                     onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
@@ -448,8 +448,8 @@ export default function AdminActualites() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Lien externe (optionnel)</label>
-                  <input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="lien-externe-optionnel">Lien externe (optionnel)</label>
+                  <input id="lien-externe-optionnel" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.hrefExternal} onChange={(e) => setForm({ ...form, hrefExternal: e.target.value })} placeholder="https://..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   <p className="text-xs text-gray-400 mt-1">Si renseigné, l'article renvoie vers ce lien au lieu d'une page de détail interne.</p>
                 </div>
               </div>
@@ -469,8 +469,8 @@ export default function AdminActualites() {
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Publication</p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Statut</label>
-                  <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="statut">Statut</label>
+                  <select id="statut" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
                     <option value="brouillon">Brouillon</option>
                     <option value="publie">Publié</option>
                     <option value="depublie">Dépublié</option>
@@ -478,16 +478,16 @@ export default function AdminActualites() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Date de publication *</label>
-                  <input required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="date-de-publication">Date de publication *</label>
+                  <input id="date-de-publication" required type="date" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   <p className="text-xs text-gray-400 mt-1">Date affichée et utilisée pour le tri — pas la visibilité (voir ci-dessous).</p>
                 </div>
               </div>
 
               {form.status === "publie" && (
                 <div className="mt-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Publier plus tard (optionnel)</label>
-                  <input
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="publier-plus-tard-optionnel">Publier plus tard (optionnel)</label>
+                  <input id="publier-plus-tard-optionnel"
                     type="datetime-local"
                     value={form.scheduledAt}
                     onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
@@ -515,8 +515,8 @@ export default function AdminActualites() {
                   </span>
                 </label>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                  <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                  <label className="text-sm text-gray-700" htmlFor="ordre-d-affichage">Ordre d'affichage</label>
+                  <input id="ordre-d-affichage" type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
                 </div>
               </div>
             </div>

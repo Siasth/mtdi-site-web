@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
-import { hasPerm } from "@/lib/permissions";
+import { hasPerm, withRequiredViewPermissions } from "@/lib/permissions";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -27,8 +27,11 @@ export async function PATCH(
   `;
 
   if (Array.isArray(permissionCodes)) {
+    // ANO-153 : filet de sécurité serveur — complète les "voir" manquants
+    // même si la requête ne vient pas de l'interface standard du back-office.
+    const completedCodes = withRequiredViewPermissions(permissionCodes as string[]);
     await sql`DELETE FROM role_permissions WHERE role_id = ${id}`;
-    for (const code of permissionCodes as string[]) {
+    for (const code of completedCodes) {
       const perm = await sql`SELECT id FROM permissions WHERE code = ${code}`;
       if (perm.rows[0]) {
         await sql`

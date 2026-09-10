@@ -75,6 +75,48 @@ export const PERMISSIONS = [
 
 export type PermissionCode = (typeof PERMISSIONS)[number]["code"];
 
+// ANO-153 : une permission d'action (créer/modifier/supprimer/restaurer/gérer)
+// n'a aucun sens sans la permission de visualisation correspondante — on ne
+// peut pas "modifier" un contenu qu'on ne peut pas "voir" dans l'écran
+// back-office. La dépendance se déduit du préfixe du code (tout avant le
+// dernier point), PAS du champ "module" : plusieurs groupes de permissions
+// indépendants (ex. "actualites.*", "categories.*", "mediatheque.*")
+// partagent le même module pour l'affichage, sans dépendre les uns des
+// autres.
+
+function permissionPrefix(code: string): string {
+  return code.slice(0, code.lastIndexOf("."));
+}
+
+// Le "voir" dont dépend ce code, si un tel code existe dans le catalogue
+// (certaines permissions, ex. "securite.modifier", sont autonomes : pas de
+// "securite.voir" séparé, donc pas de dépendance).
+export function getRequiredViewPermission(code: PermissionCode): PermissionCode | null {
+  if (code.endsWith(".voir")) return null;
+  const viewCode = `${permissionPrefix(code)}.voir`;
+  return (PERMISSIONS.some((p) => p.code === viewCode) ? (viewCode as PermissionCode) : null);
+}
+
+// Tous les codes qui dépendent de ce "voir" (même préfixe, action différente
+// de "voir") : à retirer si on décoche le "voir" correspondant.
+export function getDependentPermissions(code: PermissionCode): PermissionCode[] {
+  if (!code.endsWith(".voir")) return [];
+  const prefix = permissionPrefix(code);
+  return PERMISSIONS.filter((p) => p.code !== code && permissionPrefix(p.code) === prefix).map((p) => p.code);
+}
+
+// Complète un ensemble de codes pour qu'il respecte toutes les dépendances
+// (ajoute les "voir" manquants). Utilisé côté serveur en filet de sécurité,
+// au cas où une requête API contournerait l'interface du back-office.
+export function withRequiredViewPermissions(codes: string[]): string[] {
+  const result = new Set(codes);
+  for (const code of codes) {
+    const dep = getRequiredViewPermission(code as PermissionCode);
+    if (dep) result.add(dep);
+  }
+  return Array.from(result);
+}
+
 // Libellés et ordre d'affichage des groupes dans l'écran Rôles.
 export const PERMISSION_CATEGORIES: { key: "editorial" | "technique"; label: string; description: string }[] = [
   { key: "editorial", label: "Contenu éditorial", description: "Ce qui est visible sur le site public" },

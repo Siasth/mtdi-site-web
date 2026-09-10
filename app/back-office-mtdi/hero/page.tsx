@@ -237,14 +237,14 @@ export default function AdminHero() {
 
             {activeLang === "fr" ? (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Texte alternatif (Français) *</label>
-                <input required value={form.altFr} onChange={(e) => setForm({ ...form, altFr: e.target.value })} placeholder="Décrit l'image pour l'accessibilité" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="texte-alternatif-francais">Texte alternatif (Français) *</label>
+                <input id="texte-alternatif-francais" required value={form.altFr} onChange={(e) => setForm({ ...form, altFr: e.target.value })} placeholder="Décrit l'image pour l'accessibilité" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             ) : (
               <div>
                 {!form.altFr && <p className="text-xs text-amber-600 mb-2">Renseignez d'abord le texte français.</p>}
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Alt text (English)</label>
-                <input value={form.altEn} onChange={(e) => setForm({ ...form, altEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="alt-text-english">Alt text (English)</label>
+                <input id="alt-text-english" value={form.altEn} onChange={(e) => setForm({ ...form, altEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
             )}
 
@@ -254,8 +254,8 @@ export default function AdminHero() {
                 Visible sur le site
               </label>
               <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                <input type="number" value={form.displayOrder || ""} placeholder="0" onChange={(e) => setForm({ ...form, displayOrder: e.target.value === "" ? 0 : Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                <label className="text-sm text-gray-700" htmlFor="ordre-d-affichage">Ordre d'affichage</label>
+                <input id="ordre-d-affichage" type="number" value={form.displayOrder || ""} placeholder="0" onChange={(e) => setForm({ ...form, displayOrder: e.target.value === "" ? 0 : Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 

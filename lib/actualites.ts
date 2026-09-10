@@ -71,13 +71,6 @@ export async function getActualites(locale: Locale, limit?: number): Promise<Act
 }
 
 // Un seul article publié, par id (page de détail interne).
-// ANO-140 : permet de distinguer un ID qui n'existe pas du tout (vraie 404)
-// d'un article existant mais non publié (message spécifique côté page).
-export async function actualiteExistsButUnpublished(id: number): Promise<boolean> {
-  const result = await sql`SELECT id FROM actualites WHERE id = ${id} AND deleted_at IS NULL`;
-  return result.rows.length > 0;
-}
-
 export async function getActualiteById(id: number, locale: Locale): Promise<Actualite | null> {
   const result = await sql`
     SELECT a.*, c.name_fr AS cat_name_fr, c.name_en AS cat_name_en, c.color AS cat_color
@@ -87,6 +80,14 @@ export async function getActualiteById(id: number, locale: Locale): Promise<Actu
   `;
   if (result.rows.length === 0) return null;
   return mapRow(result.rows[0], locale);
+}
+
+// Distingue "l'article n'a jamais existé" (404 classique) de "l'article a
+// existé mais a été dépublié/archivé/supprimé depuis" : dans ce second cas on
+// affiche un message plus clair que la page 404 générique.
+export async function actualiteExistsButUnpublished(id: number): Promise<boolean> {
+  const result = await sql`SELECT 1 FROM actualites WHERE id = ${id} LIMIT 1`;
+  return result.rows.length > 0;
 }
 
 // Articles de la même catégorie (pour la colonne "Articles similaires").

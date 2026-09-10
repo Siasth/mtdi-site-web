@@ -78,19 +78,19 @@ export default function AdminCabinet() {
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Niveau hiérarchique</label><input type="number" min={0} value={form.level} onChange={(e) => setForm({ ...form, level: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div className="col-span-2"><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur</label><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-full rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="niveau-hierarchique">Niveau hiérarchique</label><input id="niveau-hierarchique" type="number" min={0} value={form.level} onChange={(e) => setForm({ ...form, level: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+              <div className="col-span-2"><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="couleur">Couleur</label><input id="couleur" type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-full rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
             </div>
             {activeLang === "fr" ? (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Rôle (FR) *</label><input required value={form.roleFr} onChange={(e) => setForm({ ...form, roleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Direction/Service (FR)</label><input value={form.directionFr} onChange={(e) => setForm({ ...form, directionFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="role-fr">Rôle (FR) *</label><input id="role-fr" required value={form.roleFr} onChange={(e) => setForm({ ...form, roleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="direction-service-fr">Direction/Service (FR)</label><input id="direction-service-fr" value={form.directionFr} onChange={(e) => setForm({ ...form, directionFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
               </>
             ) : (
               <>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Role (EN)</label><input value={form.roleEn} onChange={(e) => setForm({ ...form, roleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Direction/Service (EN)</label><input value={form.directionEn} onChange={(e) => setForm({ ...form, directionEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="role-en">Role (EN)</label><input id="role-en" value={form.roleEn} onChange={(e) => setForm({ ...form, roleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="direction-service-en">Direction/Service (EN)</label><input id="direction-service-en" value={form.directionEn} onChange={(e) => setForm({ ...form, directionEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
               </>
             )}

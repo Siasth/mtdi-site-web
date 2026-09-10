@@ -5,7 +5,7 @@ import { Pagination, paginate } from "../components/Pagination";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { useHasPermission } from "../AdminLayoutClient";
 import { DeleteIcon } from "../components/ActionIcons";
-import { PERMISSIONS, PERMISSION_CATEGORIES, PERMISSION_MODULES } from "@/lib/permissions";
+import { PERMISSIONS, PERMISSION_CATEGORIES, PERMISSION_MODULES, getRequiredViewPermission, getDependentPermissions, type PermissionCode } from "@/lib/permissions";
 
 const VERT = "#006828";
 
@@ -53,7 +53,21 @@ export default function AdminRoles() {
 
   function toggleCode(code: string) {
     const next = new Set(checkedCodes);
-    if (next.has(code)) next.delete(code); else next.add(code);
+    if (next.has(code)) {
+      next.delete(code);
+      // ANO-153 : décocher "voir" retire aussi toutes les permissions
+      // d'action qui en dépendent (impossible de garder "modifier" sans
+      // "voir").
+      for (const dependent of getDependentPermissions(code as PermissionCode)) {
+        next.delete(dependent);
+      }
+    } else {
+      next.add(code);
+      // Cocher une permission d'action implique automatiquement la
+      // permission de visualisation correspondante.
+      const requiredView = getRequiredViewPermission(code as PermissionCode);
+      if (requiredView) next.add(requiredView);
+    }
     setCheckedCodes(next);
   }
 
@@ -185,12 +199,12 @@ export default function AdminRoles() {
               <ModalCloseButton onClick={() => setShowCreate(false)} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom du rôle *</label>
-              <input required value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-du-role">Nom du rôle *</label>
+              <input id="nom-du-role" required value={newRoleName} onChange={(e) => setNewRoleName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description</label>
-              <input value={newRoleDesc} onChange={(e) => setNewRoleDesc(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="description">Description</label>
+              <input id="description" value={newRoleDesc} onChange={(e) => setNewRoleDesc(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <PermissionChecklist allPermissions={allPermissions} checkedCodes={checkedCodes} onToggle={toggleCode} onToggleMany={toggleMany} disabled={false} />
             <div className="flex gap-2 pt-2">
@@ -289,18 +303,31 @@ function PermissionChecklist({
                       <span className="text-xs font-bold uppercase tracking-widest text-gray-500">{mod.label}</span>
                     </label>
                     <div className="space-y-1.5 pl-6">
-                      {perms.map((p) => (
-                        <label key={p.code} className="flex items-start gap-2 text-sm text-gray-700">
-                          <input
-                            type="checkbox"
-                            checked={checkedCodes.has(p.code)}
-                            onChange={() => onToggle(p.code)}
-                            disabled={disabled}
-                            className="mt-0.5"
-                          />
-                          <span>{p.description}</span>
-                        </label>
-                      ))}
+                      {perms.map((p) => {
+                        const requiredView = getRequiredViewPermission(p.code as PermissionCode);
+                        return (
+                          <label key={p.code} className="flex items-start gap-2 text-sm text-gray-700">
+                            <input
+                              type="checkbox"
+                              checked={checkedCodes.has(p.code)}
+                              onChange={() => onToggle(p.code)}
+                              disabled={disabled}
+                              className="mt-0.5"
+                            />
+                            <span>
+                              {p.description}
+                              {/* ANO-153 : rend la dépendance visible en permanence
+                                  plutôt que de cocher "voir" en silence sans que
+                                  l'admin comprenne pourquoi (cocher cette case coche
+                                  aussi "Voir" automatiquement, décocher "Voir"
+                                  décoche celle-ci). */}
+                              {requiredView && (
+                                <span className="block text-[11px] text-gray-400">Nécessite « Voir »</span>
+                              )}
+                            </span>
+                          </label>
+                        );
+                      })}
                     </div>
                   </div>
                 );

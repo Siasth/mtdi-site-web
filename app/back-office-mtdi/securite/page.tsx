@@ -88,8 +88,8 @@ export default function AdminSecurite() {
         <p className="text-xs text-gray-400 mb-4">{email}</p>
         <form onSubmit={handleNameChange} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-complet">Nom complet</label>
+            <input id="nom-complet" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           {nameMsg && <p className={`text-sm ${nameMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{nameMsg.text}</p>}
           <button type="submit" disabled={nameLoading} className="px-4 py-2 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
@@ -102,17 +102,17 @@ export default function AdminSecurite() {
         <h2 className="font-bold text-gray-900 mb-4">Changer mon mot de passe</h2>
         <form onSubmit={handlePasswordChange} className="space-y-3">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mot de passe actuel</label>
-            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="mot-de-passe-actuel">Mot de passe actuel</label>
+            <input id="mot-de-passe-actuel" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nouveau mot de passe</label>
-            <input type="password" minLength={12} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nouveau-mot-de-passe">Nouveau mot de passe</label>
+            <input id="nouveau-mot-de-passe" type="password" minLength={12} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             <p className="text-xs text-gray-400 mt-1">12 caractères minimum. Une phrase facile à retenir mais longue est préférable à un mot court avec des symboles.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Confirmer le nouveau mot de passe</label>
-            <input type="password" minLength={12} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="confirmer-le-nouveau-mot-de-passe">Confirmer le nouveau mot de passe</label>
+            <input id="confirmer-le-nouveau-mot-de-passe" type="password" minLength={12} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           {pwdMsg && <p className={`text-sm ${pwdMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{pwdMsg.text}</p>}
           <button type="submit" disabled={pwdLoading} className="px-4 py-2 text-sm font-bold uppercase tracking-wider text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>

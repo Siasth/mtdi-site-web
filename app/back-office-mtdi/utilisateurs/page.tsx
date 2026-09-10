@@ -218,26 +218,26 @@ export default function AdminUtilisateurs() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom complet *</label>
-              <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-complet">Nom complet *</label>
+              <input id="nom-complet" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email *</label>
-              <input required type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email">Email *</label>
+              <input id="email" required type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Rôle *</label>
-              <select required value={form.roleId} onChange={(e) => setForm({ ...form, roleId: e.target.value })}
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="role">Rôle *</label>
+              <select id="role" required value={form.roleId} onChange={(e) => setForm({ ...form, roleId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
                 <option value="">Sélectionner...</option>
                 {roles.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Mot de passe initial *</label>
-              <input required type="text" minLength={12} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="mot-de-passe-initial">Mot de passe initial *</label>
+              <input id="mot-de-passe-initial" required type="text" minLength={12} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               <p className="text-xs text-gray-400 mt-1">12 caractères minimum. L'utilisateur devra le changer à sa première connexion.</p>
             </div>
@@ -286,8 +286,8 @@ export default function AdminUtilisateurs() {
               </div>
               <p className="text-sm text-gray-500">Pour <strong>{resetTarget.name}</strong> ({resetTarget.email})</p>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nouveau mot de passe *</label>
-                <input required type="text" minLength={12} value={resetPassword} onChange={(e) => setResetPassword(e.target.value)}
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nouveau-mot-de-passe">Nouveau mot de passe *</label>
+                <input id="nouveau-mot-de-passe" required type="text" minLength={12} value={resetPassword} onChange={(e) => setResetPassword(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" autoFocus />
                 <p className="text-xs text-gray-400 mt-1">12 caractères minimum. La personne devra le changer à sa prochaine connexion.</p>
               </div>

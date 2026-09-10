@@ -282,17 +282,17 @@ export default function AdminChantiers() {
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Numéro</label>
-                    <input value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} placeholder="01" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="numero">Numéro</label>
+                    <input id="numero" value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} placeholder="01" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                   <div className="col-span-2">
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre (Français) *</label>
-                    <input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-francais">Titre (Français) *</label>
+                    <input id="titre-francais" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Sous-titre</label>
-                  <input value={form.subtitleFr} onChange={(e) => setForm({ ...form, subtitleFr: e.target.value })} placeholder="ex : SNIAM 2023-2027" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="sous-titre">Sous-titre</label>
+                  <input id="sous-titre" value={form.subtitleFr} onChange={(e) => setForm({ ...form, subtitleFr: e.target.value })} placeholder="ex : SNIAM 2023-2027" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
@@ -307,12 +307,12 @@ export default function AdminChantiers() {
               <div className="space-y-4">
                 {!form.titleFr && <p className="text-xs text-amber-600">Renseignez d'abord le contenu en français.</p>}
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Title (English)</label>
-                  <input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="title-english">Title (English)</label>
+                  <input id="title-english" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Subtitle (English)</label>
-                  <input value={form.subtitleEn} onChange={(e) => setForm({ ...form, subtitleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="subtitle-english">Subtitle (English)</label>
+                  <input id="subtitle-english" value={form.subtitleEn} onChange={(e) => setForm({ ...form, subtitleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
@@ -386,8 +386,8 @@ export default function AdminChantiers() {
                 Visible sur le site
               </label>
               <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-700">Ordre d'affichage</label>
-                <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+                <label className="text-sm text-gray-700" htmlFor="ordre-d-affichage">Ordre d'affichage</label>
+                <input id="ordre-d-affichage" type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-16 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
               </div>
             </div>
 

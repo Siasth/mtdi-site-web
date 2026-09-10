@@ -62,8 +62,8 @@ export default function AdminVideos() {
               <h2 className="font-bold text-gray-900 text-lg">{editing === "new" ? "Nouvelle vidéo" : "Modifier"}</h2>
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (FR) *</label><input required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Titre (EN)</label><input value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-fr">Titre (FR) *</label><input id="titre-fr" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-en">Titre (EN)</label><input id="titre-en" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="grid grid-cols-4 gap-3">
               <input value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} placeholder="Date" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               {(() => {
@@ -89,8 +89,8 @@ export default function AdminVideos() {
               })()}
               <input value={form.source} onChange={(e) => setForm({ ...form, source: e.target.value })} placeholder="Source" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Lien YouTube *</label><input required value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur de vignette</label><input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-20 h-9 rounded border border-gray-200" /><ColorContrastHint color={form.color} /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien-youtube">Lien YouTube *</label><input id="lien-youtube" required value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="couleur-de-vignette">Couleur de vignette</label><input id="couleur-de-vignette" type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-20 h-9 rounded border border-gray-200" /><ColorContrastHint color={form.color} /></div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>

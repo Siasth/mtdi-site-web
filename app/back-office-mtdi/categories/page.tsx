@@ -155,24 +155,24 @@ export default function AdminCategories() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (Français) *</label>
-              <input required value={form.nameFr} onChange={(e) => setForm({ ...form, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-francais">Nom (Français) *</label>
+              <input id="nom-francais" required value={form.nameFr} onChange={(e) => setForm({ ...form, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nom (English)</label>
-              <input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-english">Nom (English)</label>
+              <input id="nom-english" value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Couleur</label>
-                <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-8 rounded border border-gray-200 cursor-pointer" />
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider" htmlFor="couleur">Couleur</label>
+                <input id="couleur" type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-8 rounded border border-gray-200 cursor-pointer" />
                 <span className="text-xs text-gray-400 font-mono">{form.color}</span>
               </div>
               <ColorContrastHint color={form.color} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ordre d'affichage</label>
-              <input type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="ordre-d-affichage">Ordre d'affichage</label>
+              <input id="ordre-d-affichage" type="number" value={form.displayOrder} onChange={(e) => setForm({ ...form, displayOrder: Number(e.target.value) })} className="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm" />
             </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
