@@ -162,7 +162,7 @@ export default async function ActualiteDetailPage({ params }: Props) {
                           className="flex-shrink-0 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white rounded"
                           style={{ background: BANNER }}
                         >
-                          {a.kind === "link" ? (isEn ? "Open" : "Ouvrir") : (isEn ? "Download" : "Télécharger")}
+                          {a.kind === "link" ? (isEn ? "Open" : "Ouvrir") : (isEn ? "View/Download" : "Visualiser/Télécharger")}
                         </span>
                       </a>
                     ))}

@@ -3,6 +3,7 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import Link from "next/link";
 import { getOpportunites } from "@/lib/opportunites";
+import { getGeneralSettings } from "@/lib/general-settings";
 import OffersListClient from "./OffersListClient";
 
 const VERT       = "#162233";
@@ -25,6 +26,7 @@ export default async function ParticiperPage({ params }: Props) {
     getOpportunites(isEn ? "en" : "fr", "stages"),
     getOpportunites(isEn ? "en" : "fr", "appels-offres"),
   ]);
+  const { appelsOffresExternalUrl } = await getGeneralSettings();
 
   const sections = [
     {
@@ -40,7 +42,7 @@ export default async function ParticiperPage({ params }: Props) {
       ),
       status: null as string | null,
       message: t.appelsOffresMessage,
-      cta: { label: t.consulterAppelsOffres, href: "https://appels-offres.gouv.bj/", external: true },
+      cta: { label: t.consulterAppelsOffres, href: appelsOffresExternalUrl, external: true },
       bg: "bg-white",
       offers: offresAppelsOffres,
     },
@@ -109,7 +111,7 @@ export default async function ParticiperPage({ params }: Props) {
           <section
             key={section.id}
             id={section.id}
-            className={`px-4 sm:px-6 lg:px-8 py-20 ${section.bg}`}
+            className={`px-4 sm:px-6 lg:px-8 py-20 scroll-mt-20 ${section.bg}`}
             style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}
           >
             <div className="max-w-7xl mx-auto">

@@ -50,10 +50,14 @@ export default function DocumentListClient({ documents, dict, locale }: { docume
           </div>
 
           <div className="relative flex-shrink-0 w-full sm:w-64">
+            <label htmlFor="documentheque-search" className="sr-only">
+              {locale === "en" ? "Search a document" : "Rechercher un document"}
+            </label>
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" fill="none" stroke="rgba(26,26,26,0.4)" strokeWidth="2.2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" />
             </svg>
             <input
+              id="documentheque-search"
               type="search"
               value={query}
               onChange={(e) => { setQuery(e.target.value); setPage(1); }}

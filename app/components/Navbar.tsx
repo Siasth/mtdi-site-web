@@ -129,9 +129,9 @@ export default function Navbar({ locale: _locale, dict }: { locale?: string; dic
     {
       title: s.participer ?? "PARTICIPER",
       links: [
-        { label: l.emploisRecrutement ?? "Emplois & recrutement", href: `${prefix}/participer` },
-        { label: l.stages ?? "Stages", href: `${prefix}/participer` },
-        { label: l.appelsOffres ?? "Appels d'offres", href: `${prefix}/participer` },
+        { label: l.emploisRecrutement ?? "Emplois & recrutement", href: `${prefix}/participer#emplois` },
+        { label: l.stages ?? "Stages", href: `${prefix}/participer#stages` },
+        { label: l.appelsOffres ?? "Appels d'offres", href: `${prefix}/participer#appels-offres` },
         { label: l.ecrireAuMinistre ?? "Écrire au Ministre", href: `${prefix}/ecrire-au-ministre` },
       ],
     },

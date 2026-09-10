@@ -12,6 +12,12 @@ type Partner = { name: string; full: string; description: string; accent: string
 
 const partenairesInstitutionnels: Partner[] = [
   {
+    name: "Présidence",
+    full: "Présidence de la République du Bénin",
+    description: "Autorité de tutelle du gouvernement béninois, dont les priorités numériques guident la feuille de route du ministère.",
+    accent: "#006828",
+  },
+  {
     name: "APDP",
     full: "Autorité de Protection des Données Personnelles",
     description: "Instance nationale de contrôle du traitement des données à caractère personnel, garante du respect de la vie privée numérique au Bénin.",
@@ -23,12 +29,6 @@ const partenairesInstitutionnels: Partner[] = [
     description: "Gère l'identité civile et délivre les documents d'identité officiels des citoyens béninois, dont le programme MonIdentité.bj.",
     accent: "#006828",
     logoSrc: "/logo-anip.png",
-  },
-  {
-    name: "Présidence",
-    full: "Présidence de la République du Bénin",
-    description: "Autorité de tutelle du gouvernement béninois, dont les priorités numériques guident la feuille de route du ministère.",
-    accent: "#006828",
   },
   {
     name: "Sèmè City",

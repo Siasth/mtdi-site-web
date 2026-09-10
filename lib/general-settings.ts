@@ -22,6 +22,8 @@ export type GeneralSettings = {
   openingHoursFr: string;
   openingHoursEn: string;
   locationMapUrl: string; // optionnel : lien vers une carte (Google Maps...)
+  strategieIaDocUrl: string; // lien de téléchargement du document PDF de la SNIA
+  appelsOffresExternalUrl: string; // lien externe "Consulter les appels d'offres" (page Participer)
 };
 
 export const GENERAL_SETTINGS_DEFAULTS: GeneralSettings = {
@@ -45,6 +47,8 @@ export const GENERAL_SETTINGS_DEFAULTS: GeneralSettings = {
   openingHoursFr: "Lundi – Vendredi : 8h00 – 17h00",
   openingHoursEn: "Monday – Friday: 8:00 AM – 5:00 PM",
   locationMapUrl: "",
+  strategieIaDocUrl: "https://innovation.gouv.bj/assets/Documents/sniam-2023-2027.pdf",
+  appelsOffresExternalUrl: "https://appels-offres.gouv.bj/",
 };
 
 // Utilisable côté serveur (Server Components, routes API) : lecture directe

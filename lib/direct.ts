@@ -1,4 +1,5 @@
 import { sql } from "@/lib/db";
+import { formatDateTime } from "@/lib/format-date";
 
 export type UpcomingEvent = { id: number; date: string; title: string; description: string };
 export type Replay = { id: number; title: string; source: string; date: string; url: string };
@@ -11,7 +12,7 @@ export async function getUpcomingEvents(locale: Locale): Promise<UpcomingEvent[]
   `;
   return result.rows.map((r) => ({
     id: r.id as number,
-    date: new Date(r.event_date as string).toISOString(),
+    date: formatDateTime(new Date(r.event_date as string).toISOString(), locale),
     title: (locale === "en" && r.title_en ? r.title_en : r.title_fr) as string,
     description: ((locale === "en" && r.description_en ? r.description_en : r.description_fr) as string) || "",
   }));
@@ -26,7 +27,7 @@ export async function getReplays(locale: Locale): Promise<Replay[]> {
     id: r.id as number,
     title: (locale === "en" && r.title_en ? r.title_en : r.title_fr) as string,
     source: (r.source as string) || "",
-    date: r.replay_date ? new Date(r.replay_date as string).toISOString() : "",
+    date: r.replay_date ? formatDateTime(new Date(r.replay_date as string).toISOString(), locale) : "",
     url: r.url as string,
   }));
 }

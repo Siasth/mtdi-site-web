@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     // silencieusement (aucune image ne s'affiche, aucune erreur visible).
     remotePatterns: [
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+      { protocol: "https", hostname: "img.youtube.com" },
     ],
   },
   // Les routes API lisent les fichiers data/*.json avec un nom de fichier

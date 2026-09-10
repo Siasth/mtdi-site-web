@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import type { GalerieItem, GalerieCollection } from "@/lib/galerie";
 import { Pagination, paginate } from "@/app/components/Pagination";
+import GalerieLightbox from "./GalerieLightbox";
 
 const VERT = "#006828";
 const ROUGE = "#EB0000";
@@ -28,6 +29,7 @@ export default function GalerieListClient({
   const [activeFilter, setActiveFilter] = useState<number | "all">("all");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const prefix = locale === "en" ? "/en" : "";
 
   const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -75,6 +77,9 @@ export default function GalerieListClient({
         }];
 
   const resultLabel = filtered.length > 1 ? dict.resultatsPluriel : dict.resultats;
+
+  const isLightboxable = (item: GalerieItem) => !item.hrefExternal && !item.videoUrl && !!item.image;
+  const lightboxPhotos = sections.flatMap((s) => s.items).filter(isLightboxable);
 
   function formatDate(iso: string | null) {
     if (!iso) return "";
@@ -169,12 +174,21 @@ export default function GalerieListClient({
                 {section.items.map((item) => {
                   const href = item.hrefExternal || item.videoUrl || (item.image ? item.image : "#");
                   const isExternal = !!(item.hrefExternal || item.videoUrl);
+                  const openInLightbox = isLightboxable(item);
                   return (
                     <a
                       key={item.id}
                       href={href}
                       target={isExternal ? "_blank" : undefined}
                       rel={isExternal ? "noopener noreferrer" : undefined}
+                      onClick={
+                        openInLightbox
+                          ? (e) => {
+                              e.preventDefault();
+                              setLightboxIndex(lightboxPhotos.findIndex((p) => p.id === item.id));
+                            }
+                          : undefined
+                      }
                       className="group bg-white hover:bg-gris-perle transition-colors block"
                     >
                       <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16 / 10" }}>
@@ -184,7 +198,7 @@ export default function GalerieListClient({
                           <div className="absolute inset-0" style={{ background: "#162233" }} />
                         )}
 
-                        {item.type === "video" && (
+                        {item.type === "video" && item.videoUrl && (
                           <>
                             <div className="absolute inset-0 flex items-center justify-center z-10">
                               <div className="w-16 h-16 rounded-full flex items-center justify-center opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all" style={{ background: "rgba(0,0,0,0.5)", border: "2px solid rgba(255,255,255,0.4)" }}>
@@ -226,6 +240,16 @@ export default function GalerieListClient({
       </div>
 
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
+
+      {lightboxIndex !== null && lightboxPhotos.length > 0 && (
+        <GalerieLightbox
+          items={lightboxPhotos}
+          index={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+          onNavigate={setLightboxIndex}
+          formatDate={formatDate}
+        />
+      )}
       <style>{`
         .prose-institutionnel p { margin: 0.3em 0; }
         .prose-institutionnel strong { font-weight: 900; }

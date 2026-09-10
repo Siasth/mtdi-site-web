@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { VideoItem } from "@/lib/videos";
 import { Pagination, paginate } from "@/app/components/Pagination";
+import { getYoutubeThumbnail } from "@/lib/youtube-thumbnail";
 
 const VERT  = "#162233";
 const ROUGE = "#EB0000";
@@ -18,7 +20,9 @@ export default function VideothequeListClient({ videos, dict }: { videos: VideoI
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
-        {pageItems.map((video) => (
+        {pageItems.map((video) => {
+          const thumbnail = getYoutubeThumbnail(video.url);
+          return (
           <article key={video.id} className="group bg-white hover:bg-gris-perle transition-colors">
             {/* Thumbnail */}
             <Link
@@ -29,12 +33,22 @@ export default function VideothequeListClient({ videos, dict }: { videos: VideoI
               className="block relative w-full"
               style={{ aspectRatio: "16 / 9" }}
             >
-              <div className="absolute inset-0" style={{ background: video.color }}>
-                <div
-                  className="absolute inset-0 opacity-20"
-                  style={{ backgroundImage: "radial-gradient(circle at 40% 40%, rgba(255,255,255,0.2) 0%, transparent 65%)" }}
+              {thumbnail ? (
+                <Image
+                  src={thumbnail}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
-              </div>
+              ) : (
+                <div className="absolute inset-0" style={{ background: video.color }}>
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{ backgroundImage: "radial-gradient(circle at 40% 40%, rgba(255,255,255,0.2) 0%, transparent 65%)" }}
+                  />
+                </div>
+              )}
 
               {/* Play button */}
               <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -86,7 +100,8 @@ export default function VideothequeListClient({ videos, dict }: { videos: VideoI
               </div>
             </div>
           </article>
-        ))}
+          );
+        })}
       </div>
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
     </>

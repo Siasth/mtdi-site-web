@@ -4,6 +4,7 @@ import Footer from "../../components/Footer";
 import StrategieIASubNav from "../../components/StrategieIASubNav";
 import Link from "next/link";
 import { getPiliers } from "@/lib/strategie-ia-content";
+import { getGeneralSettings } from "@/lib/general-settings";
 import { IconPreset } from "../../components/IconPreset";
 
 const VERT  = "#006828";
@@ -25,6 +26,7 @@ export default async function StrategieIAPage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.strategie;
   const piliers = await getPiliers(locale === "en" ? "en" : "fr");
+  const { strategieIaDocUrl } = await getGeneralSettings();
 
   return (
     <>
@@ -54,7 +56,7 @@ export default async function StrategieIAPage({ params }: Props) {
 
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
-                href="https://innovation.gouv.bj/assets/Documents/sniam-2023-2027.pdf"
+                href={strategieIaDocUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-7 py-4 text-sm font-black uppercase tracking-wider transition-all hover:gap-5"
@@ -127,7 +129,7 @@ export default async function StrategieIAPage({ params }: Props) {
               </p>
             </div>
             <a
-              href="https://innovation.gouv.bj/assets/Documents/sniam-2023-2027.pdf"
+              href={strategieIaDocUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-shrink-0 inline-flex items-center gap-3 px-8 py-4 text-sm font-black uppercase tracking-wider transition-all hover:gap-5"

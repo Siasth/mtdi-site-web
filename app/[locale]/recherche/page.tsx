@@ -220,9 +220,6 @@ function SearchContent() {
                                 {item.description && (
                                   <p className="text-sm text-gray-500 leading-relaxed">{item.description}</p>
                                 )}
-                                <p className="text-xs text-gray-400 mt-1.5 font-mono">
-                                  {isExternal ? item.href : `gouv.bj${item.href}`}
-                                </p>
                               </Link>
                             </article>
                           );

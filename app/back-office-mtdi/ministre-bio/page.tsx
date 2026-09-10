@@ -203,7 +203,7 @@ export default function AdminMinistreBio() {
             <button type="button" onClick={addParcours} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter une étape</button>
           </div>
           {parcours.map((item, i) => (
-            <div key={i} className="border border-gray-100 rounded-lg p-4 space-y-2 relative">
+            <div key={i} className="border border-gray-100 rounded-lg p-4 pt-9 space-y-2 relative">
               <button type="button" onClick={() => removeParcours(i)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xs">✕ Retirer</button>
               <div className="grid grid-cols-2 gap-3">
                 <input value={item.period} onChange={(e) => updateParcours(i, "period", e.target.value)} placeholder="Période (optionnel, ex: Mai 2026)" className="px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
@@ -220,10 +220,10 @@ export default function AdminMinistreBio() {
             <button type="button" onClick={addPriorite} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter une priorité</button>
           </div>
           {priorites.map((item, i) => (
-            <div key={i} className="border border-gray-100 rounded-lg p-4 space-y-2 relative">
+            <div key={i} className="border border-gray-100 rounded-lg p-4 pt-9 space-y-2 relative">
               <span className="absolute top-2 left-2 text-xs font-black text-gray-300">{String(i + 1).padStart(2, "0")}</span>
               <button type="button" onClick={() => removePriorite(i)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xs">✕ Retirer</button>
-              <input value={item.title} onChange={(e) => updatePriorite(i, "title", e.target.value)} placeholder="Titre de la priorité" className="w-full px-2 py-1.5 mt-4 border border-gray-200 rounded-lg text-sm font-semibold" />
+              <input value={item.title} onChange={(e) => updatePriorite(i, "title", e.target.value)} placeholder="Titre de la priorité" className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm font-semibold" />
               <textarea value={item.description} onChange={(e) => updatePriorite(i, "description", e.target.value)} placeholder="Description" rows={2} className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
             </div>
           ))}

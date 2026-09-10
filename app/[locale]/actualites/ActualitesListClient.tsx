@@ -44,44 +44,54 @@ export default function ActualitesListClient({
     <>
       {/* Filter tabs + recherche */}
       <section className="px-4 sm:px-6 lg:px-8 py-6 bg-white" style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}>
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
-          <div className="flex gap-px overflow-x-auto" role="list" aria-label="Filtrer par catégorie" style={{ scrollbarWidth: "none" }}>
-            <button
-              role="listitem"
-              onClick={() => { setActiveCategory(null); setPage(1); }}
-              className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest"
-              aria-current={activeCategory === null ? "true" : undefined}
-              style={{ background: activeCategory === null ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === null ? "white" : "rgba(26,26,26,0.65)" }}
-            >
-              {dict.tous}
-            </button>
-            {categories.map((cat) => (
+        <div className="max-w-7xl mx-auto flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+            <div className="flex gap-px overflow-x-auto" role="list" aria-label="Filtrer par catégorie" style={{ scrollbarWidth: "none" }}>
               <button
-                key={cat}
                 role="listitem"
-                onClick={() => { setActiveCategory(cat); setPage(1); }}
+                onClick={() => { setActiveCategory(null); setPage(1); }}
                 className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest"
-                aria-current={activeCategory === cat ? "true" : undefined}
-                style={{ background: activeCategory === cat ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat ? "white" : "rgba(26,26,26,0.65)" }}
+                aria-current={activeCategory === null ? "true" : undefined}
+                style={{ background: activeCategory === null ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === null ? "white" : "rgba(26,26,26,0.65)" }}
               >
-                {cat}
+                {dict.tous}
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  role="listitem"
+                  onClick={() => { setActiveCategory(cat); setPage(1); }}
+                  className="flex-shrink-0 px-5 py-2.5 text-xs font-black uppercase tracking-widest"
+                  aria-current={activeCategory === cat ? "true" : undefined}
+                  style={{ background: activeCategory === cat ? VERT : "rgba(0,0,0,0.04)", color: activeCategory === cat ? "white" : "rgba(26,26,26,0.65)" }}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative flex-shrink-0 w-full sm:w-64">
+              <label htmlFor="actualites-search" className="sr-only">
+                {locale === "en" ? "Search an article" : "Rechercher un article"}
+              </label>
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" fill="none" stroke="rgba(26,26,26,0.4)" strokeWidth="2.2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" />
+              </svg>
+              <input
+                id="actualites-search"
+                type="search"
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+                placeholder={locale === "en" ? "Search an article..." : "Rechercher un article..."}
+                className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
+                style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+              />
+            </div>
           </div>
 
-          <div className="relative flex-shrink-0 w-full sm:w-64">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="15" height="15" fill="none" stroke="rgba(26,26,26,0.4)" strokeWidth="2.2" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" strokeLinecap="round" />
-            </svg>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-              placeholder={locale === "en" ? "Search an article..." : "Rechercher un article..."}
-              className="w-full pl-9 pr-3 py-2.5 text-sm bg-gris-perle rounded-lg focus:outline-none focus:ring-1"
-              style={{ border: "1px solid rgba(0,0,0,0.08)" }}
-            />
-          </div>
+          <p className="text-xs font-semibold text-anthracite/50" aria-live="polite">
+            {filtered.length} {locale === "en" ? (filtered.length > 1 ? "results" : "result") : (filtered.length > 1 ? "résultats" : "résultat")}
+          </p>
         </div>
       </section>
 

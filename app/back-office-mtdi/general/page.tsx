@@ -13,6 +13,8 @@ type FormState = {
   facebook: string; twitter: string; linkedin: string; instagram: string; youtube: string;
   contactEmail: string; ministreEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
   openingHoursFr: string; openingHoursEn: string; locationMapUrl: string;
+  strategieIaDocUrl: string;
+  appelsOffresExternalUrl: string;
 };
 
 // Format assez permissif : chiffres, espaces, +, -, parenthèses (ex: +229 21 30 00 00)
@@ -42,6 +44,8 @@ export default function AdminGeneral() {
           contactAddressEn: d.contactAddressEn || "",
           openingHoursFr: d.openingHoursFr || "", openingHoursEn: d.openingHoursEn || "",
           locationMapUrl: d.locationMapUrl || "",
+          strategieIaDocUrl: d.strategieIaDocUrl || "",
+          appelsOffresExternalUrl: d.appelsOffresExternalUrl || "",
         });
         setLoading(false);
       });
@@ -239,6 +243,32 @@ export default function AdminGeneral() {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
             <p className="text-xs text-gray-400 mt-1">Affiche un lien "Voir sur la carte" sur la page Contact si renseigné.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Document de la Stratégie Nationale d'IA (lien de téléchargement)</label>
+            <input
+              type="url"
+              pattern={URL_PATTERN}
+              title="URL valide commençant par http:// ou https://"
+              value={form.strategieIaDocUrl}
+              onChange={(e) => setForm({ ...form, strategieIaDocUrl: e.target.value })}
+              placeholder="https://..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            />
+            <p className="text-xs text-gray-400 mt-1">Utilisé par le bouton "Télécharger la stratégie" sur la page Stratégie Nationale d'IA.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Plateforme externe des appels d'offres</label>
+            <input
+              type="url"
+              pattern={URL_PATTERN}
+              title="URL valide commençant par http:// ou https://"
+              value={form.appelsOffresExternalUrl}
+              onChange={(e) => setForm({ ...form, appelsOffresExternalUrl: e.target.value })}
+              placeholder="https://..."
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+            />
+            <p className="text-xs text-gray-400 mt-1">Utilisé sur la page "Participer" quand aucun appel d'offre n'est publié individuellement.</p>
           </div>
         </section>
 
