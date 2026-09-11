@@ -113,20 +113,20 @@ export default function AdminPartenaires() {
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="nom-sigle">Nom / sigle *</label><input id="nom-sigle" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ex: ANIP" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Logo (optionnel)</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="partenaire-logo-upload">Logo (optionnel)</label>
               {form.logoSrc && <img src={form.logoSrc} alt="" className="h-8 mb-2 object-contain" />}
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Choisir un logo"}<input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleLogoUpload} /></label>
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Import en cours…" : "Choisir un logo"}<input id="partenaire-logo-upload" type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleLogoUpload} /></label>
               {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             {activeLang === "fr" ? (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="intitule-complet-fr">Intitulé complet (FR) *</label><input id="intitule-complet-fr" required value={form.fullFr} onChange={(e) => setForm({ ...form, fullFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={3} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><MarkdownEditor id="description-fr" value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={3} /></div>
               </>
             ) : (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="full-name-en">Full name (EN)</label><input id="full-name-en" value={form.fullEn} onChange={(e) => setForm({ ...form, fullEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><MarkdownEditor id="description-en" value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} /></div>
               </>
             )}
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible sur le site</label>

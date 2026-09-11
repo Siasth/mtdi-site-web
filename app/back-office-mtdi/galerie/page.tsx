@@ -362,8 +362,8 @@ export default function AdminGalerie() {
                   <input id="titre-francais" required value={itemForm.titleFr} onChange={(e) => setItemForm({ ...itemForm, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
-                  <MarkdownEditor value={itemForm.descriptionFr} onChange={(v) => setItemForm({ ...itemForm, descriptionFr: v })} rows={3} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="description-francais">Description (Français)</label>
+                  <MarkdownEditor id="description-francais" value={itemForm.descriptionFr} onChange={(v) => setItemForm({ ...itemForm, descriptionFr: v })} rows={3} />
                 </div>
               </div>
             ) : (
@@ -374,8 +374,8 @@ export default function AdminGalerie() {
                   <input id="title-english" value={itemForm.titleEn} onChange={(e) => setItemForm({ ...itemForm, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
-                  <MarkdownEditor value={itemForm.descriptionEn} onChange={(v) => setItemForm({ ...itemForm, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="description-english">Description (English)</label>
+                  <MarkdownEditor id="description-english" value={itemForm.descriptionEn} onChange={(v) => setItemForm({ ...itemForm, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} />
                 </div>
               </div>
             )}
@@ -418,11 +418,11 @@ export default function AdminGalerie() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image *</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="galerie-image-upload">Image *</label>
               {itemForm.image && <img src={itemForm.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading ? "Envoi..." : "Choisir une image"}
-                <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("image", e)} />
+                {uploading ? "Import en cours…" : "Choisir une image"}
+                <input id="galerie-image-upload" type="file" accept="image/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("image", e)} />
               </label>
             </div>
 
@@ -431,7 +431,7 @@ export default function AdminGalerie() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="video-fichier-ou-lien-youtube">Vidéo (fichier ou lien YouTube)</label>
                 <input id="video-fichier-ou-lien-youtube" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                  {uploading ? "Envoi..." : "Ou uploader un fichier vidéo"}
+                  {uploading ? "Import en cours…" : "Ou uploader un fichier vidéo"}
                   <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("videoUrl", e)} />
                 </label>
               </div>

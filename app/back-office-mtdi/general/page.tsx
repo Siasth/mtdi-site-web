@@ -125,10 +125,10 @@ export default function AdminGeneral() {
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Identité</h2>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="nom-ministere">
               Nom complet du ministère <span className="text-red-500">*</span>
             </label>
-            <input value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="nom-ministere" value={form.siteName} onChange={(e) => setForm({ ...form, siteName: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="sigle">Sigle</label>
@@ -160,7 +160,7 @@ export default function AdminGeneral() {
               <div className="flex-1">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{label}</p>
                 <label className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50">
-                  {uploadingField === field ? "Envoi..." : "Changer"}
+                  {uploadingField === field ? "Import en cours…" : "Changer"}
                   <input type="file" accept="image/*" className="hidden" disabled={uploadingField !== null} onChange={(e) => handleUpload(field, e)} />
                 </label>
               </div>
@@ -189,10 +189,10 @@ export default function AdminGeneral() {
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Coordonnées (pied de page)</h2>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email-contact-general">
               Email de contact général <span className="text-red-500">*</span>
             </label>
-            <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="email-contact-general" value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email-destinataire-formulaire-ecrire-au-">

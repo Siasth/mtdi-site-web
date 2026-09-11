@@ -4,7 +4,7 @@ import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
-import { uploadFile } from "@/lib/client-upload";
+import { uploadFile, fileNameFromUrl } from "@/lib/client-upload";
 
 const VERT = "#006828";
 type Item = { id: number; title_fr: string; title_en: string | null; description_fr: string | null; description_en: string | null; type: string; href: string; display_order: number; active: boolean; deleted_at: string | null };
@@ -93,9 +93,9 @@ export default function AdminKitPresse() {
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-en">Titre (EN)</label><input id="titre-en" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><textarea id="description-fr" value={form.descriptionFr} onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })} rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Fichier *</label>
-              {form.href && <p className="text-xs text-gray-500 mb-2 truncate">{form.href}</p>}
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="kit-presse-fichier-upload">Fichier *</label>
+              {form.href && <p className="text-xs text-gray-500 mb-2 truncate">{fileNameFromUrl(form.href)}</p>}
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Import en cours…" : "Uploader un fichier"}<input id="kit-presse-fichier-upload" type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
               {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>

@@ -387,16 +387,17 @@ export default function AdminActualites() {
                   <input id="titre-francais" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (Français)</label>
-                  <MarkdownEditor value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={6} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="extrait-francais">Extrait (Français)</label>
+                  <MarkdownEditor id="extrait-francais" value={form.excerptFr} onChange={(v) => setForm({ ...form, excerptFr: v })} rows={6} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Temps de lecture</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="temps-lecture-valeur">Temps de lecture</label>
                   {(() => {
                     const { amount, unit } = parseDuration(form.readTime, READ_TIME_UNITS);
                     return (
                       <div className="flex gap-2 max-w-[220px]">
                         <input
+                          id="temps-lecture-valeur"
                           type="number" min={0} step={1} inputMode="numeric"
                           value={amount}
                           onChange={(e) => setForm({ ...form, readTime: formatDuration(e.target.value, unit) })}
@@ -404,6 +405,7 @@ export default function AdminActualites() {
                           className="w-20 px-3 py-2 border border-gray-200 rounded-lg text-sm"
                         />
                         <select
+                          aria-label="Unité du temps de lecture"
                           value={unit}
                           onChange={(e) => setForm({ ...form, readTime: formatDuration(amount, e.target.value) })}
                           className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm"
@@ -425,8 +427,8 @@ export default function AdminActualites() {
                   <input id="titre-english" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Extrait (English)</label>
-                  <MarkdownEditor value={form.excerptEn} onChange={(v) => setForm({ ...form, excerptEn: v })} placeholder="Laisser vide si pas encore traduit" rows={6} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="extrait-english">Extrait (English)</label>
+                  <MarkdownEditor id="extrait-english" value={form.excerptEn} onChange={(v) => setForm({ ...form, excerptEn: v })} placeholder="Laisser vide si pas encore traduit" rows={6} />
                 </div>
               </div>
             )}
@@ -454,11 +456,11 @@ export default function AdminActualites() {
                 </div>
               </div>
               <div className="mt-4">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="actualite-image-upload">Image</label>
                 {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                  {uploading ? "Envoi..." : "Choisir une image"}
-                  <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
+                  {uploading ? "Import en cours…" : "Choisir une image"}
+                  <input id="actualite-image-upload" type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
                 </label>
                 {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
               </div>
@@ -522,9 +524,9 @@ export default function AdminActualites() {
             </div>
 
             <div className="pt-2 border-t border-gray-100">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+              <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                 Ressources associées
-              </label>
+              </p>
               <p className="text-xs text-gray-400 mb-3">
                 Documents, ou liens vers la Galerie, la Vidéothèque, un article externe, etc.
               </p>
@@ -543,7 +545,7 @@ export default function AdminActualites() {
 
               <div className="flex flex-wrap gap-2 mt-2">
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                  {uploadingAttachment ? "Envoi..." : "📎 Uploader un fichier"}
+                  {uploadingAttachment ? "Import en cours…" : "📎 Uploader un fichier"}
                   <input type="file" className="hidden" disabled={uploadingAttachment} onChange={handleAttachmentUpload} />
                 </label>
               </div>

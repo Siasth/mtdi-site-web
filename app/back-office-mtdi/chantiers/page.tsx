@@ -295,8 +295,8 @@ export default function AdminChantiers() {
                   <input id="sous-titre" value={form.subtitleFr} onChange={(e) => setForm({ ...form, subtitleFr: e.target.value })} placeholder="ex : SNIAM 2023-2027" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (Français)</label>
-                  <MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="description-francais">Description (Français)</label>
+                  <MarkdownEditor id="description-francais" value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} />
                   <p className={`text-[11px] mt-1 ${plainText(form.descriptionFr).length > DESCRIPTION_MAX_CHARS ? "text-red-600 font-semibold" : "text-gray-400"}`}>
                     {plainText(form.descriptionFr).length} / {DESCRIPTION_MAX_CHARS} caractères
                     {plainText(form.descriptionFr).length > DESCRIPTION_MAX_CHARS && " — limite dépassée, le texte sera coupé sur le site"}
@@ -315,8 +315,8 @@ export default function AdminChantiers() {
                   <input id="subtitle-english" value={form.subtitleEn} onChange={(e) => setForm({ ...form, subtitleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Description (English)</label>
-                  <MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} />
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="description-english">Description (English)</label>
+                  <MarkdownEditor id="description-english" value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} />
                   <p className={`text-[11px] mt-1 ${plainText(form.descriptionEn).length > DESCRIPTION_MAX_CHARS ? "text-red-600 font-semibold" : "text-gray-400"}`}>
                     {plainText(form.descriptionEn).length} / {DESCRIPTION_MAX_CHARS} caractères
                     {plainText(form.descriptionEn).length > DESCRIPTION_MAX_CHARS && " — limite dépassée, le texte sera coupé sur le site"}
@@ -326,22 +326,22 @@ export default function AdminChantiers() {
             )}
 
             <div className="pt-2 border-t border-gray-100">
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image de fond *</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="chantier-image-upload">Image de fond *</label>
               {form.image && <img src={form.image} alt="" className="h-24 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                {uploading === "image" ? "Envoi..." : "Choisir une image"}
-                <input type="file" accept="image/*" className="hidden" disabled={!!uploading} onChange={(e) => handleUpload("image", e)} />
+                {uploading === "image" ? "Import en cours…" : "Choisir une image"}
+                <input id="chantier-image-upload" type="file" accept="image/*" className="hidden" disabled={!!uploading} onChange={(e) => handleUpload("image", e)} />
               </label>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo de fond (optionnel — remplace l'image si présente)</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="chantier-video-upload">Vidéo de fond (optionnel — remplace l'image si présente)</label>
               {/* Aligné sur le même correctif que Hero (ANO-132) : n'afficher
                   que le nom de fichier, pas l'URL complète de stockage. */}
               {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{fileNameFromUrl(form.video)}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploading === "video" ? "Import en cours…" : "Choisir une vidéo"}
-                <input type="file" accept="video/*" className="hidden" disabled={!!uploading} onChange={(e) => handleUpload("video", e)} />
+                <input id="chantier-video-upload" type="file" accept="video/*" className="hidden" disabled={!!uploading} onChange={(e) => handleUpload("video", e)} />
               </label>
               {form.video && (
                 <button type="button" onClick={() => setForm({ ...form, video: "" })} className="ml-2 text-xs text-red-500 hover:underline">Retirer</button>
@@ -350,9 +350,9 @@ export default function AdminChantiers() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Couleur d'accent</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="chantier-couleur-accent">Couleur d'accent</label>
               <div className="flex items-center gap-2">
-                <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
+                <input id="chantier-couleur-accent" type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
                 <span className="text-xs text-gray-400 font-mono">{form.color}</span>
               </div>
               <ColorContrastHint color={form.color} />
@@ -360,7 +360,7 @@ export default function AdminChantiers() {
 
             <div className="pt-2 border-t border-gray-100">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chiffres clés (max 3)</label>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Chiffres clés (max 3)</p>
                 {form.stats.length < 3 && (
                   <button type="button" onClick={addStat} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter</button>
                 )}

@@ -112,32 +112,32 @@ export default function AdminStructures() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="sigle">Sigle *</label><input id="sigle" required value={form.acronym} onChange={(e) => setForm({ ...form, acronym: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Couleur / Site web</label><div className="flex gap-2"><input type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-12 rounded border border-gray-200" /><input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div><ColorContrastHint color={form.accent} /></div>
+              <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" id="structure-couleur-site-label">Couleur / Site web</label><div className="flex gap-2"><input type="color" aria-labelledby="structure-couleur-site-label" aria-label="Couleur" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-12 rounded border border-gray-200" /><input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" aria-labelledby="structure-couleur-site-label" aria-label="Site web" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div><ColorContrastHint color={form.accent} /></div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Logo</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="structure-logo-upload">Logo</label>
               {form.logoSrc && <img src={form.logoSrc} alt="" className="h-10 mb-2 object-contain" />}
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Choisir un logo"}<input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleLogoUpload} /></label>
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Import en cours…" : "Choisir un logo"}<input id="structure-logo-upload" type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleLogoUpload} /></label>
               {uploadError && <p className="text-xs text-red-600 mt-2">{uploadError}</p>}
             </div>
             {activeLang === "fr" ? (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="nom-fr">Nom (FR) *</label><input id="nom-fr" required value={form.nameFr} onChange={(e) => setForm({ ...form, nameFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="etiquette-courte-fr">Étiquette courte (FR)</label><input id="etiquette-courte-fr" value={form.labelFr} onChange={(e) => setForm({ ...form, labelFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><MarkdownEditor id="description-fr" value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
               </>
             ) : (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="name-en">Name (EN)</label><input id="name-en" value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="short-label-en">Short label (EN)</label><input id="short-label-en" value={form.labelEn} onChange={(e) => setForm({ ...form, labelEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><MarkdownEditor id="description-en" value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
               </>
             )}
             <div>
-              <div className="flex items-center justify-between mb-2"><label className="text-xs font-semibold text-gray-500 uppercase">Missions ({activeLang === "fr" ? "Français" : "English"})</label><button type="button" onClick={addMission} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter</button></div>
+              <div className="flex items-center justify-between mb-2"><p className="text-xs font-semibold text-gray-500 uppercase">Missions ({activeLang === "fr" ? "Français" : "English"})</p><button type="button" onClick={addMission} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Ajouter</button></div>
               {missionsList.map((m, i) => (
                 <div key={i} className="flex items-center gap-2 mb-2">
-                  <input value={m} onChange={(e) => updateMission(i, e.target.value)} className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
+                  <input aria-label={`Mission ${i + 1} (${activeLang === "fr" ? "Français" : "English"})`} value={m} onChange={(e) => updateMission(i, e.target.value)} className="flex-1 px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
                   <button type="button" onClick={() => removeMission(i)} className="text-red-400 hover:text-red-600 text-sm px-1">✕</button>
                 </div>
               ))}

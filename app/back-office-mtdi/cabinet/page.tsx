@@ -85,13 +85,13 @@ export default function AdminCabinet() {
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="role-fr">Rôle (FR) *</label><input id="role-fr" required value={form.roleFr} onChange={(e) => setForm({ ...form, roleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="direction-service-fr">Direction/Service (FR)</label><input id="direction-service-fr" value={form.directionFr} onChange={(e) => setForm({ ...form, directionFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (FR)</label><MarkdownEditor value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><MarkdownEditor id="description-fr" value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={4} /></div>
               </>
             ) : (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="role-en">Role (EN)</label><input id="role-en" value={form.roleEn} onChange={(e) => setForm({ ...form, roleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="direction-service-en">Direction/Service (EN)</label><input id="direction-service-en" value={form.directionEn} onChange={(e) => setForm({ ...form, directionEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1">Description (EN)</label><MarkdownEditor value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><MarkdownEditor id="description-en" value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={4} /></div>
               </>
             )}
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible sur le site</label>

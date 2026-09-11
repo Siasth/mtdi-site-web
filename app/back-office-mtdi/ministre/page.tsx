@@ -123,7 +123,7 @@ export default function AdminMinistre() {
               {form.photo && <img src={form.photo} alt="" className="w-full h-full object-cover" />}
             </div>
             <label className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-50">
-              {uploading ? "Envoi..." : "Changer la photo"}
+              {uploading ? "Import en cours…" : "Changer la photo"}
               <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleUpload} />
             </label>
             {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}

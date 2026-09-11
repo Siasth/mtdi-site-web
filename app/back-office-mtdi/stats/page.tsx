@@ -330,9 +330,9 @@ export default function AdminStats() {
                 <input id="objectif-max" required type="number" value={form.maxValue} onChange={(e) => setForm({ ...form, maxValue: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4">Couleur</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="stat-couleur">Couleur</label>
                 <div className="flex items-center gap-2">
-                  <input type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
+                  <input id="stat-couleur" type="color" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} className="w-10 h-9 rounded border border-gray-200 cursor-pointer" />
                   <span className="text-xs text-gray-400 font-mono">{form.color}</span>
                 </div>
                 <ColorContrastHint color={form.color} />

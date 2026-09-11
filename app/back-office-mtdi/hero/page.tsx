@@ -212,20 +212,20 @@ export default function AdminHero() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Image *</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="hero-image-upload">Image *</label>
               {form.image && <img src={form.image} alt="" className="h-28 rounded-lg mb-2 object-cover" />}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploadingImage ? "Import en cours…" : "Choisir une image"}
-                <input type="file" accept="image/*" className="hidden" disabled={uploadingImage} onChange={(e) => handleUpload("image", e)} />
+                <input id="hero-image-upload" type="file" accept="image/*" className="hidden" disabled={uploadingImage} onChange={(e) => handleUpload("image", e)} />
               </label>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Vidéo (optionnel — remplace l'image si présente)</label>
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="hero-video-upload">Vidéo (optionnel — remplace l'image si présente)</label>
               {form.video && <p className="text-xs text-gray-500 mb-2 truncate">{fileNameFromUrl(form.video)}</p>}
               <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                 {uploadingVideo ? "Import en cours…" : "Choisir une vidéo"}
-                <input type="file" accept="video/*" className="hidden" disabled={uploadingVideo} onChange={(e) => handleUpload("video", e)} />
+                <input id="hero-video-upload" type="file" accept="video/*" className="hidden" disabled={uploadingVideo} onChange={(e) => handleUpload("video", e)} />
               </label>
               {form.video && (
                 <button type="button" onClick={() => setForm({ ...form, video: "" })} className="ml-2 text-xs text-red-500 hover:underline">

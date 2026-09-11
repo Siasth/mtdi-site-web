@@ -114,7 +114,7 @@ export default function AdminDocuments() {
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="fichier-lien">Fichier / lien *</label>
               <input id="fichier-lien" required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} placeholder="https://... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
-              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Envoi..." : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
+              <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">{uploading ? "Import en cours…" : "Ou uploader un fichier"}<input type="file" className="hidden" disabled={uploading} onChange={handleUpload} /></label>
               {uploadedFileName && !uploadError && (
                 <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-sm text-green-700">
                   <span>✓</span>
