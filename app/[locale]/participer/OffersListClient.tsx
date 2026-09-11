@@ -32,7 +32,7 @@ export default function OffersListClient({
               <span className="px-2 py-0.5 text-[10px] font-black uppercase tracking-widest" style={{ background: `${JAUNE}30`, color: "#7A5800" }}>{offer.deadline}</span>
             )}
           </div>
-          {offer.description && <p className="text-anthracite/75 text-sm font-medium leading-relaxed mb-4">{offer.description}</p>}
+          {offer.description && <div className="prose-offer text-anthracite/75 text-sm font-medium leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: offer.description }} />}
           {offer.href && (
             <a
               href={offer.href}
@@ -48,6 +48,14 @@ export default function OffersListClient({
         </div>
       ))}
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
+      <style>{`
+        .prose-offer p { margin: 0 0 0.6em; }
+        .prose-offer p:last-child { margin-bottom: 0; }
+        .prose-offer ul { list-style: disc; padding-left: 1.3em; margin: 0.5em 0; }
+        .prose-offer ol { list-style: decimal; padding-left: 1.3em; margin: 0.5em 0; }
+        .prose-offer strong { font-weight: 800; color: #1A1A1A; }
+        .prose-offer a { color: ${VERT}; text-decoration: underline; }
+      `}</style>
     </div>
   );
 }

@@ -91,7 +91,7 @@ export default async function PartenairesPage({ params }: Props) {
                       </div>
                       <h3 className="text-anthracite font-black text-base uppercase leading-snug mb-1">{partner.name}</h3>
                       <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: partner.accent }}>{partner.full}</p>
-                      <p className="text-anthracite/70 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors">{partner.description}</p>
+                      <div className="prose-partner text-anthracite/70 text-sm font-medium leading-relaxed group-hover:text-anthracite/80 transition-colors" dangerouslySetInnerHTML={{ __html: partner.description }} />
                     </div>
                   ))}
                 </div>
@@ -126,6 +126,14 @@ export default async function PartenairesPage({ params }: Props) {
         </section>
 
       </main>
+
+      <style>{`
+        .prose-partner p { margin: 0 0 0.5em; }
+        .prose-partner p:last-child { margin-bottom: 0; }
+        .prose-partner ul { list-style: disc; padding-left: 1.2em; margin: 0.4em 0; }
+        .prose-partner ol { list-style: decimal; padding-left: 1.2em; margin: 0.4em 0; }
+        .prose-partner strong { font-weight: 800; color: #1A1A1A; }
+      `}</style>
 
       <Footer locale={locale} dict={dict.footer} />
     </>

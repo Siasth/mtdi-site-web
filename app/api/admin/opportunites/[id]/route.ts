@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 function getIp(req: NextRequest): string | null {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
@@ -20,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { type, titleFr, titleEn, descriptionFr, descriptionEn, href, deadline, displayOrder, active } = body;
   await sql`
     UPDATE opportunites SET
-      type = COALESCE(${type}, type), title_fr = COALESCE(${titleFr}, title_fr), title_en = ${titleEn ?? null}, description_fr = ${descriptionFr ?? null}, description_en = ${descriptionEn ?? null}, href = ${href ?? null}, deadline_label = ${deadline ?? null}, display_order = COALESCE(${displayOrder}, display_order), active = COALESCE(${active}, active)
+      type = COALESCE(${type}, type), title_fr = COALESCE(${titleFr}, title_fr), title_en = ${titleEn ?? null}, description_fr = ${descriptionFr ? sanitizeRichText(descriptionFr) : null}, description_en = ${descriptionEn ? sanitizeRichText(descriptionEn) : null}, href = ${href ?? null}, deadline_label = ${deadline ?? null}, display_order = COALESCE(${displayOrder}, display_order), active = COALESCE(${active}, active)
     WHERE id = ${id}
   `;
   await logAudit({ userId: session.id, action: "modifier", module: "opportunites", resourceId: id, ip: getIp(req) });

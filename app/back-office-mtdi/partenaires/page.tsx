@@ -85,7 +85,7 @@ export default function AdminPartenaires() {
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageItems.map((p) => (
               <div key={p.id} className={`flex items-center justify-between p-4 ${p.deleted_at ? "opacity-40" : ""}`}>
-                <div className="flex items-center gap-3">{p.logo_src && <img src={p.logo_src} alt="" className="h-6 w-14 object-contain" />}<div><p className="font-medium text-gray-900 text-sm">{p.name}</p><p className="text-xs text-gray-400">{p.full_fr}</p></div></div>
+                <div className="flex items-center gap-3">{p.logo_src && <img src={p.logo_src} alt="" className="h-6 w-14 object-contain" />}<div><p className="font-medium text-gray-900 text-sm">{p.name}</p><p className="text-xs text-gray-400">{p.full_fr} · Ordre : {p.display_order}</p></div></div>
                 <div className="flex gap-1">{p.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(p)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(p)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(p)} /></>}</div>
               </div>
             ))}
@@ -107,9 +107,14 @@ export default function AdminPartenaires() {
               </div>
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="categorie">Catégorie</label><select id="categorie" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="couleur">Couleur</label><input id="couleur" type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-full h-9 rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="ordre-affichage">Ordre d'affichage</label>
+                <input id="ordre-affichage" type="number" value={form.displayOrder || ""} placeholder="0" onChange={(e) => setForm({ ...form, displayOrder: e.target.value === "" ? 0 : Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+                <p className="text-xs text-gray-400 mt-1">Plus petit = affiché en premier, au sein de sa catégorie.</p>
+              </div>
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="nom-sigle">Nom / sigle *</label><input id="nom-sigle" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="ex: ANIP" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { requireSession, logAudit } from "@/lib/auth";
 import { hasPerm } from "@/lib/permissions";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 // Jamais mis en cache : ces routes back-office doivent toujours refléter
 // l'état réel de la base (sans ça, "Enregistrer" peut sembler ne rien
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (!titleFr) return NextResponse.json({ error: "Le titre (FR) est requis" }, { status: 400 });
   const result = await sql`
     INSERT INTO opportunites (type, title_fr, title_en, description_fr, description_en, href, deadline_label, display_order, active, created_by)
-    VALUES (${type || 'emplois'}, ${titleFr}, ${titleEn || null}, ${descriptionFr || null}, ${descriptionEn || null}, ${href || null}, ${deadline || null}, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
+    VALUES (${type || 'emplois'}, ${titleFr}, ${titleEn || null}, ${descriptionFr ? sanitizeRichText(descriptionFr) : null}, ${descriptionEn ? sanitizeRichText(descriptionEn) : null}, ${href || null}, ${deadline || null}, ${displayOrder ?? 0}, ${active ?? true}, ${session.id})
     RETURNING id
   `;
   await logAudit({ userId: session.id, action: "creer", module: "opportunites", resourceId: String(result.rows[0].id), ip: getIp(req) });

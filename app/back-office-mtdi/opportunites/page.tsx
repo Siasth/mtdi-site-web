@@ -4,6 +4,7 @@ import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import MarkdownEditor from "../components/MarkdownEditor";
 
 const VERT = "#006828";
 const TYPES = [
@@ -81,12 +82,12 @@ export default function AdminOpportunites() {
             {activeLang === "fr" ? (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-fr">Titre (FR) *</label><input id="titre-fr" required value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><textarea id="description-fr" value={form.descriptionFr} onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-fr">Description (FR)</label><MarkdownEditor id="description-fr" value={form.descriptionFr} onChange={(v) => setForm({ ...form, descriptionFr: v })} rows={3} /></div>
               </>
             ) : (
               <>
                 <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="title-en">Title (EN)</label><input id="title-en" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><textarea id="description-en" value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+                <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="description-en">Description (EN)</label><MarkdownEditor id="description-en" value={form.descriptionEn} onChange={(v) => setForm({ ...form, descriptionEn: v })} placeholder="Laisser vide si pas encore traduit" rows={3} /></div>
               </>
             )}
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date-limite-libelle-libre">Date limite (libellé libre)</label><input id="date-limite-libelle-libre" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} placeholder="ex: Avant le 15 septembre 2026" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
