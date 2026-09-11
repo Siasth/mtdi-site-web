@@ -16,6 +16,7 @@ export type GeneralSettings = {
   youtube: string;
   contactEmail: string;
   ministreEmail: string;
+  pressEmail: string;
   contactPhone: string;
   contactAddress: string;
   contactAddressEn: string;
@@ -41,6 +42,7 @@ export const GENERAL_SETTINGS_DEFAULTS: GeneralSettings = {
   youtube: "",
   contactEmail: "contact@gouv.bj",
   ministreEmail: "mtdi.contact@gouv.bj",
+  pressEmail: "mtdi.presse@gouv.bj",
   contactPhone: "+229 01 21 30 00 00",
   contactAddress: "Boulevard de la Marina\n01 BP 412 Cotonou\nRépublique du Bénin",
   contactAddressEn: "Boulevard de la Marina\n01 BP 412 Cotonou\nRepublic of Benin",

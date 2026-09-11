@@ -11,7 +11,7 @@ type FormState = {
   siteName: string; siteNameShort: string; taglineFr: string; taglineEn: string;
   logoHeader: string; logoFooter: string; favicon: string;
   facebook: string; twitter: string; linkedin: string; instagram: string; youtube: string;
-  contactEmail: string; ministreEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
+  contactEmail: string; ministreEmail: string; pressEmail: string; contactPhone: string; contactAddress: string; contactAddressEn: string;
   openingHoursFr: string; openingHoursEn: string; locationMapUrl: string;
   strategieIaDocUrl: string;
   appelsOffresExternalUrl: string;
@@ -40,7 +40,7 @@ export default function AdminGeneral() {
           logoHeader: d.logoHeader || "", logoFooter: d.logoFooter || "", favicon: d.favicon || "",
           facebook: d.facebook || "", twitter: d.twitter || "", linkedin: d.linkedin || "",
           instagram: d.instagram || "", youtube: d.youtube || "",
-          contactEmail: d.contactEmail || "", ministreEmail: d.ministreEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
+          contactEmail: d.contactEmail || "", ministreEmail: d.ministreEmail || "", pressEmail: d.pressEmail || "", contactPhone: d.contactPhone || "", contactAddress: d.contactAddress || "",
           contactAddressEn: d.contactAddressEn || "",
           openingHoursFr: d.openingHoursFr || "", openingHoursEn: d.openingHoursEn || "",
           locationMapUrl: d.locationMapUrl || "",
@@ -199,6 +199,13 @@ export default function AdminGeneral() {
               Email destinataire — formulaire "Écrire au Ministre"
             </label>
             <input id="email-destinataire-formulaire-ecrire-au-" value={form.ministreEmail} onChange={(e) => setForm({ ...form, ministreEmail: e.target.value })} placeholder="mtdi.contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email-presse">
+              Email presse (page Kit presse)
+            </label>
+            <input id="email-presse" type="email" value={form.pressEmail} onChange={(e) => setForm({ ...form, pressEmail: e.target.value })} placeholder="mtdi.presse@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <p className="text-xs text-gray-400 mt-1">ANO-024 : les adresses email du ministère utilisent le domaine gouv.bj (convention commune à toute l'administration), contrairement aux liens du site qui utilisent innovation.gouv.bj.</p>
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="telephone">Téléphone</label>

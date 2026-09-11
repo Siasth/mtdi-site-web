@@ -2,6 +2,7 @@ import { getDictionary, type Locale } from "../dictionaries";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getKitPresseItems } from "@/lib/kit-presse";
+import { getGeneralSettings } from "@/lib/general-settings";
 import KitPresseListClient from "./KitPresseListClient";
 
 const VERT = "#162233";
@@ -15,6 +16,7 @@ export default async function KitPressePage({ params }: Props) {
   const dict = await getDictionary(locale as Locale);
   const t = dict.kitpresse;
   const docs = await getKitPresseItems(locale === "en" ? "en" : "fr");
+  const { pressEmail } = await getGeneralSettings();
 
   return (
     <>
@@ -55,8 +57,8 @@ export default async function KitPressePage({ params }: Props) {
                 {t.demandesSupplementaires}{" "}
                 <strong style={{ color: VERT }}>{t.serviceComm}</strong>{" "}
                 {t.a}{" "}
-                <a href="mailto:presse@innovation.gouv.bj" className="underline font-semibold" style={{ color: VERT }}>
-                  presse@innovation.gouv.bj
+                <a href={`mailto:${pressEmail}`} className="underline font-semibold" style={{ color: VERT }}>
+                  {pressEmail}
                 </a>.
               </p>
             </div>
@@ -78,8 +80,8 @@ export default async function KitPressePage({ params }: Props) {
                   </svg>
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-anthracite/60 mb-1">Email</p>
-                    <a href="mailto:presse@innovation.gouv.bj" className="text-anthracite font-semibold text-sm hover:opacity-70 transition-opacity">
-                      presse@innovation.gouv.bj
+                    <a href={`mailto:${pressEmail}`} className="text-anthracite font-semibold text-sm hover:opacity-70 transition-opacity">
+                      {pressEmail}
                     </a>
                   </div>
                 </div>
