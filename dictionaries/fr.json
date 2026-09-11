@@ -377,7 +377,7 @@
   },
   "plandusite": {
     "titre": "Plan du Site",
-    "sousTitre": "Toutes les pages du site mtdi.gouv.bj",
+    "sousTitre": "Toutes les pages du site innovation.gouv.bj",
     "liensExternes": "Liens externes",
     "sections": {
       "accueil": "Accueil",
@@ -417,7 +417,7 @@
     "titre": "Politique de Confidentialité",
     "sousTitre": "Protection des données personnelles",
     "majDate": "Dernière mise à jour : 1er août 2026",
-    "intro": "Le Ministère de la Transformation Digitale et de l'Innovation (MTDI) accorde une importance particulière à la protection de vos données à caractère personnel. Cette politique décrit quelles données sont collectées sur mtdi.gouv.bj, pourquoi, et comment vous pouvez exercer vos droits, conformément à la Loi n°2017-20 du 20 avril 2018 portant Code du numérique (Livre 5) et sous le contrôle de l'Autorité de Protection des Données Personnelles (APDP)."
+    "intro": "Le Ministère de la Transformation Digitale et de l'Innovation (MTDI) accorde une importance particulière à la protection de vos données à caractère personnel. Cette politique décrit quelles données sont collectées sur innovation.gouv.bj, pourquoi, et comment vous pouvez exercer vos droits, conformément à la Loi n°2017-20 du 20 avril 2018 portant Code du numérique (Livre 5) et sous le contrôle de l'Autorité de Protection des Données Personnelles (APDP)."
   },
   "accessibilite": {
     "titre": "Accessibilité",
