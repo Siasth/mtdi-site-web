@@ -63,7 +63,7 @@ export default function AdminContactsSpecifiques() {
             </div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="role">Rôle *</label><input id="role" required value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} placeholder="ex: Presse & Accréditations" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="nom-du-service">Nom du service</label><input id="nom-du-service" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Email" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Téléphone" className="px-3 py-2 border border-gray-200 rounded-lg text-sm" />
             </div>

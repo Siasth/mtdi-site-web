@@ -289,6 +289,7 @@ export default function AdminActualites() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
             <tr>
@@ -342,6 +343,7 @@ export default function AdminActualites() {
             )}
           </tbody>
         </table>
+        </div>
         <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
@@ -436,7 +438,7 @@ export default function AdminActualites() {
             {/* ── Classement ── comment l'article est catégorisé et trouvé */}
             <div className="pt-3 border-t border-gray-100">
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Classement</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="categorie">Catégorie *</label>
                   <select id="categorie"
@@ -469,7 +471,7 @@ export default function AdminActualites() {
             {/* ── Publication ── si/quand l'article devient visible, et comment il est mis en avant */}
             <div className="pt-3 border-t border-gray-100">
               <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Publication</p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="statut">Statut</label>
                   <select id="statut" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">

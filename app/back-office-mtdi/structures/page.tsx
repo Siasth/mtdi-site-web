@@ -110,7 +110,7 @@ export default function AdminStructures() {
               </div>
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="sigle">Sigle *</label><input id="sigle" required value={form.acronym} onChange={(e) => setForm({ ...form, acronym: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" id="structure-couleur-site-label">Couleur / Site web</label><div className="flex gap-2"><input type="color" aria-labelledby="structure-couleur-site-label" aria-label="Couleur" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-12 rounded border border-gray-200" /><input type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" aria-labelledby="structure-couleur-site-label" aria-label="Site web" value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} placeholder="https://..." className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div><ColorContrastHint color={form.accent} /></div>
             </div>

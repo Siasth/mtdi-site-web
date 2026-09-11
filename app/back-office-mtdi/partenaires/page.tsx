@@ -107,7 +107,7 @@ export default function AdminPartenaires() {
               </div>
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="categorie">Catégorie</label><select id="categorie" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">{CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="couleur">Couleur</label><input id="couleur" type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="w-full h-9 rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
             </div>

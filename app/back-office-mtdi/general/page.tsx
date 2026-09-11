@@ -134,7 +134,7 @@ export default function AdminGeneral() {
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="sigle">Sigle</label>
             <input id="sigle" value={form.siteNameShort} onChange={(e) => setForm({ ...form, siteNameShort: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm max-w-[160px]" />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="slogan-francais">Slogan (Français)</label>
               <input id="slogan-francais" value={form.taglineFr} onChange={(e) => setForm({ ...form, taglineFr: e.target.value })} placeholder="Optionnel" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
@@ -224,7 +224,7 @@ export default function AdminGeneral() {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="horaires-d-ouverture-francais">Horaires d'ouverture (Français)</label>
               <input id="horaires-d-ouverture-francais" value={form.openingHoursFr} onChange={(e) => setForm({ ...form, openingHoursFr: e.target.value })} placeholder="ex : Lundi – Vendredi : 8h00 – 17h00" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

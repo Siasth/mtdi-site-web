@@ -171,7 +171,7 @@ export default function AdminMinistreBio() {
 
         <section className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <h2 className="font-bold text-gray-900">Textes courts ({activeLang === "fr" ? "Français" : "English"})</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="fil-d-ariane">Fil d'Ariane</label><input id="fil-d-ariane" value={form[`breadcrumb${suffix}`]} onChange={(e) => setField(`breadcrumb${suffix}` as "breadcrumbFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="badge">Badge</label><input id="badge" value={form[`badge${suffix}`]} onChange={(e) => setField(`badge${suffix}` as "badgeFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="badge-sous-titre">Badge (sous-titre)</label><input id="badge-sous-titre" value={form[`badgeSousTitre${suffix}`]} onChange={(e) => setField(`badgeSousTitre${suffix}` as "badgeSousTitreFr", e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
@@ -205,7 +205,7 @@ export default function AdminMinistreBio() {
           {parcours.map((item, i) => (
             <div key={i} className="border border-gray-100 rounded-lg p-4 pt-9 space-y-2 relative">
               <button type="button" onClick={() => removeParcours(i)} className="absolute top-2 right-2 text-red-400 hover:text-red-600 text-xs">✕ Retirer</button>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input value={item.period} onChange={(e) => updateParcours(i, "period", e.target.value)} placeholder="Période (optionnel, ex: Mai 2026)" className="px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
                 <input value={item.title} onChange={(e) => updateParcours(i, "title", e.target.value)} placeholder="Titre" className="px-2 py-1.5 border border-gray-200 rounded-lg text-sm" />
               </div>

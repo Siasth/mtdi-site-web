@@ -160,6 +160,7 @@ export default function AdminUtilisateurs() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
             <tr>
@@ -206,6 +207,7 @@ export default function AdminUtilisateurs() {
             ))}
           </tbody>
         </table>
+        </div>
         <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 

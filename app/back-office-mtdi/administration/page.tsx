@@ -134,7 +134,7 @@ export default function AdminAdministration() {
         <h2 className="font-bold text-gray-900 mb-1">Configuration SMTP</h2>
         <p className="text-xs text-gray-400 mb-4">Utilisé pour l'envoi des codes 2FA et des notifications par email.</p>
         <form onSubmit={handleSmtpSave} className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="hote-smtp">Hôte SMTP *</label>
               <input id="hote-smtp" required value={smtp.host} onChange={(e) => setSmtp({ ...smtp, host: e.target.value })} placeholder="smtp.gmail.com" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

@@ -66,6 +66,7 @@ export default function AdminLogs() {
       ) : (
         <>
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 <tr>
@@ -99,6 +100,7 @@ export default function AdminLogs() {
                 )}
               </tbody>
             </table>
+            </div>
           </div>
 
           <div className="flex items-center justify-between mt-4 text-sm text-gray-500">

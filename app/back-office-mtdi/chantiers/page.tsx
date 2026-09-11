@@ -214,6 +214,7 @@ export default function AdminChantiers() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
             <tr>
@@ -258,6 +259,7 @@ export default function AdminChantiers() {
             )}
           </tbody>
         </table>
+        </div>
         <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
       </div>
 
@@ -280,7 +282,7 @@ export default function AdminChantiers() {
 
             {activeLang === "fr" ? (
               <div className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="numero">Numéro</label>
                     <input id="numero" value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} placeholder="01" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

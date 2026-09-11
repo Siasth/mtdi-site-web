@@ -142,7 +142,7 @@ export default function AdminMinistre() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="titre-fonction-complete">Titre / fonction complète</label>
                 <input id="titre-fonction-complete" value={form.titleFr} onChange={(e) => setForm({ ...form, titleFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-ligne-1">Badge (ligne 1)</label>
                   <input id="badge-ligne-1" value={form.badgeFr} onChange={(e) => setForm({ ...form, badgeFr: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
@@ -173,7 +173,7 @@ export default function AdminMinistre() {
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="title-full-function">Title / full function</label>
                 <input id="title-full-function" value={form.titleEn} onChange={(e) => setForm({ ...form, titleEn: e.target.value })} placeholder="Laisser vide si pas encore traduit" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="badge-line-1">Badge (line 1)</label>
                   <input id="badge-line-1" value={form.badgeEn} onChange={(e) => setForm({ ...form, badgeEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />

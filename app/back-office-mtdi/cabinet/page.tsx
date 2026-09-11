@@ -77,7 +77,7 @@ export default function AdminCabinet() {
               </div>
               <ModalCloseButton onClick={() => setEditing(null)} />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="niveau-hierarchique">Niveau hiérarchique</label><input id="niveau-hierarchique" type="number" min={0} value={form.level} onChange={(e) => setForm({ ...form, level: Number(e.target.value) })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
               <div className="col-span-2"><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="couleur">Couleur</label><input id="couleur" type="color" value={form.accent} onChange={(e) => setForm({ ...form, accent: e.target.value })} className="h-9 w-full rounded border border-gray-200" /><ColorContrastHint color={form.accent} /></div>
             </div>

@@ -243,6 +243,7 @@ export default function AdminGalerie() {
             </div>
           )}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 <tr>
@@ -289,6 +290,7 @@ export default function AdminGalerie() {
                 )}
               </tbody>
             </table>
+            </div>
             <Pagination page={itemsSafePage} totalPages={itemsTotalPages} onChange={setItemsPage} />
           </div>
         </>
@@ -304,6 +306,7 @@ export default function AdminGalerie() {
             </div>
           )}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                 <tr>
@@ -334,6 +337,7 @@ export default function AdminGalerie() {
                 )}
               </tbody>
             </table>
+            </div>
             <Pagination page={collectionsSafePage} totalPages={collectionsTotalPages} onChange={setCollectionsPage} />
           </div>
         </>
@@ -380,7 +384,7 @@ export default function AdminGalerie() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-4 pt-2 border-t border-gray-100">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-gray-100">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 mt-4" htmlFor="type">Type</label>
                 <select id="type" value={itemForm.type} onChange={(e) => setItemForm({ ...itemForm, type: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white">
@@ -401,7 +405,7 @@ export default function AdminGalerie() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="credit-photo-video">Crédit photo/vidéo</label>
                 <input id="credit-photo-video" value={itemForm.credit} onChange={(e) => setItemForm({ ...itemForm, credit: e.target.value })} placeholder="ex : MTDI / Direction de la Communication" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
