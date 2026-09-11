@@ -140,9 +140,17 @@ export default async function ActualiteDetailPage({ params }: Props) {
                     {article.attachments.map((a, i) => (
                       <a
                         key={i}
-                        href={a.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={a.kind === "link" ? a.url : `/api/download?url=${encodeURIComponent(a.url)}&name=${encodeURIComponent(a.name)}`}
+                        // ANO-084 : un fichier (kind !== "link") doit se
+                        // télécharger, pas s'ouvrir en aperçu dans l'onglet —
+                        // d'où le passage par la route proxy /api/download,
+                        // seul moyen fiable de forcer le téléchargement d'un
+                        // fichier cross-origin (Vercel Blob). Un vrai lien
+                        // externe (kind === "link") continue de s'ouvrir dans
+                        // un nouvel onglet comme avant.
+                        {...(a.kind === "link"
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : { download: a.name })}
                         className="flex items-center justify-between gap-4 p-4 border rounded-lg hover:bg-gris-perle transition-colors"
                         style={{ borderColor: `${VERT}40` }}
                       >
