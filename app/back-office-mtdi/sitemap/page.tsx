@@ -3,16 +3,18 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
-import { EditIcon, DeleteIcon } from "../components/ActionIcons";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 
 const VERT = "#006828";
-type Section = { id: number; title_fr: string; title_en: string | null; display_order: number; active: boolean };
-type Link = { id: number; section_id: number; label_fr: string; label_en: string | null; href: string; display_order: number; active: boolean };
+type Section = { id: number; title_fr: string; title_en: string | null; display_order: number; active: boolean; deleted_at: string | null };
+type Link = { id: number; section_id: number; label_fr: string; label_en: string | null; href: string; display_order: number; active: boolean; deleted_at: string | null };
 
 export default function AdminSitemap() {
   const canManage = useHasPermission("ressources.gerer");
   const [sections, setSections] = useState<Section[]>([]);
   const [linkPagesBySection, setLinkPagesBySection] = useState<Record<number, number>>({});
+  const [showDeletedSections, setShowDeletedSections] = useState(false);
+  const [showDeletedLinksBySection, setShowDeletedLinksBySection] = useState<Record<number, boolean>>({});
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
@@ -42,7 +44,8 @@ export default function AdminSitemap() {
     await fetch(isNew ? "/api/admin/sitemap-sections" : `/api/admin/sitemap-sections/${editSec}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...secForm, displayOrder: isNew ? sections.length : undefined }) });
     setEditSec(null); load();
   }
-  async function deleteSec(s: Section) { if (confirm(`Supprimer la section "${s.title_fr}" et tous ses liens ?`)) { await fetch(`/api/admin/sitemap-sections/${s.id}`, { method: "DELETE" }); load(); } }
+  async function deleteSec(s: Section) { if (confirm(`Supprimer la section "${s.title_fr}" et tous ses liens ? (réversible)`)) { await fetch(`/api/admin/sitemap-sections/${s.id}`, { method: "DELETE" }); load(); } }
+  async function restoreSec(s: Section) { await fetch(`/api/admin/sitemap-sections/${s.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) }); load(); }
 
   // Liens
   const [editLink, setEditLink] = useState<number | "new" | null>(null);
@@ -57,7 +60,8 @@ export default function AdminSitemap() {
     await fetch(isNew ? "/api/admin/sitemap-links" : `/api/admin/sitemap-links/${editLink}`, { method: isNew ? "POST" : "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...linkForm, sectionId: linkSectionId, displayOrder: isNew ? sectionLinks.length : undefined }) });
     setEditLink(null); load();
   }
-  async function deleteLink(l: Link) { if (confirm(`Supprimer le lien "${l.label_fr}" ?`)) { await fetch(`/api/admin/sitemap-links/${l.id}`, { method: "DELETE" }); load(); } }
+  async function deleteLink(l: Link) { if (confirm(`Supprimer le lien "${l.label_fr}" ? (réversible)`)) { await fetch(`/api/admin/sitemap-links/${l.id}`, { method: "DELETE" }); load(); } }
+  async function restoreLink(l: Link) { await fetch(`/api/admin/sitemap-links/${l.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) }); load(); }
 
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
@@ -78,28 +82,63 @@ export default function AdminSitemap() {
       </div>
       <p className="text-xs text-gray-400 mb-6">"Régénérer la suggestion" reconstruit tout le plan du site à partir des pages connues du site actuel — pratique pour repartir d'une base à jour, mais écrase vos modifications manuelles. Pensez à vérifier le résultat avant de le laisser en ligne.</p>
 
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeletedSections} onChange={(e) => setShowDeletedSections(e.target.checked)} />
+        Afficher les sections supprimées ({sections.filter((s) => s.deleted_at).length})
+      </label>
+
       <div className="space-y-6">
-        {sections.map((sec) => {
-          const sectionLinks = links.filter((l) => l.section_id === sec.id);
+        {(showDeletedSections ? sections.filter((s) => s.deleted_at) : sections.filter((s) => !s.deleted_at)).map((sec) => {
+          const showDeletedLinks = showDeletedLinksBySection[sec.id] || false;
+          const allSectionLinks = links.filter((l) => l.section_id === sec.id);
+          const sectionLinks = showDeletedLinks ? allSectionLinks.filter((l) => l.deleted_at) : allSectionLinks.filter((l) => !l.deleted_at);
           const { pageItems, totalPages, safePage } = paginate(sectionLinks, linkPagesBySection[sec.id] || 1, 10);
           return (
-          <div key={sec.id} className="bg-white rounded-xl border border-gray-200 p-5">
+          <div key={sec.id} className={`bg-white rounded-xl border border-gray-200 p-5 ${sec.deleted_at ? "opacity-40" : ""}`}>
             <div className="flex items-center justify-between mb-3">
               <p className="font-bold text-gray-900">{sec.title_fr}</p>
               <div className="flex gap-1">
-                <button onClick={() => openNewLink(sec.id)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Lien</button>
-                <EditIcon label="Modifier la section" onClick={() => openEditSec(sec)} />
-                <DeleteIcon label="Supprimer la section" onClick={() => deleteSec(sec)} />
+                {sec.deleted_at ? (
+                  <RestoreIcon label="Restaurer la section" onClick={() => restoreSec(sec)} />
+                ) : (
+                  <>
+                    <button onClick={() => openNewLink(sec.id)} className="text-xs font-bold hover:underline" style={{ color: VERT }}>+ Lien</button>
+                    <EditIcon label="Modifier la section" onClick={() => openEditSec(sec)} />
+                    <DeleteIcon label="Supprimer la section" onClick={() => deleteSec(sec)} />
+                  </>
+                )}
               </div>
             </div>
+            {!sec.deleted_at && (
+              <label className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                <input
+                  type="checkbox"
+                  checked={showDeletedLinks}
+                  onChange={(e) => {
+                    setShowDeletedLinksBySection((prev) => ({ ...prev, [sec.id]: e.target.checked }));
+                    setLinkPagesBySection((prev) => ({ ...prev, [sec.id]: 1 }));
+                  }}
+                />
+                Liens supprimés ({allSectionLinks.filter((l) => l.deleted_at).length})
+              </label>
+            )}
             <div className="divide-y divide-gray-100">
               {pageItems.map((l) => (
                 <div key={l.id} className="flex items-center justify-between py-2">
                   <div><p className="text-sm text-gray-800">{l.label_fr}</p><p className="text-xs text-gray-400">{l.href}</p></div>
-                  <div className="flex gap-1"><EditIcon label="Modifier" onClick={() => openEditLink(l)} /><DeleteIcon label="Supprimer" onClick={() => deleteLink(l)} /></div>
+                  <div className="flex gap-1">
+                    {l.deleted_at ? (
+                      <RestoreIcon label="Restaurer" onClick={() => restoreLink(l)} />
+                    ) : (
+                      <>
+                        <EditIcon label="Modifier" onClick={() => openEditLink(l)} />
+                        <DeleteIcon label="Supprimer" onClick={() => deleteLink(l)} />
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
-              {sectionLinks.length === 0 && <p className="py-2 text-xs text-gray-400">Aucun lien</p>}
+              {sectionLinks.length === 0 && <p className="py-2 text-xs text-gray-400">{showDeletedLinks ? "Aucun lien supprimé." : "Aucun lien"}</p>}
             </div>
             <Pagination page={safePage} totalPages={totalPages} onChange={(p) => setLinkPagesBySection((prev) => ({ ...prev, [sec.id]: p }))} />
           </div>

@@ -13,6 +13,7 @@ export default function AdminLiensUtiles() {
   const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -34,7 +35,8 @@ export default function AdminLiensUtiles() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems, totalPages, safePage } = paginate(items, page, 10);
+  const visibleItems = showDeleted ? items.filter((x) => x.deleted_at) : items.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleItems, page, 10);
 
   return (
     <div className="p-8">
@@ -42,6 +44,10 @@ export default function AdminLiensUtiles() {
         <div><h1 className="text-2xl font-bold text-gray-900">Liens utiles</h1><p className="text-sm text-gray-500 mt-1">Affichés dans le pied de page ET le méga-menu (source unique)</p></div>
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau lien</button>
       </div>
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({items.filter((x) => x.deleted_at).length})
+      </label>
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
         {pageItems.map((it) => (
           <div key={it.id} className={`flex items-center justify-between p-4 ${it.deleted_at ? "opacity-40" : ""}`}>
@@ -49,7 +55,7 @@ export default function AdminLiensUtiles() {
             <div className="flex gap-1">{it.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(it)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(it)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(it)} /></>}</div>
           </div>
         ))}
-        {items.length === 0 && <p className="p-8 text-center text-gray-400">Aucun lien</p>}
+        {visibleItems.length === 0 && <p className="p-8 text-center text-gray-400">{showDeleted ? "Aucun élément supprimé." : "Aucun lien"}</p>}
       </div>
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 

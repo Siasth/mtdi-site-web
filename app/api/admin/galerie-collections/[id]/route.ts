@@ -16,7 +16,13 @@ export async function PATCH(
     return NextResponse.json({ error: "Permission refusée" }, { status: 403 });
   }
   const { id } = await params;
-  const { nameFr, nameEn, displayOrder } = await req.json();
+  const body = await req.json();
+  if (body.restore) {
+    await sql`UPDATE galerie_collections SET deleted_at = NULL WHERE id = ${id}`;
+    await logAudit({ userId: session.id, action: "restaurer", module: "galerie", resourceId: id, ip: getIp(req) });
+    return NextResponse.json({ ok: true });
+  }
+  const { nameFr, nameEn, displayOrder } = body;
   await sql`
     UPDATE galerie_collections SET
       name_fr = COALESCE(${nameFr}, name_fr),

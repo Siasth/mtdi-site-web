@@ -44,6 +44,7 @@ export default function AdminStats() {
 
   const [stats, setStats] = useState<Stat[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -164,7 +165,8 @@ export default function AdminStats() {
     );
   }
 
-  const { pageItems, totalPages, safePage } = paginate(stats, page, 10);
+  const visibleStats = showDeleted ? stats.filter((x) => x.deleted_at) : stats.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleStats, page, 10);
 
   return (
     <div className="p-8">
@@ -212,6 +214,11 @@ export default function AdminStats() {
         </form>
       )}
 
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({stats.filter((x) => x.deleted_at).length})
+      </label>
+
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -255,8 +262,8 @@ export default function AdminStats() {
                 </td>
               </tr>
             ))}
-            {stats.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">Aucun chiffre clé — ajoutez-en un pour l'afficher sur la page d'accueil</td></tr>
+            {visibleStats.length === 0 && (
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">{showDeleted ? "Aucun élément supprimé." : "Aucun chiffre clé — ajoutez-en un pour l'afficher sur la page d'accueil"}</td></tr>
             )}
           </tbody>
         </table>

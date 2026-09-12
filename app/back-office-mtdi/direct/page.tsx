@@ -18,6 +18,8 @@ export default function AdminDirect() {
   const [replays, setReplays] = useState<Replay[]>([]);
   const [upcomingPage, setUpcomingPage] = useState(1);
   const [replaysPage, setReplaysPage] = useState(1);
+  const [showDeletedUpcoming, setShowDeletedUpcoming] = useState(false);
+  const [showDeletedReplays, setShowDeletedReplays] = useState(false);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -75,8 +77,10 @@ export default function AdminDirect() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems: pageOfUpcoming, totalPages: upcomingTotalPages, safePage: upcomingSafePage } = paginate(upcoming, upcomingPage, 10);
-  const { pageItems: pageOfReplays, totalPages: replaysTotalPages, safePage: replaysSafePage } = paginate(replays, replaysPage, 10);
+  const visibleUpcoming = showDeletedUpcoming ? upcoming.filter((x) => x.deleted_at) : upcoming.filter((x) => !x.deleted_at);
+  const visibleReplays = showDeletedReplays ? replays.filter((x) => x.deleted_at) : replays.filter((x) => !x.deleted_at);
+  const { pageItems: pageOfUpcoming, totalPages: upcomingTotalPages, safePage: upcomingSafePage } = paginate(visibleUpcoming, upcomingPage, 10);
+  const { pageItems: pageOfReplays, totalPages: replaysTotalPages, safePage: replaysSafePage } = paginate(visibleReplays, replaysPage, 10);
 
   return (
     <div className="p-8">
@@ -89,7 +93,13 @@ export default function AdminDirect() {
 
       {tab === "upcoming" && (
         <>
-          <div className="mb-4 flex justify-end"><button onClick={openNewU} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvel événement</button></div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={showDeletedUpcoming} onChange={(e) => { setShowDeletedUpcoming(e.target.checked); setUpcomingPage(1); }} />
+              Afficher les éléments supprimés ({upcoming.filter((x) => x.deleted_at).length})
+            </label>
+            <button onClick={openNewU} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvel événement</button>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageOfUpcoming.map((u) => (
               <div key={u.id} className={`flex items-center justify-between p-4 ${u.deleted_at ? "opacity-40" : ""}`}>
@@ -97,7 +107,7 @@ export default function AdminDirect() {
                 <div className="flex gap-1">{u.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreU(u)} /> : <><EditIcon label="Modifier" onClick={() => openEditU(u)} /><DeleteIcon label="Supprimer" onClick={() => deleteU(u)} /></>}</div>
               </div>
             ))}
-            {upcoming.length === 0 && <p className="p-8 text-center text-gray-400">Aucun événement</p>}
+            {visibleUpcoming.length === 0 && <p className="p-8 text-center text-gray-400">{showDeletedUpcoming ? "Aucun élément supprimé." : "Aucun événement"}</p>}
           </div>
           <Pagination page={upcomingSafePage} totalPages={upcomingTotalPages} onChange={setUpcomingPage} />
         </>
@@ -105,7 +115,13 @@ export default function AdminDirect() {
 
       {tab === "replays" && (
         <>
-          <div className="mb-4 flex justify-end"><button onClick={openNewR} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle rediffusion</button></div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={showDeletedReplays} onChange={(e) => { setShowDeletedReplays(e.target.checked); setReplaysPage(1); }} />
+              Afficher les éléments supprimés ({replays.filter((x) => x.deleted_at).length})
+            </label>
+            <button onClick={openNewR} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle rediffusion</button>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageOfReplays.map((r) => (
               <div key={r.id} className={`flex items-center justify-between p-4 ${r.deleted_at ? "opacity-40" : ""}`}>
@@ -113,7 +129,7 @@ export default function AdminDirect() {
                 <div className="flex gap-1">{r.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreR(r)} /> : <><EditIcon label="Modifier" onClick={() => openEditR(r)} /><DeleteIcon label="Supprimer" onClick={() => deleteR(r)} /></>}</div>
               </div>
             ))}
-            {replays.length === 0 && <p className="p-8 text-center text-gray-400">Aucune rediffusion</p>}
+            {visibleReplays.length === 0 && <p className="p-8 text-center text-gray-400">{showDeletedReplays ? "Aucun élément supprimé." : "Aucune rediffusion"}</p>}
           </div>
           <Pagination page={replaysSafePage} totalPages={replaysTotalPages} onChange={setReplaysPage} />
         </>

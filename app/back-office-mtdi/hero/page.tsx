@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
-import { EditIcon, HideIcon, RestoreIcon } from "../components/ActionIcons";
+import { EditIcon, DeleteIcon, RestoreIcon, ToggleOnIcon, ToggleOffIcon } from "../components/ActionIcons";
 import { uploadFile, fileNameFromUrl } from "@/lib/client-upload";
 
 const VERT = "#006828";
@@ -36,6 +36,7 @@ export default function AdminHero() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [activeLang, setActiveLang] = useState<"fr" | "en">("fr");
+  const [showDeleted, setShowDeleted] = useState(false);
 
   function load() {
     setLoading(true);
@@ -117,9 +118,29 @@ export default function AdminHero() {
     }
   }
 
-  async function handleHide(s: Slide) {
-    if (!confirm("Masquer ce slide ? (réversible, il n'apparaîtra plus sur le site tant qu'il n'est pas restauré)")) return;
+  async function handleDelete(s: Slide) {
+    if (!confirm("Supprimer ce slide ? (suppression réversible : il ne sera plus visible dans la liste par défaut, mais reste récupérable via le filtre \"Afficher les éléments supprimés\")")) return;
     await fetch(`/api/admin/hero-slides/${s.id}`, { method: "DELETE" });
+    load();
+  }
+
+  // Bascule rapide publié/masqué depuis la liste, sans passer par le
+  // formulaire d'édition. On renvoie l'objet complet (pas seulement
+  // `active`) car la route PATCH n'applique pas COALESCE sur video/altEn :
+  // un envoi partiel effacerait ces champs par erreur.
+  async function toggleActive(s: Slide) {
+    await fetch(`/api/admin/hero-slides/${s.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image: s.image,
+        video: s.video || "",
+        altFr: s.alt_fr,
+        altEn: s.alt_en || "",
+        displayOrder: s.display_order,
+        active: !s.active,
+      }),
+    });
     load();
   }
 
@@ -148,7 +169,8 @@ export default function AdminHero() {
     );
   }
 
-  const { pageItems, totalPages, safePage } = paginate(slides, page, 9);
+  const visibleSlides = showDeleted ? slides.filter((s) => s.deleted_at) : slides.filter((s) => !s.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleSlides, page, 9);
 
   return (
     <div className="p-8">
@@ -161,6 +183,15 @@ export default function AdminHero() {
           + Nouveau slide
         </button>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input
+          type="checkbox"
+          checked={showDeleted}
+          onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }}
+        />
+        Afficher les éléments supprimés ({slides.filter((s) => s.deleted_at).length})
+      </label>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {pageItems.map((s) => (
@@ -179,8 +210,13 @@ export default function AdminHero() {
                     <RestoreIcon label="Restaurer" onClick={() => handleRestore(s)} />
                   ) : (
                     <>
+                      {s.active ? (
+                        <ToggleOnIcon label="Masquer du site" onClick={() => toggleActive(s)} />
+                      ) : (
+                        <ToggleOffIcon label="Publier sur le site" onClick={() => toggleActive(s)} />
+                      )}
                       <EditIcon label="Modifier" onClick={() => openEdit(s)} />
-                      <HideIcon label="Masquer" onClick={() => handleHide(s)} />
+                      <DeleteIcon label="Supprimer" onClick={() => handleDelete(s)} />
                     </>
                   )}
                 </div>
@@ -188,8 +224,10 @@ export default function AdminHero() {
             </div>
           </div>
         ))}
-        {slides.length === 0 && (
-          <p className="text-gray-400 col-span-full text-center py-8">Aucun slide — ajoutez-en un pour l'afficher sur la page d'accueil</p>
+        {visibleSlides.length === 0 && (
+          <p className="text-gray-400 col-span-full text-center py-8">
+            {showDeleted ? "Aucun élément supprimé." : "Aucun slide — ajoutez-en un pour l'afficher sur la page d'accueil"}
+          </p>
         )}
       </div>
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />

@@ -52,6 +52,7 @@ export default function AdminChantiers() {
   const canManage = useHasPermission("accueil.gerer");
   const [chantiers, setChantiers] = useState<Chantier[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -199,7 +200,8 @@ export default function AdminChantiers() {
     );
   }
 
-  const { pageItems, totalPages, safePage } = paginate(chantiers, page, 10);
+  const visibleChantiers = showDeleted ? chantiers.filter((x) => x.deleted_at) : chantiers.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleChantiers, page, 10);
 
   return (
     <div className="p-8">
@@ -212,6 +214,11 @@ export default function AdminChantiers() {
           + Nouveau chantier
         </button>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({chantiers.filter((x) => x.deleted_at).length})
+      </label>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -254,8 +261,8 @@ export default function AdminChantiers() {
                 </td>
               </tr>
             ))}
-            {chantiers.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">Aucun chantier</td></tr>
+            {visibleChantiers.length === 0 && (
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-400">{showDeleted ? "Aucun élément supprimé." : "Aucun chantier"}</td></tr>
             )}
           </tbody>
         </table>

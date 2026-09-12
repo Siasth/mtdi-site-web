@@ -17,6 +17,7 @@ export default function AdminIAStrategie() {
   const [piliers, setPiliers] = useState<Pilier[]>([]);
   const [jalons, setJalons] = useState<Jalon[]>([]);
   const [jalonsPage, setJalonsPage] = useState(1);
+  const [showDeletedJalons, setShowDeletedJalons] = useState(false);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -59,7 +60,8 @@ export default function AdminIAStrategie() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems: pageOfJalons, totalPages: jalonsTotalPages, safePage: jalonsSafePage } = paginate(jalons, jalonsPage, 10);
+  const visibleJalons = showDeletedJalons ? jalons.filter((x) => x.deleted_at) : jalons.filter((x) => !x.deleted_at);
+  const { pageItems: pageOfJalons, totalPages: jalonsTotalPages, safePage: jalonsSafePage } = paginate(visibleJalons, jalonsPage, 10);
 
   return (
     <div className="p-8">
@@ -87,7 +89,13 @@ export default function AdminIAStrategie() {
 
       {tab === "jalons" && (
         <>
-          <div className="mb-4 flex justify-end"><button onClick={openNewJ} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau jalon</button></div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={showDeletedJalons} onChange={(e) => { setShowDeletedJalons(e.target.checked); setJalonsPage(1); }} />
+              Afficher les éléments supprimés ({jalons.filter((x) => x.deleted_at).length})
+            </label>
+            <button onClick={openNewJ} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau jalon</button>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageOfJalons.map((j) => (
               <div key={j.id} className={`flex items-center justify-between p-4 ${j.deleted_at ? "opacity-40" : ""}`}>

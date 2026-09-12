@@ -20,8 +20,7 @@ export async function GET() {
   const result = await sql`
     SELECT c.*, (SELECT COUNT(*) FROM actualites a WHERE a.category_id = c.id AND a.deleted_at IS NULL) AS usage_count
     FROM categories c
-    WHERE c.deleted_at IS NULL
-    ORDER BY c.display_order ASC
+    ORDER BY c.deleted_at NULLS FIRST, c.display_order ASC
   `;
   return NextResponse.json(result.rows, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }

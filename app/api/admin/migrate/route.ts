@@ -1449,6 +1449,7 @@ export async function POST(req: NextRequest) {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
+    await sql.query(`ALTER TABLE sitemap_sections ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`);
     await sql.query(`
       CREATE TABLE IF NOT EXISTS sitemap_links (
         id SERIAL PRIMARY KEY,
@@ -1460,6 +1461,7 @@ export async function POST(req: NextRequest) {
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
+    await sql.query(`ALTER TABLE sitemap_links ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`);
     const sitemapCount = await sql`SELECT COUNT(*) AS count FROM sitemap_sections`;
     if (Number(sitemapCount.rows[0].count) === 0) {
       const seedSitemap = [

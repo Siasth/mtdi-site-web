@@ -19,6 +19,7 @@ export default function AdminOpportunites() {
   const canManage = useHasPermission("ressources.gerer");
   const [items, setItems] = useState<Item[]>([]);
   const [pagesByType, setPagesByType] = useState<Record<string, number>>({});
+  const [showDeletedByType, setShowDeletedByType] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -48,11 +49,26 @@ export default function AdminOpportunites() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle opportunité</button>
       </div>
       {TYPES.map((ty) => {
-        const itemsOfType = items.filter((it) => it.type === ty.value);
+        const showDeleted = showDeletedByType[ty.value] || false;
+        const allItemsOfType = items.filter((it) => it.type === ty.value);
+        const itemsOfType = showDeleted ? allItemsOfType.filter((it) => it.deleted_at) : allItemsOfType.filter((it) => !it.deleted_at);
         const { pageItems, totalPages, safePage } = paginate(itemsOfType, pagesByType[ty.value] || 1, 10);
         return (
         <div key={ty.value} className="mb-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">{ty.label}</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-500">{ty.label}</h2>
+            <label className="flex items-center gap-2 text-xs text-gray-500">
+              <input
+                type="checkbox"
+                checked={showDeleted}
+                onChange={(e) => {
+                  setShowDeletedByType((prev) => ({ ...prev, [ty.value]: e.target.checked }));
+                  setPagesByType((prev) => ({ ...prev, [ty.value]: 1 }));
+                }}
+              />
+              Supprimés ({allItemsOfType.filter((it) => it.deleted_at).length})
+            </label>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageItems.map((it) => (
               <div key={it.id} className={`flex items-center justify-between p-4 ${it.deleted_at ? "opacity-40" : ""}`}>
@@ -60,7 +76,7 @@ export default function AdminOpportunites() {
                 <div className="flex gap-1">{it.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(it)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(it)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(it)} /></>}</div>
               </div>
             ))}
-            {itemsOfType.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucune — message d'attente affiché sur le site</p>}
+            {itemsOfType.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">{showDeleted ? "Aucun élément supprimé." : "Aucune — message d'attente affiché sur le site"}</p>}
           </div>
           <Pagination page={safePage} totalPages={totalPages} onChange={(p) => setPagesByType((prev) => ({ ...prev, [ty.value]: p }))} />
         </div>

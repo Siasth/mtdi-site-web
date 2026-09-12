@@ -16,6 +16,8 @@ export default function AdminIAOlympiades() {
   const [criteres, setCriteres] = useState<Critere[]>([]);
   const [editionsPage, setEditionsPage] = useState(1);
   const [criteresPage, setCriteresPage] = useState(1);
+  const [showDeletedEditions, setShowDeletedEditions] = useState(false);
+  const [showDeletedCriteres, setShowDeletedCriteres] = useState(false);
   const [loading, setLoading] = useState(true);
 
   function load() {
@@ -56,8 +58,10 @@ export default function AdminIAOlympiades() {
   if (!canManage) return <div className="p-8"><p className="text-gray-500">Accès refusé.</p></div>;
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems: pageOfEditions, totalPages: editionsTotalPages, safePage: editionsSafePage } = paginate(editions, editionsPage, 10);
-  const { pageItems: pageOfCriteres, totalPages: criteresTotalPages, safePage: criteresSafePage } = paginate(criteres, criteresPage, 10);
+  const visibleEditions = showDeletedEditions ? editions.filter((x) => x.deleted_at) : editions.filter((x) => !x.deleted_at);
+  const visibleCriteres = showDeletedCriteres ? criteres.filter((x) => x.deleted_at) : criteres.filter((x) => !x.deleted_at);
+  const { pageItems: pageOfEditions, totalPages: editionsTotalPages, safePage: editionsSafePage } = paginate(visibleEditions, editionsPage, 10);
+  const { pageItems: pageOfCriteres, totalPages: criteresTotalPages, safePage: criteresSafePage } = paginate(visibleCriteres, criteresPage, 10);
 
   return (
     <div className="p-8">
@@ -71,7 +75,13 @@ export default function AdminIAOlympiades() {
 
       {tab === "editions" && (
         <>
-          <div className="mb-4 flex justify-end"><button onClick={openNewE} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle édition</button></div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={showDeletedEditions} onChange={(e) => { setShowDeletedEditions(e.target.checked); setEditionsPage(1); }} />
+              Afficher les éléments supprimés ({editions.filter((x) => x.deleted_at).length})
+            </label>
+            <button onClick={openNewE} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouvelle édition</button>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageOfEditions.map((ed) => (
               <div key={ed.id} className={`flex items-center justify-between p-4 ${ed.deleted_at ? "opacity-40" : ""}`}>
@@ -79,7 +89,7 @@ export default function AdminIAOlympiades() {
                 <div className="flex gap-1">{ed.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreE(ed)} /> : <><EditIcon label="Modifier" onClick={() => openEditE(ed)} /><DeleteIcon label="Supprimer" onClick={() => deleteE(ed)} /></>}</div>
               </div>
             ))}
-            {editions.length === 0 && <p className="p-8 text-center text-gray-400">Aucune édition</p>}
+            {visibleEditions.length === 0 && <p className="p-8 text-center text-gray-400">{showDeletedEditions ? "Aucun élément supprimé." : "Aucune édition"}</p>}
           </div>
           <Pagination page={editionsSafePage} totalPages={editionsTotalPages} onChange={setEditionsPage} />
         </>
@@ -87,7 +97,13 @@ export default function AdminIAOlympiades() {
 
       {tab === "criteres" && (
         <>
-          <div className="mb-4 flex justify-end"><button onClick={openNewC} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau critère</button></div>
+          <div className="mb-4 flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
+              <input type="checkbox" checked={showDeletedCriteres} onChange={(e) => { setShowDeletedCriteres(e.target.checked); setCriteresPage(1); }} />
+              Afficher les éléments supprimés ({criteres.filter((x) => x.deleted_at).length})
+            </label>
+            <button onClick={openNewC} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau critère</button>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageOfCriteres.map((c) => (
               <div key={c.id} className={`flex items-center justify-between p-4 gap-4 ${c.deleted_at ? "opacity-40" : ""}`}>
@@ -95,7 +111,7 @@ export default function AdminIAOlympiades() {
                 <div className="flex gap-1 flex-shrink-0">{c.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => restoreC(c)} /> : <><EditIcon label="Modifier" onClick={() => openEditC(c)} /><DeleteIcon label="Supprimer" onClick={() => deleteC(c)} /></>}</div>
               </div>
             ))}
-            {criteres.length === 0 && <p className="p-8 text-center text-gray-400">Aucun critère</p>}
+            {visibleCriteres.length === 0 && <p className="p-8 text-center text-gray-400">{showDeletedCriteres ? "Aucun élément supprimé." : "Aucun critère"}</p>}
           </div>
           <Pagination page={criteresSafePage} totalPages={criteresTotalPages} onChange={setCriteresPage} />
         </>

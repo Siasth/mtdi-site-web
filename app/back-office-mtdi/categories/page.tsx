@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
-import { EditIcon, DeleteIcon } from "../components/ActionIcons";
+import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import { ColorContrastHint } from "../components/ColorContrastHint";
 
 const VERT = "#006828";
@@ -16,6 +16,7 @@ type Category = {
   color: string;
   display_order: number;
   usage_count: string;
+  deleted_at: string | null;
 };
 
 type FormState = { nameFr: string; nameEn: string; color: string; displayOrder: number };
@@ -27,6 +28,7 @@ export default function AdminCategories() {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -89,10 +91,15 @@ export default function AdminCategories() {
     if (!res.ok) alert(data.error);
     load();
   }
+  async function handleRestore(c: Category) {
+    await fetch(`/api/admin/categories/${c.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) });
+    load();
+  }
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems, totalPages, safePage } = paginate(categories, page, 10);
+  const visibleCategories = showDeleted ? categories.filter((x) => x.deleted_at) : categories.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleCategories, page, 10);
 
   return (
     <div className="p-8">
@@ -107,6 +114,11 @@ export default function AdminCategories() {
           </button>
         )}
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({categories.filter((x) => x.deleted_at).length})
+      </label>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -132,15 +144,21 @@ export default function AdminCategories() {
                 {canManage && (
                   <td className="px-5 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <EditIcon label="Modifier" onClick={() => openEdit(c)} />
-                      <DeleteIcon label="Supprimer" onClick={() => handleDelete(c)} />
+                      {c.deleted_at ? (
+                        <RestoreIcon label="Restaurer" onClick={() => handleRestore(c)} />
+                      ) : (
+                        <>
+                          <EditIcon label="Modifier" onClick={() => openEdit(c)} />
+                          <DeleteIcon label="Supprimer" onClick={() => handleDelete(c)} />
+                        </>
+                      )}
                     </div>
                   </td>
                 )}
               </tr>
             ))}
-            {categories.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-gray-400">Aucune catégorie</td></tr>
+            {visibleCategories.length === 0 && (
+              <tr><td colSpan={5} className="px-5 py-8 text-center text-gray-400">{showDeleted ? "Aucun élément supprimé." : "Aucune catégorie"}</td></tr>
             )}
           </tbody>
         </table>

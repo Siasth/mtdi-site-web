@@ -84,6 +84,7 @@ export default function AdminActualites() {
 
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | "new" | null>(null);
@@ -264,7 +265,8 @@ export default function AdminActualites() {
     );
   }
 
-  const { pageItems, totalPages, safePage } = paginate(articles, page, 10);
+  const visibleArticles = showDeleted ? articles.filter((x) => x.deleted_at) : articles.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleArticles, page, 10);
 
   return (
     <div className="p-8">
@@ -287,6 +289,11 @@ export default function AdminActualites() {
           )}
         </div>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({articles.filter((x) => x.deleted_at).length})
+      </label>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -338,8 +345,8 @@ export default function AdminActualites() {
                 </td>
               </tr>
             ))}
-            {articles.length === 0 && (
-              <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">Aucun article</td></tr>
+            {visibleArticles.length === 0 && (
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">{showDeleted ? "Aucun élément supprimé." : "Aucun article"}</td></tr>
             )}
           </tbody>
         </table>

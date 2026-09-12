@@ -11,7 +11,7 @@ import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
-type Collection = { id: number; name_fr: string; name_en: string | null; display_order: number; usage_count: string };
+type Collection = { id: number; name_fr: string; name_en: string | null; display_order: number; usage_count: string; deleted_at: string | null };
 
 type GalerieItem = {
   id: number;
@@ -53,6 +53,8 @@ export default function AdminGalerie() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [itemsPage, setItemsPage] = useState(1);
   const [collectionsPage, setCollectionsPage] = useState(1);
+  const [showDeletedItems, setShowDeletedItems] = useState(false);
+  const [showDeletedCollections, setShowDeletedCollections] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
@@ -184,6 +186,10 @@ export default function AdminGalerie() {
     if (!res.ok) alert(d.error);
     load();
   }
+  async function handleRestoreColl(c: Collection) {
+    await fetch(`/api/admin/galerie-collections/${c.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ restore: true }) });
+    load();
+  }
 
   if (!canView) {
     return (
@@ -212,8 +218,10 @@ export default function AdminGalerie() {
     );
   }
 
-  const { pageItems: pageOfItems, totalPages: itemsTotalPages, safePage: itemsSafePage } = paginate(items, itemsPage, 10);
-  const { pageItems: pageOfCollections, totalPages: collectionsTotalPages, safePage: collectionsSafePage } = paginate(collections, collectionsPage, 10);
+  const visibleItems = showDeletedItems ? items.filter((x) => x.deleted_at) : items.filter((x) => !x.deleted_at);
+  const visibleCollections = showDeletedCollections ? collections.filter((x) => x.deleted_at) : collections.filter((x) => !x.deleted_at);
+  const { pageItems: pageOfItems, totalPages: itemsTotalPages, safePage: itemsSafePage } = paginate(visibleItems, itemsPage, 10);
+  const { pageItems: pageOfCollections, totalPages: collectionsTotalPages, safePage: collectionsSafePage } = paginate(visibleCollections, collectionsPage, 10);
 
   return (
     <div className="p-8">
@@ -229,14 +237,18 @@ export default function AdminGalerie() {
           Éléments ({items.filter((i) => !i.deleted_at).length})
         </button>
         <button onClick={() => setTab("collections")} className="px-4 py-2 text-sm font-bold" style={tab === "collections" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>
-          Collections ({collections.length})
+          Collections ({collections.filter((c) => !c.deleted_at).length})
         </button>
       </div>
 
       {tab === "items" && (
         <>
           {canManage && (
-            <div className="mb-4 flex justify-end">
+            <div className="mb-4 flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" checked={showDeletedItems} onChange={(e) => { setShowDeletedItems(e.target.checked); setItemsPage(1); }} />
+                Afficher les éléments supprimés ({items.filter((x) => x.deleted_at).length})
+              </label>
               <button onClick={openNewItem} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
                 + Nouvel élément
               </button>
@@ -285,8 +297,8 @@ export default function AdminGalerie() {
                     </td>
                   </tr>
                 ))}
-                {items.length === 0 && (
-                  <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">Aucun élément</td></tr>
+                {visibleItems.length === 0 && (
+                  <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-400">{showDeletedItems ? "Aucun élément supprimé." : "Aucun élément"}</td></tr>
                 )}
               </tbody>
             </table>
@@ -299,7 +311,11 @@ export default function AdminGalerie() {
       {tab === "collections" && (
         <>
           {canManage && (
-            <div className="mb-4 flex justify-end">
+            <div className="mb-4 flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input type="checkbox" checked={showDeletedCollections} onChange={(e) => { setShowDeletedCollections(e.target.checked); setCollectionsPage(1); }} />
+                Afficher les éléments supprimés ({collections.filter((x) => x.deleted_at).length})
+              </label>
               <button onClick={openNewColl} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>
                 + Nouvelle collection
               </button>
@@ -318,22 +334,28 @@ export default function AdminGalerie() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {pageOfCollections.map((c) => (
-                  <tr key={c.id}>
+                  <tr key={c.id} className={c.deleted_at ? "opacity-40" : ""}>
                     <td className="px-5 py-3 font-medium text-gray-900">{c.name_fr}</td>
                     <td className="px-5 py-3 text-gray-500">{c.name_en || <span className="text-amber-600 text-xs">⚠ non traduit</span>}</td>
                     <td className="px-5 py-3 text-gray-500">{c.usage_count}</td>
                     {canManage && (
                       <td className="px-5 py-3">
                         <div className="flex items-center justify-end gap-1">
-                          <EditIcon label="Modifier" onClick={() => openEditColl(c)} />
-                          <DeleteIcon label="Supprimer" onClick={() => handleDeleteColl(c)} />
+                          {c.deleted_at ? (
+                            <RestoreIcon label="Restaurer" onClick={() => handleRestoreColl(c)} />
+                          ) : (
+                            <>
+                              <EditIcon label="Modifier" onClick={() => openEditColl(c)} />
+                              <DeleteIcon label="Supprimer" onClick={() => handleDeleteColl(c)} />
+                            </>
+                          )}
                         </div>
                       </td>
                     )}
                   </tr>
                 ))}
-                {collections.length === 0 && (
-                  <tr><td colSpan={4} className="px-5 py-8 text-center text-gray-400">Aucune collection</td></tr>
+                {visibleCollections.length === 0 && (
+                  <tr><td colSpan={4} className="px-5 py-8 text-center text-gray-400">{showDeletedCollections ? "Aucun élément supprimé." : "Aucune collection"}</td></tr>
                 )}
               </tbody>
             </table>

@@ -3,8 +3,8 @@ type Locale = "fr" | "en";
 export type SitemapSection = { id: number; title: string; links: { id: number; label: string; href: string }[] };
 
 export async function getSitemapSections(locale: Locale): Promise<SitemapSection[]> {
-  const sections = await sql`SELECT * FROM sitemap_sections WHERE active = TRUE ORDER BY display_order ASC`;
-  const links = await sql`SELECT * FROM sitemap_links WHERE active = TRUE ORDER BY display_order ASC`;
+  const sections = await sql`SELECT * FROM sitemap_sections WHERE active = TRUE AND deleted_at IS NULL ORDER BY display_order ASC`;
+  const links = await sql`SELECT * FROM sitemap_links WHERE active = TRUE AND deleted_at IS NULL ORDER BY display_order ASC`;
   return sections.rows.map((s) => ({
     id: s.id as number,
     title: (locale === "en" && s.title_en ? s.title_en : s.title_fr) as string,

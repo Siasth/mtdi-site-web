@@ -29,6 +29,7 @@ export default function AdminPartenaires() {
   const canManage = useHasPermission("ministere.gerer");
   const [items, setItems] = useState<Partner[]>([]);
   const [pagesByCategory, setPagesByCategory] = useState<Record<string, number>>({});
+  const [showDeletedByCategory, setShowDeletedByCategory] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<number | "new" | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -77,11 +78,26 @@ export default function AdminPartenaires() {
         <button onClick={openNew} className="px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-white rounded-lg" style={{ background: VERT }}>+ Nouveau partenaire</button>
       </div>
       {CATEGORIES.map((cat) => {
-        const itemsOfCat = items.filter((p) => p.category === cat.value);
+        const showDeleted = showDeletedByCategory[cat.value] || false;
+        const allItemsOfCat = items.filter((p) => p.category === cat.value);
+        const itemsOfCat = showDeleted ? allItemsOfCat.filter((p) => p.deleted_at) : allItemsOfCat.filter((p) => !p.deleted_at);
         const { pageItems, totalPages, safePage } = paginate(itemsOfCat, pagesByCategory[cat.value] || 1, 10);
         return (
         <div key={cat.value} className="mb-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">{cat.label}</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-black uppercase tracking-widest text-gray-500">{cat.label}</h2>
+            <label className="flex items-center gap-2 text-xs text-gray-500">
+              <input
+                type="checkbox"
+                checked={showDeleted}
+                onChange={(e) => {
+                  setShowDeletedByCategory((prev) => ({ ...prev, [cat.value]: e.target.checked }));
+                  setPagesByCategory((prev) => ({ ...prev, [cat.value]: 1 }));
+                }}
+              />
+              Supprimés ({allItemsOfCat.filter((p) => p.deleted_at).length})
+            </label>
+          </div>
           <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {pageItems.map((p) => (
               <div key={p.id} className={`flex items-center justify-between p-4 ${p.deleted_at ? "opacity-40" : ""}`}>
@@ -89,7 +105,7 @@ export default function AdminPartenaires() {
                 <div className="flex gap-1">{p.deleted_at ? <RestoreIcon label="Restaurer" onClick={() => handleRestore(p)} /> : <><EditIcon label="Modifier" onClick={() => openEdit(p)} /><DeleteIcon label="Supprimer" onClick={() => handleDelete(p)} /></>}</div>
               </div>
             ))}
-            {itemsOfCat.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">Aucun</p>}
+            {itemsOfCat.length === 0 && <p className="p-4 text-center text-gray-400 text-sm">{showDeleted ? "Aucun élément supprimé." : "Aucun"}</p>}
           </div>
           <Pagination page={safePage} totalPages={totalPages} onChange={(pg) => setPagesByCategory((prev) => ({ ...prev, [cat.value]: pg }))} />
         </div>

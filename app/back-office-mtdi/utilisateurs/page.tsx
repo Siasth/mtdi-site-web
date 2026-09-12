@@ -26,6 +26,7 @@ export default function AdminUtilisateurs() {
   const canView = useHasPermission("utilisateurs.voir");
   const [users, setUsers] = useState<UserRow[]>([]);
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -141,7 +142,8 @@ export default function AdminUtilisateurs() {
 
   if (loading) return <div className="p-8 text-gray-400">Chargement...</div>;
 
-  const { pageItems, totalPages, safePage } = paginate(users, page, 10);
+  const visibleUsers = showDeleted ? users.filter((x) => x.deleted_at) : users.filter((x) => !x.deleted_at);
+  const { pageItems, totalPages, safePage } = paginate(visibleUsers, page, 10);
 
   return (
     <div className="p-8">
@@ -158,6 +160,11 @@ export default function AdminUtilisateurs() {
           + Nouvel utilisateur
         </button>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({users.filter((x) => x.deleted_at).length})
+      </label>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">

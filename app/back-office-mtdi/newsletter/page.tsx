@@ -36,6 +36,7 @@ export default function AdminNewsletter() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
 
   function load() {
     setLoading(true);
@@ -46,10 +47,11 @@ export default function AdminNewsletter() {
   useEffect(() => { if (canView) load(); }, [canView]);
 
   const filtered = useMemo(() => {
+    const base = showDeleted ? items.filter((s) => s.deleted_at) : items.filter((s) => !s.deleted_at);
     const q = search.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter((s) => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q));
-  }, [items, search]);
+    if (!q) return base;
+    return base.filter((s) => s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q));
+  }, [items, search, showDeleted]);
 
   const activeCount = useMemo(() => items.filter((s) => s.active && !s.deleted_at).length, [items]);
   const { pageItems, totalPages, safePage } = paginate(filtered, page, PAGE_SIZE);
@@ -114,6 +116,11 @@ export default function AdminNewsletter() {
           </button>
         </div>
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+        <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); setPage(1); }} />
+        Afficher les éléments supprimés ({items.filter((x) => x.deleted_at).length})
+      </label>
 
       <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
         {pageItems.map((s) => (
