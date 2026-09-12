@@ -38,7 +38,7 @@ export default function ActualitesListClient({
   const filtered = normalizedQuery
     ? byCategory.filter((a) => a.title.toLowerCase().includes(normalizedQuery))
     : byCategory;
-  const { pageItems: visible, totalPages, safePage } = paginate(filtered, page, 12);
+  const { pageItems: visible, totalPages, safePage } = paginate(filtered, page, 6);
 
   return (
     <>
@@ -89,7 +89,7 @@ export default function ActualitesListClient({
             </div>
           </div>
 
-          <p className="text-xs font-semibold text-anthracite/50" aria-live="polite">
+          <p className="text-xs font-semibold text-anthracite/65" aria-live="polite">
             {filtered.length} {locale === "en" ? (filtered.length > 1 ? "results" : "result") : (filtered.length > 1 ? "résultats" : "résultat")}
           </p>
         </div>
@@ -99,56 +99,38 @@ export default function ActualitesListClient({
       <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gris-perle">
         <div className="max-w-7xl mx-auto">
           {filtered.length === 0 ? (
-            <p className="text-center text-anthracite/50 text-sm font-medium py-12">
+            <p className="text-center text-anthracite/65 text-sm font-medium py-12">
               {locale === "en" ? "No articles match your search." : "Aucun article ne correspond à votre recherche."}
             </p>
           ) : (
           <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px" style={{ background: "rgba(0,0,0,0.08)" }}>
             {visible.map((article) => {
               const href = article.hrefExternal || `${prefix}/actualites/${article.id}`;
               const isExternal = !!article.hrefExternal;
               return (
-                <article key={article.id} className="group flex flex-col bg-white overflow-hidden transition-shadow hover:shadow-lg" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
-                  <div className="relative w-full" style={{ aspectRatio: "16 / 9", background: article.image ? "#000" : "rgba(0,104,40,0.06)" }}>
-                    {article.image ? (
-                      <img
-                        src={article.image}
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <img
-                        src="/mtdi-banner.png"
-                        alt=""
-                        className="absolute inset-0 w-full h-full object-contain p-8"
-                      />
-                    )}
-                    <span
-                      className="absolute top-3 right-3 inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest"
-                      style={{ background: article.categoryColor, color: textColorFor(article.categoryColor) }}
-                    >
+                <article key={article.id} className="group flex flex-col justify-between p-8 bg-white hover:bg-gris-perle transition-colors" style={{ minHeight: "260px" }}>
+                  <div>
+                    <span className="inline-block px-2.5 py-1 text-[10px] font-black uppercase tracking-widest mb-5" style={{ background: article.categoryColor, color: textColorFor(article.categoryColor) }}>
                       {article.category}
                     </span>
-                  </div>
-
-                  <div className="flex flex-col flex-1 p-6">
-                    <span className="text-anthracite/60 text-xs font-medium mb-3">
-                      {new Date(article.publishedAt).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", { day: "numeric", month: "long", year: "numeric" })}
-                    </span>
-                    <h2 className="text-anthracite font-black text-base leading-snug uppercase group-hover:text-anthracite/80 transition-colors flex-1">
+                    <h2 className="text-anthracite font-black text-base sm:text-lg leading-snug uppercase group-hover:text-anthracite/80 transition-colors">
                       {article.title}
                     </h2>
+                  </div>
 
+                  <div className="flex items-center justify-between mt-8 pt-5" style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
+                    <span className="text-anthracite/80 text-xs font-medium">
+                      {new Date(article.publishedAt).toLocaleDateString(locale === "en" ? "en-US" : "fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                    </span>
                     <Link
                       href={href}
                       target={isExternal ? "_blank" : undefined}
                       rel={isExternal ? "noopener noreferrer" : undefined}
-                      className="mt-5 inline-flex items-center justify-between gap-3 px-4 py-3 text-xs font-black uppercase tracking-widest text-white transition-opacity hover:opacity-90"
-                      style={{ background: VERT }}
+                      className="text-xs font-black uppercase tracking-widest transition-all"
+                      style={{ color: VERT }}
                     >
                       {dict.lire}
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </Link>
                   </div>
                 </article>
