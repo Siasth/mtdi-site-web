@@ -15,6 +15,8 @@ import { TableHeader as BaseTableHeader } from "@tiptap/extension-table-header";
 import { TableCell as BaseTableCell } from "@tiptap/extension-table-cell";
 import { TextAlign } from "@tiptap/extension-text-align";
 import Paragraph from "@tiptap/extension-paragraph";
+import { ListItem as BaseListItem } from "@tiptap/extension-list-item";
+import { BulletList as BaseBulletList } from "@tiptap/extension-bullet-list";
 
 // Étend les paragraphes pour supporter interligne et espacement entre
 // paragraphes (attributs appliqués comme style CSS inline, conservés par
@@ -60,6 +62,52 @@ const ParagraphWithSpacing = Paragraph.extend({
     return ["p", attrs, 0];
   },
 });
+
+// Un item de liste (<li>) n'accepte par défaut qu'un paragraphe comme
+// premier bloc ("paragraph block*"). Résultat : appliquer un style de titre
+// à la première ligne d'un item numéroté est impossible pour l'éditeur, qui
+// éjecte alors la ligne de la liste (perte du numéro) pour respecter le
+// schéma. On autorise ici un titre OU un paragraphe en tête de l'item, afin
+// de pouvoir composer « 1. Titre + paragraphe » sans quitter la liste ni
+// casser la numérotation.
+const ListItem = BaseListItem.extend({
+  content: "(paragraph | heading) block*",
+});
+
+// Le HTML natif n'a pas d'équivalent à ol[type] pour changer le style de
+// puce d'une <ul> — on ajoute donc un attribut personnalisé rendu en style
+// inline, avec 3 styles au choix (disc / cercle / carré).
+export const BULLET_STYLES = [
+  { label: "• Disque", value: "disc" },
+  { label: "○ Cercle", value: "circle" },
+  { label: "▪ Carré", value: "square" },
+];
+const BulletList = BaseBulletList.extend({
+  addAttributes() {
+    return {
+      bulletStyle: {
+        default: "disc",
+        parseHTML: (el: HTMLElement) => el.style.listStyleType || "disc",
+        renderHTML: (attrs: { bulletStyle?: string }) => {
+          if (!attrs.bulletStyle || attrs.bulletStyle === "disc") return {};
+          return { style: `list-style-type: ${attrs.bulletStyle}` };
+        },
+      },
+    };
+  },
+});
+
+// ol[type] est un attribut HTML natif (contrairement aux puces) : le
+// navigateur affiche nativement 1/2/3, A/B/C, a/b/c, I/II/III ou i/ii/iii
+// sans CSS supplémentaire. On expose juste les 5 valeurs dans la barre
+// d'outils, l'attribut est déjà géré par l'extension OrderedList standard.
+export const ORDERED_LIST_TYPES = [
+  { label: "1, 2, 3…", value: "1" },
+  { label: "A, B, C…", value: "A" },
+  { label: "a, b, c…", value: "a" },
+  { label: "I, II, III…", value: "I" },
+  { label: "i, ii, iii…", value: "i" },
+];
 
 // Étend les cellules pour supporter une couleur de fond personnalisée
 // (setCellAttribute("backgroundColor", ...) n'a aucun effet sans ça).
@@ -301,9 +349,51 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <ToolbarButton title="Liste à puces" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
         <span className="text-sm">•</span>
       </ToolbarButton>
+      {editor.isActive("bulletList") && (
+        <div className="flex items-center gap-0.5">
+          {BULLET_STYLES.map((s) => (
+            <ToolbarButton
+              key={s.value}
+              title={s.label}
+              active={(editor.getAttributes("bulletList").bulletStyle || "disc") === s.value}
+              onClick={() => editor.chain().focus().updateAttributes("bulletList", { bulletStyle: s.value }).run()}
+            >
+              <span className="text-sm">{s.label[0]}</span>
+            </ToolbarButton>
+          ))}
+        </div>
+      )}
       <ToolbarButton title="Liste numérotée" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
         <span className="text-xs font-bold">1.</span>
       </ToolbarButton>
+      {editor.isActive("orderedList") && (
+        <>
+          <select
+            title="Style de numérotation"
+            value={(editor.getAttributes("orderedList").type as string | null) || "1"}
+            onChange={(e) => editor.chain().focus().updateAttributes("orderedList", { type: e.target.value }).run()}
+            className="text-xs border border-gray-200 rounded px-1 py-1 bg-white text-gray-600 cursor-pointer"
+          >
+            {ORDERED_LIST_TYPES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <input
+            type="number"
+            min={1}
+            title="Reprendre la numérotation à…"
+            // Filet de sécurité : si une liste numérotée doit être interrompue
+            // par un élément qui ne peut pas vivre dans un item (image,
+            // tableau…), la liste suivante recommence à 1 par défaut (comme en
+            // HTML standard). Ce champ permet de corriger manuellement le
+            // numéro de reprise sans tout retaper.
+            value={(editor.getAttributes("orderedList").start as number | undefined) ?? 1}
+            onChange={(e) => {
+              const n = Math.max(1, Number(e.target.value) || 1);
+              editor.chain().focus().updateAttributes("orderedList", { start: n }).run();
+            }}
+            className="w-12 text-xs border border-gray-200 rounded px-1 py-1 bg-white text-gray-600"
+          />
+        </>
+      )}
       <ToolbarButton title="Citation" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
         <span className="text-sm">"</span>
       </ToolbarButton>
@@ -450,8 +540,10 @@ export default function MarkdownEditor({
     // sur leur dernier état jusqu'à la prochaine frappe.
     shouldRerenderOnTransaction: true,
     extensions: [
-      StarterKit.configure({ link: false, paragraph: false }),
+      StarterKit.configure({ link: false, paragraph: false, listItem: false, bulletList: false }),
       ParagraphWithSpacing,
+      ListItem,
+      BulletList,
       Link.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder: placeholder || "Écrivez ici…" }),
       TextStyle,
@@ -501,6 +593,16 @@ export default function MarkdownEditor({
         .prose-editor p { margin: 0.4em 0; }
         .prose-editor ul { list-style: disc; padding-left: 1.4em; margin: 0.4em 0; }
         .prose-editor ol { list-style: decimal; padding-left: 1.4em; margin: 0.4em 0; }
+        .prose-editor li h1, .prose-editor li h2, .prose-editor li h3 { margin-top: 0; }
+        .prose-editor li p { margin: 0.2em 0; }
+        /* Le marqueur (numéro/puce) hérite de la taille/graisse du <li>, pas
+           de son contenu : sans ça, un titre appliqué à un item de liste
+           s'affiche en grand alors que son numéro reste minuscule. On fait
+           donc correspondre le <li> lui-même au style du titre qu'il contient. */
+        .prose-editor li:has(> h1) { font-size: 1.4em; font-weight: 900; }
+        .prose-editor li:has(> h2) { font-size: 1.2em; font-weight: 900; }
+        .prose-editor li:has(> h3) { font-size: 1.05em; font-weight: 900; }
+        .prose-editor li:has(> h1) > h1, .prose-editor li:has(> h2) > h2, .prose-editor li:has(> h3) > h3 { font-size: 1em; }
         .prose-editor blockquote { border-left: 2px solid ${VERT}; padding-left: 0.8em; color: #666; font-style: italic; margin: 0.5em 0; }
         .prose-editor code { background: #f1f1ef; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; }
         .prose-editor a { color: ${VERT}; text-decoration: underline; }
