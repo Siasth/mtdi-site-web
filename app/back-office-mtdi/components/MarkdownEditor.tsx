@@ -346,7 +346,14 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <div className="w-px h-5 bg-gray-200 mx-1" />
 
-      <ToolbarButton title="Liste à puces" active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+      {/* ANO-065 : cliquer sur "Liste à puces"/"Liste numérotée" alors que le
+          curseur est dans un titre l'enveloppait silencieusement dans un
+          <ul>/<ol><li> (annoncé "liste de 1 élément" par un lecteur d'écran).
+          On désactive donc ces boutons dans ce cas — sans restreindre le
+          schéma des items de liste eux-mêmes, qui doivent rester capables de
+          contenir un titre quand la liste est déjà créée (cf. la personnalisation
+          des puces/numéros ci-dessous et son CSS associé). */}
+      <ToolbarButton title="Liste à puces" active={editor.isActive("bulletList")} disabled={editor.isActive("heading")} onClick={() => editor.chain().focus().toggleBulletList().run()}>
         <span className="text-sm">•</span>
       </ToolbarButton>
       {editor.isActive("bulletList") && (
@@ -363,7 +370,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
           ))}
         </div>
       )}
-      <ToolbarButton title="Liste numérotée" active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+      <ToolbarButton title="Liste numérotée" active={editor.isActive("orderedList")} disabled={editor.isActive("heading")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
         <span className="text-xs font-bold">1.</span>
       </ToolbarButton>
       {editor.isActive("orderedList") && (
