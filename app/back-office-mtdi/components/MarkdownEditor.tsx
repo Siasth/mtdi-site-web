@@ -203,6 +203,7 @@ function Toolbar({ editor }: { editor: Editor | null }) {
   const [showColors, setShowColors] = useState(false);
   const [colorWarning, setColorWarning] = useState(false);
   const [showCellColors, setShowCellColors] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   if (!editor) return null;
 
@@ -517,6 +518,49 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <ToolbarButton title="Rétablir" onClick={() => editor.chain().focus().redo().run()}>
         <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10a8 8 0 10-14.5 4.7M21 10V4m0 6h-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </ToolbarButton>
+
+      <div className="relative ml-auto">
+        <ToolbarButton title="Aide sur l'éditeur" onClick={() => setShowHelp((s) => !s)}>
+          <span className="text-sm font-black" style={{ fontStyle: "normal" }}>?</span>
+        </ToolbarButton>
+        {showHelp && (
+          <div
+            className="absolute z-20 top-9 right-0 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-80 text-xs text-gray-700 leading-relaxed space-y-3"
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <div className="flex items-center justify-between">
+              <p className="font-black text-gray-900 uppercase tracking-wide text-[11px]">Aide-mémoire éditeur</p>
+              <button type="button" onClick={() => setShowHelp(false)} className="text-gray-400 hover:text-gray-700 leading-none text-base">×</button>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-900 mb-1">Listes</p>
+              <ul className="space-y-1 list-disc pl-4">
+                <li><strong>Entrée</strong> crée un nouvel élément de liste ; <strong>Maj+Entrée</strong> fait un simple retour à la ligne dans le même élément (utile pour un titre suivi d'une explication, comme un seul point de liste sur plusieurs lignes).</li>
+                <li>Un élément de liste peut contenir un titre (H1/H2/H3) : le numéro ou la puce reprend alors sa taille.</li>
+                <li>Les boutons de liste sont désactivés tant que le curseur est dans un titre, pour éviter de le transformer en liste par erreur.</li>
+                <li>Les petites flèches à côté des boutons Liste à puces/numérotée permettent de choisir le style (puce ronde/carrée, chiffres/lettres/romains...).</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-900 mb-1">Liens et tableaux</p>
+              <ul className="space-y-1 list-disc pl-4">
+                <li>Sélectionnez du texte puis cliquez sur l'icône lien pour l'associer à une URL.</li>
+                <li>Cliquez dans un tableau pour faire apparaître les outils dédiés (lignes, colonnes, fusion, couleur de fond).</li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-bold text-gray-900 mb-1">Le reste</p>
+              <ul className="space-y-1 list-disc pl-4">
+                <li>Gras, italique, barré, code, couleur et police s'appliquent au texte sélectionné.</li>
+                <li>Annuler/Rétablir fonctionnent aussi au clavier (Ctrl+Z / Ctrl+Y).</li>
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
