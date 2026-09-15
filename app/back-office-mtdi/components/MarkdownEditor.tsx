@@ -537,7 +537,8 @@ function Toolbar({ editor }: { editor: Editor | null }) {
               <p className="font-bold text-gray-900 mb-1">Listes</p>
               <ul className="space-y-1 list-disc pl-4">
                 <li><strong>Entrée</strong> crée un nouvel élément de liste ; <strong>Maj+Entrée</strong> fait un simple retour à la ligne dans le même élément (utile pour un titre suivi d'une explication, comme un seul point de liste sur plusieurs lignes).</li>
-                <li>Un élément de liste peut contenir un titre (H1/H2/H3) : le numéro ou la puce reprend alors sa taille.</li>
+                <li>Un élément de liste peut contenir un titre (H1/H2/H3) : le numéro ou la puce reprend alors sa taille — mais un titre occupe <strong>tout le bloc</strong>, donc ne l'utilisez pas si une explication doit suivre sur une autre ligne du même point.</li>
+                <li>Pour un point avec un "titre" en évidence suivi d'une explication (comme ce panneau d'aide lui-même) : sélectionnez juste le mot ou la phrase à mettre en avant et cliquez sur <strong>Gras</strong>, pas sur Titre — le gras ne modifie que le texte sélectionné, alors que Titre s'appliquerait à tout le bloc, explication comprise.</li>
                 <li>Les boutons de liste sont désactivés tant que le curseur est dans un titre, pour éviter de le transformer en liste par erreur.</li>
                 <li>Les petites flèches à côté des boutons Liste à puces/numérotée permettent de choisir le style (puce ronde/carrée, chiffres/lettres/romains...).</li>
               </ul>
