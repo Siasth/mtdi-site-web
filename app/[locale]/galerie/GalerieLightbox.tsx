@@ -3,6 +3,7 @@
 import { useEffect, useCallback } from "react";
 import Image from "next/image";
 import type { GalerieItem } from "@/lib/galerie";
+import { getYoutubeEmbedUrl } from "@/lib/youtube-thumbnail";
 
 const VERT = "#006828";
 
@@ -84,16 +85,53 @@ export default function GalerieLightbox({
         )}
 
         <div className="relative w-full h-full max-w-5xl">
-          {item.image && (
-            <Image
-              key={item.id}
-              src={item.image}
-              alt={item.title}
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
+          {item.type === "video" && item.videoUrl ? (
+            (() => {
+              const embedUrl = getYoutubeEmbedUrl(item.videoUrl);
+              return embedUrl ? (
+                // ANO-003 : la vidéo se lit directement ici, dans la galerie —
+                // pas de redirection vers un onglet externe ni vers la
+                // vidéothèque (contenu totalement indépendant).
+                <iframe
+                  key={item.id}
+                  src={`${embedUrl}?autoplay=1`}
+                  title={item.title}
+                  className="w-full h-full"
+                  style={{ aspectRatio: "16/9", maxHeight: "100%" }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                // Source vidéo non reconnue (pas YouTube) : on propose
+                // l'ouverture externe plutôt que de ne rien afficher.
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 text-white">
+                  {item.image && (
+                    <Image key={item.id} src={item.image} alt={item.title} fill className="object-contain opacity-40" sizes="100vw" />
+                  )}
+                  <a
+                    href={item.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative z-10 inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-bold uppercase tracking-wider"
+                    style={{ background: VERT }}
+                  >
+                    Regarder la vidéo
+                  </a>
+                </div>
+              );
+            })()
+          ) : (
+            item.image && (
+              <Image
+                key={item.id}
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-contain"
+                sizes="100vw"
+                priority
+              />
+            )
           )}
         </div>
 

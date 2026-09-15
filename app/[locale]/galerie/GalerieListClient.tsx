@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import type { GalerieItem, GalerieCollection } from "@/lib/galerie";
 import { Pagination, paginate } from "@/app/components/Pagination";
@@ -31,6 +32,34 @@ export default function GalerieListClient({
   const [page, setPage] = useState(1);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const prefix = locale === "en" ? "/en" : "";
+
+  // ANO-003 : lien profond (?item=<id>), utilisé par le widget "Le Bénin en
+  // images" de l'accueil pour ouvrir exactement le bon élément — photo ou
+  // vidéo — au lieu d'atterrir sur la liste générique. On cherche l'élément
+  // dans la liste COMPLÈTE (pas seulement la page/le filtre actuellement
+  // affiché), pour que ça marche quel que soit l'endroit où il se trouve.
+  // Calculé directement au rendu (pas de setState dans un effet).
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [deepLinkDismissed, setDeepLinkDismissed] = useState(false);
+  const targetId = searchParams.get("item");
+  const deepLinkedItem =
+    !deepLinkDismissed && targetId
+      ? items.find(
+          (it) =>
+            String(it.id) === targetId &&
+            !it.hrefExternal &&
+            (it.image || (it.type === "video" && it.videoUrl))
+        ) ?? null
+      : null;
+
+  function closeDeepLink() {
+    setDeepLinkDismissed(true);
+    // Nettoie l'URL pour qu'un rafraîchissement ou un retour arrière ne
+    // rouvre pas la lightbox indéfiniment.
+    router.replace(pathname, { scroll: false });
+  }
 
   const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -78,7 +107,10 @@ export default function GalerieListClient({
 
   const resultLabel = filtered.length > 1 ? dict.resultatsPluriel : dict.resultats;
 
-  const isLightboxable = (item: GalerieItem) => !item.hrefExternal && !item.videoUrl && !!item.image;
+  // ANO-003 : les vidéos s'ouvrent maintenant aussi dans la lightbox (lecture
+  // intégrée), au lieu de rediriger vers un onglet externe.
+  const isLightboxable = (item: GalerieItem) =>
+    !item.hrefExternal && (!!item.image || (item.type === "video" && !!item.videoUrl));
   const lightboxPhotos = sections.flatMap((s) => s.items).filter(isLightboxable);
 
   function formatDate(iso: string | null) {
@@ -241,14 +273,24 @@ export default function GalerieListClient({
 
       <Pagination page={safePage} totalPages={totalPages} onChange={setPage} />
 
-      {lightboxIndex !== null && lightboxPhotos.length > 0 && (
+      {deepLinkedItem ? (
         <GalerieLightbox
-          items={lightboxPhotos}
-          index={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-          onNavigate={setLightboxIndex}
+          items={[deepLinkedItem]}
+          index={0}
+          onClose={closeDeepLink}
+          onNavigate={() => {}}
           formatDate={formatDate}
         />
+      ) : (
+        lightboxIndex !== null && lightboxPhotos.length > 0 && (
+          <GalerieLightbox
+            items={lightboxPhotos}
+            index={lightboxIndex}
+            onClose={() => setLightboxIndex(null)}
+            onNavigate={setLightboxIndex}
+            formatDate={formatDate}
+          />
+        )
       )}
       <style>{`
         .prose-institutionnel p { margin: 0.3em 0; }

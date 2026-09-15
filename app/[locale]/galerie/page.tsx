@@ -1,4 +1,5 @@
 import { getDictionary, type Locale } from "../dictionaries";
+import { Suspense } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import GalerieListClient from "./GalerieListClient";
@@ -37,16 +38,21 @@ export default async function GaleriePage({ params }: Props) {
           </div>
         </section>
 
-        <GalerieListClient
-          items={items}
-          collections={collections}
-          locale={locale}
-          dict={{
-            video: t.video, photo: t.photo, resultats: t.resultats, resultatsPluriel: t.resultatsPluriel,
-            aucunResultat: t.aucunResultat, essayezAutres: t.essayezAutres,
-            rechercherPlaceholder: t.rechercherPlaceholder, effacer: t.effacer,
-          }}
-        />
+        {/* ANO-003 : GalerieListClient utilise useSearchParams() pour le lien
+            profond ?item=<id> — Suspense évite l'avertissement/l'échec de
+            build associé à ce hook côté Next.js. */}
+        <Suspense fallback={null}>
+          <GalerieListClient
+            items={items}
+            collections={collections}
+            locale={locale}
+            dict={{
+              video: t.video, photo: t.photo, resultats: t.resultats, resultatsPluriel: t.resultatsPluriel,
+              aucunResultat: t.aucunResultat, essayezAutres: t.essayezAutres,
+              rechercherPlaceholder: t.rechercherPlaceholder, effacer: t.effacer,
+            }}
+          />
+        </Suspense>
       </main>
 
       <Footer locale={locale} dict={dict.footer} />
