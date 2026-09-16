@@ -205,7 +205,7 @@ export default function AdminGeneral() {
               Email presse (page Kit presse)
             </label>
             <input id="email-presse" type="email" value={form.pressEmail} onChange={(e) => setForm({ ...form, pressEmail: e.target.value })} placeholder="mtdi.presse@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
-            <p className="text-xs text-gray-400 mt-1">ANO-024 : les adresses email du ministère utilisent le domaine gouv.bj (convention commune à toute l'administration), contrairement aux liens du site qui utilisent innovation.gouv.bj.</p>
+      
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="telephone">Téléphone</label>
@@ -252,7 +252,7 @@ export default function AdminGeneral() {
             <p className="text-xs text-gray-400 mt-1">Affiche un lien "Voir sur la carte" sur la page Contact si renseigné.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="document-de-la-strategie-nationale-d-ia-">Document de la Stratégie Nationale d'IA (lien de téléchargement — affiché aux deux endroits de la page Stratégie IA : le bouton en haut de page et celui en bas)</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="document-de-la-strategie-nationale-d-ia-">Document de la Stratégie Nationale d'IA (lien de téléchargement)</label>
             <input id="document-de-la-strategie-nationale-d-ia-"
               type="url"
               pattern={URL_PATTERN}
@@ -263,19 +263,6 @@ export default function AdminGeneral() {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
             />
             <p className="text-xs text-gray-400 mt-1">Utilisé par le bouton "Télécharger la stratégie" sur la page Stratégie Nationale d'IA.</p>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="plateforme-externe-des-appels-d-offres">Plateforme externe des appels d'offres</label>
-            <input id="plateforme-externe-des-appels-d-offres"
-              type="url"
-              pattern={URL_PATTERN}
-              title="URL valide commençant par http:// ou https://"
-              value={form.appelsOffresExternalUrl}
-              onChange={(e) => setForm({ ...form, appelsOffresExternalUrl: e.target.value })}
-              placeholder="https://..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-            />
-            <p className="text-xs text-gray-400 mt-1">Utilisé sur la page "Participer" quand aucun appel d'offre n'est publié individuellement.</p>
           </div>
         </section>
 
