@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
+import { URL_PATTERN } from "@/lib/validators";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
 import MarkdownEditor from "../components/MarkdownEditor";
 
@@ -107,7 +108,7 @@ export default function AdminOpportunites() {
               </>
             )}
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date-limite-libelle-libre">Date limite (libellé libre)</label><input id="date-limite-libelle-libre" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} placeholder="ex: Avant le 15 septembre 2026" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien-candidature-details">Lien (candidature / détails)</label><input id="lien-candidature-details" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien-candidature-details">Lien (candidature / détails)</label><input id="lien-candidature-details" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={form.href} onChange={(e) => setForm({ ...form, href: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <label className="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} /> Visible</label>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditing(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>

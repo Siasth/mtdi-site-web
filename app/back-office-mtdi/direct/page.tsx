@@ -5,6 +5,7 @@ import { ModalCloseButton } from "../components/ModalHeader";
 import { Pagination, paginate } from "../components/Pagination";
 import { useHasPermission } from "../AdminLayoutClient";
 import { EditIcon, DeleteIcon, RestoreIcon } from "../components/ActionIcons";
+import { URL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -22,6 +23,35 @@ export default function AdminDirect() {
   const [showDeletedReplays, setShowDeletedReplays] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Diffusion en direct (ANO-089 / ANO-142)
+  const [liveForm, setLiveForm] = useState({ isLive: false, url: "", titleFr: "", titleEn: "" });
+  const [liveSaving, setLiveSaving] = useState(false);
+  const [liveSaveError, setLiveSaveError] = useState("");
+  const [liveSaved, setLiveSaved] = useState(false);
+  function loadLive() {
+    fetch("/api/admin/direct-live", { cache: "no-store" }).then((r) => r.json()).then((s) => {
+      setLiveForm({ isLive: s.isLive, url: s.url, titleFr: s.titleFr, titleEn: s.titleEn });
+    });
+  }
+  async function saveLive(e: React.FormEvent) {
+    e.preventDefault();
+    setLiveSaveError("");
+    setLiveSaving(true);
+    const res = await fetch("/api/admin/direct-live", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(liveForm),
+    });
+    setLiveSaving(false);
+    if (res.ok) {
+      setLiveSaved(true);
+      setTimeout(() => setLiveSaved(false), 2500);
+    } else {
+      const data = await res.json();
+      setLiveSaveError(data.error || "Erreur lors de l'enregistrement");
+    }
+  }
+
   function load() {
     setLoading(true);
     Promise.all([
@@ -29,7 +59,7 @@ export default function AdminDirect() {
       fetch("/api/admin/direct-replays", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([u, r]) => { setUpcoming(u); setReplays(r); setLoading(false); });
   }
-  useEffect(() => { if (canManage) load(); }, [canManage]);
+  useEffect(() => { if (canManage) { load(); loadLive(); } }, [canManage]);
 
   // Événement à venir
   const [editU, setEditU] = useState<number | "new" | null>(null);
@@ -85,6 +115,45 @@ export default function AdminDirect() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Direct</h1>
+
+      <form onSubmit={saveLive} className="bg-white rounded-xl border border-gray-200 p-6 mb-8 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-bold text-gray-900 text-base">Diffusion en direct</h2>
+          {liveSaved && <span className="text-xs font-bold text-green-600">Enregistré ✓</span>}
+        </div>
+        <p className="text-xs text-gray-500 -mt-2">
+          Collez l&apos;URL de la vidéo YouTube (ou de la chaîne en direct) ou de la publication Facebook Live. La plateforme est détectée automatiquement. Un lien vers un autre type de flux vidéo (ex. .m3u8) est aussi accepté à titre expérimental.
+        </p>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" checked={liveForm.isLive} onChange={(e) => setLiveForm({ ...liveForm, isLive: e.target.checked })} />
+          En direct maintenant (affiche le lecteur sur le site public)
+        </label>
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">URL de la diffusion {liveForm.isLive && "*"}</label>
+          <input
+            required={liveForm.isLive}
+            type="url"
+            value={liveForm.url}
+            onChange={(e) => setLiveForm({ ...liveForm, url: e.target.value })}
+            placeholder="https://www.youtube.com/watch?v=... ou https://www.facebook.com/.../videos/..."
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre affiché (Français)</label>
+            <input value={liveForm.titleFr} onChange={(e) => setLiveForm({ ...liveForm, titleFr: e.target.value })} placeholder="Ex : Point de presse du Ministre" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Titre affiché (Anglais)</label>
+            <input value={liveForm.titleEn} onChange={(e) => setLiveForm({ ...liveForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+        </div>
+        {liveSaveError && <p className="text-xs text-red-600">{liveSaveError}</p>}
+        <button type="submit" disabled={liveSaving} className="px-5 py-2.5 text-sm font-bold text-white rounded-lg disabled:opacity-50" style={{ background: VERT }}>
+          {liveSaving ? "Enregistrement..." : "Enregistrer"}
+        </button>
+      </form>
 
       <div className="flex gap-1 mb-6 border-b border-gray-200">
         <button onClick={() => setTab("upcoming")} className="px-4 py-2 text-sm font-bold" style={tab === "upcoming" ? { color: VERT, borderBottom: `2px solid ${VERT}` } : { color: "#999" }}>À venir ({upcoming.filter((u) => !u.deleted_at).length})</button>
@@ -164,7 +233,7 @@ export default function AdminDirect() {
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="titre-en-2">Titre (EN)</label><input id="titre-en-2" value={rForm.titleEn} onChange={(e) => setRForm({ ...rForm, titleEn: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="source">Source</label><input id="source" value={rForm.source} onChange={(e) => setRForm({ ...rForm, source: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="date">Date</label><input id="date" type="date" value={rForm.replayDate} onChange={(e) => setRForm({ ...rForm, replayDate: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien">Lien *</label><input id="lien" required value={rForm.url} onChange={(e) => setRForm({ ...rForm, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
+            <div><label className="block text-xs font-semibold text-gray-500 uppercase mb-1" htmlFor="lien">Lien *</label><input id="lien" required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={rForm.url} onChange={(e) => setRForm({ ...rForm, url: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" /></div>
             <div className="flex gap-2 pt-2"><button type="button" onClick={() => setEditR(null)} className="flex-1 py-2.5 text-sm font-bold text-gray-500 rounded-lg border border-gray-200">Annuler</button><button type="submit" className="flex-1 py-2.5 text-sm font-bold uppercase text-white rounded-lg" style={{ background: VERT }}>Enregistrer</button></div>
           </form>
         </div>
