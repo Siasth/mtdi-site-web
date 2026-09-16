@@ -66,22 +66,44 @@ function score(title: string, description: string, terms: string[], fullQuery: s
   return s;
 }
 
+// ANO-093 : chaque source est interrogée indépendamment, dans son propre
+// try/catch. Avant ce correctif, les 9 requêtes s'enchaînaient sans aucune
+// isolation : la moindre erreur sur UNE SEULE d'entre elles (table absente,
+// erreur ponctuelle...) faisait échouer TOUTE la fonction — y compris la
+// recherche dans les Rubriques statiques ci-dessus, qui ne dépend pourtant
+// pas de la base de données. Résultat observé : "Aucun résultat" pour
+// n'importe quelle recherche, même les plus évidentes.
+async function safeRows<T>(label: string, fn: () => Promise<{ rows: T[] }>): Promise<T[]> {
+  try {
+    const r = await fn();
+    return r.rows;
+  } catch (err) {
+    console.error(`[search] échec de la requête "${label}" :`, err);
+    return [];
+  }
+}
+
 export async function searchSite(query: string, locale: Locale): Promise<SearchResult[]> {
   const q = normalize(query.trim());
   if (!q) return [];
   const terms = q.split(/\s+/).filter(Boolean);
-  const like = `%${query.trim()}%`;
   const results: SearchResult[] = [];
 
-  // ── Actualités ──
-  const articles = await sql`
+  // Le filtrage par pertinence se fait entièrement en JS (normalize + score
+  // ci-dessus), pas via ILIKE en SQL : ILIKE est insensible à la casse mais
+  // PAS aux accents, donc une recherche "strategie" (sans accent, très
+  // courant) ne retrouvait jamais "Stratégie" en base. On récupère donc un
+  // ensemble large mais borné de contenu actif par source, et on le score
+  // avec la même fonction que les Rubriques statiques — un seul mécanisme
+  // de correspondance, cohérent partout.
+
+  const articles = await safeRows("actualites", () => sql`
     SELECT id, title_fr, title_en, excerpt_fr, excerpt_en, href_external
     FROM actualites
     WHERE deleted_at IS NULL AND status = 'publie' AND (scheduled_at IS NULL OR scheduled_at <= now())
-      AND (title_fr ILIKE ${like} OR title_en ILIKE ${like} OR excerpt_fr ILIKE ${like} OR excerpt_en ILIKE ${like})
-    LIMIT 20
-  `;
-  for (const a of articles.rows) {
+    ORDER BY id DESC LIMIT 300
+  `);
+  for (const a of articles) {
     const title = ((locale === "en" && a.title_en ? a.title_en : a.title_fr) as string) || "";
     const excerptRaw = ((locale === "en" && a.excerpt_en ? a.excerpt_en : a.excerpt_fr) as string) || "";
     const description = excerptRaw.replace(/<[^>]+>/g, "").slice(0, 160);
@@ -91,14 +113,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  // ── Contenu institutionnel & documents (catégorie "Pages") ──
-  const documents = await sql`
-    SELECT title_fr, title_en, description_fr, description_en, href
-    FROM documents WHERE deleted_at IS NULL AND active = TRUE
-      AND (title_fr ILIKE ${like} OR title_en ILIKE ${like} OR description_fr ILIKE ${like} OR description_en ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const d of documents.rows) {
+  const documents = await safeRows("documents", () => sql`
+    SELECT title_fr, title_en, description_fr, description_en
+    FROM documents WHERE deleted_at IS NULL AND active = TRUE LIMIT 200
+  `);
+  for (const d of documents) {
     results.push({
       title: ((locale === "en" && d.title_en ? d.title_en : d.title_fr) as string) || "",
       description: ((locale === "en" && d.description_en ? d.description_en : d.description_fr) as string) || "",
@@ -106,13 +125,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const textes = await sql`
+  const textes = await safeRows("textes_juridiques", () => sql`
     SELECT title_fr, title_en, description_fr, description_en
-    FROM textes_juridiques WHERE deleted_at IS NULL AND active = TRUE
-      AND (title_fr ILIKE ${like} OR title_en ILIKE ${like} OR description_fr ILIKE ${like} OR description_en ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const t of textes.rows) {
+    FROM textes_juridiques WHERE deleted_at IS NULL AND active = TRUE LIMIT 200
+  `);
+  for (const t of textes) {
     results.push({
       title: ((locale === "en" && t.title_en ? t.title_en : t.title_fr) as string) || "",
       description: ((locale === "en" && t.description_en ? t.description_en : t.description_fr) as string) || "",
@@ -120,13 +137,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const directions = await sql`
+  const directions = await safeRows("directions", () => sql`
     SELECT name_fr, name_en, description_fr, description_en
-    FROM directions WHERE deleted_at IS NULL AND active = TRUE
-      AND (name_fr ILIKE ${like} OR name_en ILIKE ${like} OR description_fr ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const d of directions.rows) {
+    FROM directions WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const d of directions) {
     results.push({
       title: ((locale === "en" && d.name_en ? d.name_en : d.name_fr) as string) || "",
       description: (((locale === "en" && d.description_en ? d.description_en : d.description_fr) as string) || "").replace(/<[^>]+>/g, "").slice(0, 160),
@@ -134,13 +149,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const structures = await sql`
+  const structures = await safeRows("structures", () => sql`
     SELECT name_fr, name_en, description_fr, description_en
-    FROM structures WHERE deleted_at IS NULL AND active = TRUE
-      AND (name_fr ILIKE ${like} OR name_en ILIKE ${like} OR description_fr ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const s of structures.rows) {
+    FROM structures WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const s of structures) {
     results.push({
       title: ((locale === "en" && s.name_en ? s.name_en : s.name_fr) as string) || "",
       description: (((locale === "en" && s.description_en ? s.description_en : s.description_fr) as string) || "").replace(/<[^>]+>/g, "").slice(0, 160),
@@ -148,13 +161,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const cabinet = await sql`
+  const cabinet = await safeRows("cabinet_members", () => sql`
     SELECT role_fr, role_en, description_fr, description_en
-    FROM cabinet_members WHERE deleted_at IS NULL AND active = TRUE
-      AND (role_fr ILIKE ${like} OR role_en ILIKE ${like} OR description_fr ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const c of cabinet.rows) {
+    FROM cabinet_members WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const c of cabinet) {
     results.push({
       title: ((locale === "en" && c.role_en ? c.role_en : c.role_fr) as string) || "",
       description: (((locale === "en" && c.description_en ? c.description_en : c.description_fr) as string) || "").replace(/<[^>]+>/g, "").slice(0, 160),
@@ -162,13 +173,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const partners = await sql`
+  const partners = await safeRows("partners", () => sql`
     SELECT name, full_fr, full_en, description_fr, description_en
-    FROM partners WHERE deleted_at IS NULL AND active = TRUE
-      AND (name ILIKE ${like} OR full_fr ILIKE ${like} OR description_fr ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const p of partners.rows) {
+    FROM partners WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const p of partners) {
     results.push({
       title: (p.name as string) || "",
       description: ((locale === "en" && p.description_en ? p.description_en : p.description_fr) as string) || "",
@@ -176,13 +185,11 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const eservices = await sql`
+  const eservices = await safeRows("eservices", () => sql`
     SELECT title_fr, title_en, description_fr, description_en
-    FROM eservices WHERE deleted_at IS NULL AND active = TRUE
-      AND (title_fr ILIKE ${like} OR title_en ILIKE ${like} OR description_fr ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const e of eservices.rows) {
+    FROM eservices WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const e of eservices) {
     results.push({
       title: ((locale === "en" && e.title_en ? e.title_en : e.title_fr) as string) || "",
       description: ((locale === "en" && e.description_en ? e.description_en : e.description_fr) as string) || "",
@@ -190,12 +197,10 @@ export async function searchSite(query: string, locale: Locale): Promise<SearchR
     });
   }
 
-  const videos = await sql`
-    SELECT title_fr, title_en FROM videos WHERE deleted_at IS NULL AND active = TRUE
-      AND (title_fr ILIKE ${like} OR title_en ILIKE ${like})
-    LIMIT 10
-  `;
-  for (const v of videos.rows) {
+  const videos = await safeRows("videos", () => sql`
+    SELECT title_fr, title_en FROM videos WHERE deleted_at IS NULL AND active = TRUE LIMIT 100
+  `);
+  for (const v of videos) {
     results.push({
       title: ((locale === "en" && v.title_en ? v.title_en : v.title_fr) as string) || "",
       description: "", category: "Pages", href: "/videotheque",

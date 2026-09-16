@@ -12,7 +12,7 @@ const JAUNE = "#FFBE00";
 const BOX_MINISTER = "#006828";
 const BOX_BLUE = "#0369a1";
 const BOX_ORANGE = "#ea8c00";
-const BOX_GREEN = "#0D9488"; // teal distinct du vert officiel gouvernemental (#006828, réservé au Ministre)
+const BOX_GREEN = "#0A7A6F"; // ANO-096 : #0D9488 ne donnait que 3.74:1 avec le texte blanc des boîtes (SBIN, ASIN...), sous le seuil AA de 4.5:1. Cette teinte assombrie de la même famille teal donne 5.2:1.
 const BOX_WHITE = "white";
 
 function Box({ label, sub, bg, text = "white", border, wide }: { label: string; sub?: string; bg: string; text?: string; border?: string; wide?: boolean }) {
@@ -99,7 +99,9 @@ export default async function OrganigrammePage({ params }: Props) {
             ].map((item) => (
               <span key={item.label} className="flex items-center gap-1.5">
                 <span className="inline-block w-3 h-3 flex-shrink-0" style={{ background: item.color, border: item.border }} />
-                <span className="text-[10px] font-medium text-anthracite/60">{item.label}</span>
+                {/* ANO-096 : /60 (~4.4-4.57:1 selon l'outil de mesure) est
+                    à la limite du seuil AA de 4.5:1. /65 donne ~5.4:1. */}
+                <span className="text-[10px] font-medium text-anthracite/65">{item.label}</span>
               </span>
             ))}
           </div>
