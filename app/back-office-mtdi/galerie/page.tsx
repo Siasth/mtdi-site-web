@@ -121,6 +121,10 @@ export default function AdminGalerie() {
       setSaveError("Veuillez importer une image avant d'enregistrer.");
       return;
     }
+    if (itemForm.type === "video" && !itemForm.videoUrl) {
+      setSaveError("Veuillez renseigner un lien ou importer un fichier vidéo avant d'enregistrer un élément de type vidéo.");
+      return;
+    }
     setSaving(true);
     setSaveError("");
     const isNew = editingItem === "new";
@@ -454,8 +458,8 @@ export default function AdminGalerie() {
 
             {itemForm.type === "video" && (
               <div>
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="video-fichier-ou-lien-youtube">Vidéo (fichier ou lien YouTube)</label>
-                <input id="video-fichier-ou-lien-youtube" type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="video-fichier-ou-lien-youtube">Vidéo (fichier ou lien YouTube) *</label>
+                <input id="video-fichier-ou-lien-youtube" required type="url" pattern={URL_PATTERN} title="URL valide commençant par http:// ou https://" value={itemForm.videoUrl} onChange={(e) => setItemForm({ ...itemForm, videoUrl: e.target.value })} placeholder="https://youtube.com/... ou uploadez un fichier" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-2" />
                 <label className="inline-flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
                   {uploading ? "Import en cours…" : "Ou uploader un fichier vidéo"}
                   <input type="file" accept="video/*" className="hidden" disabled={uploading} onChange={(e) => handleUpload("videoUrl", e)} />
