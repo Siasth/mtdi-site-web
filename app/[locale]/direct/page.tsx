@@ -60,6 +60,7 @@ export default async function DirectPage({ params }: Props) {
                     playsInline
                     className="absolute inset-0 w-full h-full"
                     aria-label={liveTitle}
+                    title={liveTitle}
                   />
                 ) : (
                   <iframe

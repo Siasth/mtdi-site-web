@@ -81,12 +81,17 @@ export default function HeroSection({ slides: initialSlides, dict }: { slides?: 
                 muted
                 loop
                 playsInline
+                aria-label={slide.alt || "Vidéo de présentation"}
+                title={slide.alt || "Vidéo de présentation"}
                 className="absolute inset-0 w-full h-full object-cover"
                 tabIndex={-1}
               />
               {/* ANO-081 : les balises <video> n'ont pas d'équivalent à alt=,
-                  on fournit donc un texte de remplacement dédié. */}
-              <span className="sr-only">{slide.alt}</span>
+                  on fournit donc un texte de remplacement dédié. Le repli
+                  "Vidéo de présentation" couvre le cas d'une diapositive
+                  créée avant que le texte alternatif ne devienne obligatoire
+                  côté back-office, pour ne jamais rien annoncer de vide. */}
+              <span className="sr-only">{slide.alt || "Vidéo de présentation"}</span>
             </>
           ) : (
             <Image

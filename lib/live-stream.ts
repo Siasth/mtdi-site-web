@@ -17,8 +17,14 @@ export type LiveStreamSettings = {
 
 export const LIVE_STREAM_DEFAULTS: LiveStreamSettings = {
   isLive: false,
-  provider: "",
-  url: "",
+  // ANO-089 : exemple réel et fonctionnel pré-rempli (vidéo YouTube déjà
+  // utilisée ailleurs sur le site, cf. médiathèque), pour que l'administrateur
+  // puisse tester/démontrer le mécanisme sans avoir à chercher une URL. Le
+  // champ reste modifiable librement et la diffusion n'est pas active par
+  // défaut (isLive: false) : rien ne s'affiche comme "en direct" tant que
+  // l'administrateur ne l'active pas lui-même depuis le back-office.
+  provider: "youtube",
+  url: "https://www.youtube.com/watch?v=ANyQSwEspC0",
   titleFr: "",
   titleEn: "",
 };

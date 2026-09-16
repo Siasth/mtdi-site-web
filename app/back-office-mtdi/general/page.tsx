@@ -252,7 +252,7 @@ export default function AdminGeneral() {
             <p className="text-xs text-gray-400 mt-1">Affiche un lien "Voir sur la carte" sur la page Contact si renseigné.</p>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="document-de-la-strategie-nationale-d-ia-">Document de la Stratégie Nationale d'IA (lien de téléchargement)</label>
+            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="document-de-la-strategie-nationale-d-ia-">Document de la Stratégie Nationale d'IA (lien de téléchargement — affiché aux deux endroits de la page Stratégie IA : le bouton en haut de page et celui en bas)</label>
             <input id="document-de-la-strategie-nationale-d-ia-"
               type="url"
               pattern={URL_PATTERN}

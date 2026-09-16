@@ -68,7 +68,8 @@ export default function GrandsChantiers({ dict, chantiers = [] }: { dict?: HomeD
                     playsInline
                     className="absolute inset-0 w-full h-full object-cover"
                     style={{ objectPosition: c.objectPosition }}
-                    aria-label={c.title}
+                    aria-label={c.title || "Vidéo de présentation du chantier"}
+                    title={c.title || "Vidéo de présentation du chantier"}
                   />
                 ) : (
                   <Image

@@ -68,7 +68,7 @@ export default async function Galerie({ dict, locale = "fr" }: { dict?: HomeDict
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
                 {item.type === "video" && item.videoUrl && (
-                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
                     <svg width="18" height="18" fill="#006828" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                   </div>
                 )}
