@@ -73,7 +73,10 @@ function score(title: string, description: string, terms: string[], fullQuery: s
 // recherche dans les Rubriques statiques ci-dessus, qui ne dépend pourtant
 // pas de la base de données. Résultat observé : "Aucun résultat" pour
 // n'importe quelle recherche, même les plus évidentes.
-async function safeRows<T>(label: string, fn: () => Promise<{ rows: T[] }>): Promise<T[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- lignes de
+// résultat SQL, castées champ par champ (as string) à l'usage plus bas,
+// comme partout ailleurs dans ce fichier.
+async function safeRows(label: string, fn: () => Promise<{ rows: any[] }>): Promise<any[]> {
   try {
     const r = await fn();
     return r.rows;
