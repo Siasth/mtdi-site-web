@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { uploadFile } from "@/lib/client-upload";
 import { useHasPermission } from "../AdminLayoutClient";
 import { URL_PATTERN } from "@/lib/validators";
+import { EMAIL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -204,7 +205,7 @@ export default function AdminGeneral() {
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="email-presse">
               Email presse (page Kit presse)
             </label>
-            <input id="email-presse" type="email" value={form.pressEmail} onChange={(e) => setForm({ ...form, pressEmail: e.target.value })} placeholder="mtdi.presse@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="email-presse" type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={form.pressEmail} onChange={(e) => setForm({ ...form, pressEmail: e.target.value })} placeholder="mtdi.presse@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
       
           </div>
           <div>

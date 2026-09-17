@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useHasPermission } from "../AdminLayoutClient";
+import { EMAIL_PATTERN } from "@/lib/validators";
 
 const VERT = "#006828";
 
@@ -146,7 +147,7 @@ export default function AdminAdministration() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="utilisateur">Utilisateur *</label>
-            <input id="utilisateur" required type="email" value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="utilisateur" required type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={smtp.user} onChange={(e) => setSmtp({ ...smtp, user: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="mot-de-passe">Mot de passe</label>
@@ -160,7 +161,7 @@ export default function AdminAdministration() {
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" htmlFor="adresse-d-expedition">Adresse d'expédition *</label>
-            <input id="adresse-d-expedition" required type="email" value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
+            <input id="adresse-d-expedition" required type="email" pattern={EMAIL_PATTERN} title="Adresse email valide, ex : nom@domaine.fr" value={smtp.from} onChange={(e) => setSmtp({ ...smtp, from: e.target.value })} placeholder="contact@gouv.bj" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm" />
           </div>
 
           {smtpMsg && <p className={`text-sm ${smtpMsg.type === "success" ? "text-green-600" : "text-red-600"}`}>{smtpMsg.text}</p>}

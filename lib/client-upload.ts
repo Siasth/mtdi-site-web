@@ -46,13 +46,68 @@ export async function uploadFile(file: File, previousUrl?: string): Promise<{ ur
 // stockage, qui n'apporte rien à l'utilisateur et nuit à la lisibilité du
 // formulaire (ANO-132, appliqué de façon cohérente partout où un fichier est
 // importé dans le back-office).
+//
+// Vercel Blob ajoute par défaut un suffixe aléatoire au nom de fichier
+// original pour éviter toute collision (ex: "discours-AbC123XyZ9kLmNoPq.mp4"
+// pour un fichier importé sous le nom "discours.mp4"). On ne retire que le
+// dernier segment séparé par un tiret s'il ressemble vraiment à un
+// identifiant généré (mélange de casses et de chiffres, sans quoi on
+// risquerait d'amputer un vrai nom à tirets comme "rapport-annuel-2026").
+// S'il ne reste plus rien d'exploitable une fois ce suffixe retiré (ou si
+// le nom d'origine était lui-même déjà un identifiant illisible), on
+// fabrique un nom générique plutôt que d'afficher une suite de caractères
+// sans signification.
+function looksLikeRandomToken(segment: string): boolean {
+  if (segment.length < 16) return false;
+  const hasLower = /[a-z]/.test(segment);
+  const hasUpper = /[A-Z]/.test(segment);
+  const hasDigit = /[0-9]/.test(segment);
+  // Un vrai mot n'alterne pas les casses de façon erratique ; un identifiant
+  // généré mélange typiquement minuscules/majuscules/chiffres sans motif.
+  return hasDigit && hasLower && hasUpper;
+}
+
+function genericFileName(extension: string): string {
+  const ext = extension.toLowerCase();
+  if (["mp4", "webm", "mov", "m4v"].includes(ext)) return `Fichier vidéo.${ext}`;
+  if (["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext)) return `Fichier image.${ext}`;
+  if (ext === "pdf") return `Document.${ext}`;
+  if (["doc", "docx"].includes(ext)) return `Document Word.${ext}`;
+  if (["xls", "xlsx"].includes(ext)) return `Document Excel.${ext}`;
+  return extension ? `Fichier importé.${ext}` : "Fichier importé";
+}
+
 export function fileNameFromUrl(url: string): string {
+  let raw: string;
   try {
     const parts = new URL(url).pathname.split("/");
-    return decodeURIComponent(parts[parts.length - 1] || url);
+    raw = decodeURIComponent(parts[parts.length - 1] || url);
   } catch {
-    return url;
+    raw = url;
   }
+
+  const extMatch = raw.match(/\.([a-zA-Z0-9]+)$/);
+  const extension = extMatch ? extMatch[1] : "";
+  const baseName = extension ? raw.slice(0, -(extension.length + 1)) : raw;
+
+  const segments = baseName.split("-");
+  const lastSegment = segments[segments.length - 1];
+  const withoutSuffix = segments.length > 1 && looksLikeRandomToken(lastSegment)
+    ? segments.slice(0, -1).join("-")
+    : baseName;
+
+  const cleanedName = extension ? `${withoutSuffix}.${extension}` : withoutSuffix;
+
+  // Un nom "exploitable" contient au moins une lettre (pas seulement des
+  // chiffres/tirets) et n'est pas lui-même un identifiant aléatoire (cas
+  // d'un fichier dont le nom d'origine était déjà un simple hash, sans
+  // séparateur permettant d'isoler un éventuel suffixe).
+  const looksMeaningful =
+    /[a-zA-Zà-üÀ-Ü]/.test(withoutSuffix) &&
+    withoutSuffix.replace(/[-_]/g, "").length >= 3 &&
+    !looksLikeRandomToken(withoutSuffix);
+
+  return looksMeaningful ? cleanedName : genericFileName(extension);
 }
 
 export function cleanupOldFile(url: string) {
