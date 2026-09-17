@@ -328,7 +328,9 @@
     "appelsOffresMessage": "Public contracts related to the Ministry are published on the national government tender platform. Consult the platform to access current tender files.",
     "abonnerNewsletter": "Subscribe to the newsletter",
     "consulterAppelsOffres": "View the call for tenders",
-    "voirOffre": "View offer"
+    "voirOffre": "View offer",
+    "consulterOffreStage": "View the internship offer",
+    "consulterOffreEmploi": "View the job offer"
   },
   "documentheque": {
     "titre": "Document Library",

@@ -328,7 +328,9 @@
     "appelsOffresMessage": "Les marchés publics liés au Ministère sont publiés sur la plateforme nationale des appels d'offres du Gouvernement du Bénin. Consultez la plateforme pour accéder aux dossiers d'appel d'offres en cours.",
     "abonnerNewsletter": "S'abonner à la newsletter",
     "consulterAppelsOffres": "Consulter l'appel d'offre",
-    "voirOffre": "Voir l'offre"
+    "voirOffre": "Voir l'offre",
+    "consulterOffreStage": "Consulter l'offre de stage",
+    "consulterOffreEmploi": "Consulter l'offre d'emploi"
   },
   "documentheque": {
     "titre": "Documenthèque",

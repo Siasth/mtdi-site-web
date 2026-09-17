@@ -28,6 +28,14 @@ export default async function ParticiperPage({ params }: Props) {
   ]);
   const { appelsOffresExternalUrl } = await getGeneralSettings();
 
+  // ANO-111 : le libellé du lien doit refléter la nature réelle de l'offre
+  // (appel d'offres / stage / emploi), pas un texte générique unique.
+  const offerCtaLabels: Record<string, string> = {
+    "appels-offres": t.consulterAppelsOffres,
+    stages: t.consulterOffreStage,
+    emplois: t.consulterOffreEmploi,
+  };
+
   const sections = [
     {
       id: "appels-offres",
@@ -125,9 +133,7 @@ export default async function ParticiperPage({ params }: Props) {
               {section.offers.length > 0 ? (
                 <OffersListClient
                   offers={section.offers}
-                  ctaExternal={section.cta.external}
-                  consulterAppelsOffres={t.consulterAppelsOffres}
-                  voirOffre={t.voirOffre}
+                  ctaLabel={offerCtaLabels[section.id] || t.voirOffre}
                 />
               ) : (
                 <div

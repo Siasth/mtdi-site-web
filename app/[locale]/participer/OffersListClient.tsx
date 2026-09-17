@@ -10,14 +10,10 @@ const PAGE_SIZE = 6;
 
 export default function OffersListClient({
   offers,
-  ctaExternal,
-  consulterAppelsOffres,
-  voirOffre,
+  ctaLabel,
 }: {
   offers: Opportunite[];
-  ctaExternal: boolean;
-  consulterAppelsOffres: string;
-  voirOffre: string;
+  ctaLabel: string;
 }) {
   const [page, setPage] = useState(1);
   const { pageItems, totalPages, safePage } = paginate(offers, page, PAGE_SIZE);
@@ -41,7 +37,7 @@ export default function OffersListClient({
               className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider transition-all hover:gap-4"
               style={{ color: VERT }}
             >
-              {ctaExternal ? consulterAppelsOffres : voirOffre}
+              {ctaLabel}
               <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" /></svg>
             </a>
           )}
